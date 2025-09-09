@@ -1,4 +1,4 @@
-import * as fs from "node:fs";
+import * as fs from "fs";
 
 import { defined, exceptionToString } from "@glideapps/ts-necessities";
 import { isNode } from "browser-or-node";
