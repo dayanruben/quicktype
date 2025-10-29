@@ -385,19 +385,16 @@ export class PhpRenderer extends ConvenienceRenderer {
             (_classType) =>
                 this.emitLine(...lhs, ...args, "->to(); ", "/*class*/"),
             (mapType) => {
-                this.emitBlock(["function to($my): stdClass"], () => {
-                    this.emitLine("$out = new stdClass();");
-                    this.emitBlock(["foreach ($my as $k => $v)"], () => {
-                        this.phpToObjConvert(
-                            className,
-                            mapType.values,
-                            ["$my->$k = "],
-                            ["$v"],
-                        );
-                    });
-                    this.emitLine("return $out;");
+                this.emitLine("$out = new stdClass();");
+                this.emitBlock(["foreach (", ...args, " as $k => $v)"], () => {
+                    this.phpToObjConvert(
+                        className,
+                        mapType.values,
+                        ["$out->$k = "],
+                        ["$v"],
+                    );
                 });
-                this.emitLine("return to(", ...args, ");");
+                this.emitLine("return $out;");
             },
             (enumType) =>
                 this.emitLine(
@@ -494,19 +491,16 @@ export class PhpRenderer extends ConvenienceRenderer {
                     "/*class*/",
                 ),
             (mapType) => {
-                this.emitBlock(["function from($my): stdClass"], () => {
-                    this.emitLine("$out = new stdClass();");
-                    this.emitBlock(["foreach ($my as $k => $v)"], () => {
-                        this.phpFromObjConvert(
-                            className,
-                            mapType.values,
-                            ["$out->$k = "],
-                            ["$v"],
-                        );
-                    });
-                    this.emitLine("return $out;");
+                this.emitLine("$out = new stdClass();");
+                this.emitBlock(["foreach (", ...args, " as $k => $v)"], () => {
+                    this.phpFromObjConvert(
+                        className,
+                        mapType.values,
+                        ["$out->$k = "],
+                        ["$v"],
+                    );
                 });
-                this.emitLine("return from(", ...args, ");");
+                this.emitLine("return $out;");
             },
             (enumType) =>
                 this.emitLine(
