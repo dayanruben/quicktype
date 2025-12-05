@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "enum": ["SOME_OTHER_VALUE", "MULTI_SPA_IN_GROUP_REJECTED"]
+    }
+  }
+}
