@@ -64,7 +64,7 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
 
         return matchType<MultiWord>(
             t,
-            (_anyType) => singleWord("any"),
+            (_anyType) => singleWord(this.anyType()),
             (_nullType) => singleWord("null"),
             (_boolType) => singleWord("boolean"),
             (_integerType) => singleWord("number"),
@@ -112,6 +112,8 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
             },
         );
     }
+
+    protected abstract anyType(): string;
 
     protected abstract emitEnum(e: EnumType, enumName: Name): void;
 
@@ -198,7 +200,7 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
 
     protected deserializerFunctionLine(t: Type, name: Name): Sourcelike {
         const jsonType =
-            this._tsFlowOptions.rawType === "json" ? "string" : "any";
+            this._tsFlowOptions.rawType === "json" ? "string" : this.anyType();
         return [
             "function to",
             name,
@@ -212,7 +214,7 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
     protected serializerFunctionLine(t: Type, name: Name): Sourcelike {
         const camelCaseName = modifySource(camelCase, name);
         const returnType =
-            this._tsFlowOptions.rawType === "json" ? "string" : "any";
+            this._tsFlowOptions.rawType === "json" ? "string" : this.anyType();
         return [
             "function ",
             camelCaseName,
@@ -228,9 +230,10 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
     }
 
     protected get castFunctionLines(): [string, string] {
+        const a = this.anyType();
         return [
-            "function cast<T>(val: any, typ: any): T",
-            "function uncast<T>(val: T, typ: any): any",
+            `function cast<T>(val: ${a}, typ: ${a}): T`,
+            `function uncast<T>(val: T, typ: ${a}): ${a}`,
         ];
     }
 

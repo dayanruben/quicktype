@@ -6,16 +6,19 @@ import { isNamedType } from "../../Type/TypeUtils";
 import type { JavaScriptTypeAnnotations } from "../JavaScript";
 
 import { TypeScriptFlowBaseRenderer } from "./TypeScriptFlowBaseRenderer";
-import { tsFlowTypeAnnotations } from "./utils";
 
 export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
+    protected anyType(): string {
+        return this._tsFlowOptions.preferUnknown ? "unknown" : "any";
+    }
+
     protected forbiddenNamesForGlobalNamespace(): string[] {
         return ["Array", "Date"];
     }
 
     protected deserializerFunctionLine(t: Type, name: Name): Sourcelike {
         const jsonType =
-            this._tsFlowOptions.rawType === "json" ? "string" : "any";
+            this._tsFlowOptions.rawType === "json" ? "string" : this.anyType();
         return [
             "public static to",
             name,
@@ -29,7 +32,7 @@ export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
     protected serializerFunctionLine(t: Type, name: Name): Sourcelike {
         const camelCaseName = modifySource(camelCase, name);
         const returnType =
-            this._tsFlowOptions.rawType === "json" ? "string" : "any";
+            this._tsFlowOptions.rawType === "json" ? "string" : this.anyType();
         return [
             "public static ",
             camelCaseName,
@@ -45,7 +48,15 @@ export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
     }
 
     protected get typeAnnotations(): JavaScriptTypeAnnotations {
-        return Object.assign({ never: ": never" }, tsFlowTypeAnnotations);
+        const a = this.anyType();
+        return Object.assign({ never: ": never" }, {
+            any: `: ${a}`,
+            anyArray: `: ${a}[]`,
+            anyMap: `: { [k: string]: ${a} }`,
+            string: ": string",
+            stringArray: ": string[]",
+            boolean: ": boolean",
+        });
     }
 
     protected emitModuleExports(): void {

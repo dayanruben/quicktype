@@ -5,15 +5,26 @@ import type { ClassType, EnumType } from "../../Type";
 import type { JavaScriptTypeAnnotations } from "../JavaScript";
 
 import { TypeScriptFlowBaseRenderer } from "./TypeScriptFlowBaseRenderer";
-import { tsFlowTypeAnnotations } from "./utils";
 
 export class FlowRenderer extends TypeScriptFlowBaseRenderer {
+    protected anyType(): string {
+        return this._tsFlowOptions.preferUnknown ? "mixed" : "any";
+    }
+
     protected forbiddenNamesForGlobalNamespace(): string[] {
         return ["Class", "Date", "Object", "String", "Array", "JSON", "Error"];
     }
 
     protected get typeAnnotations(): JavaScriptTypeAnnotations {
-        return Object.assign({ never: "" }, tsFlowTypeAnnotations);
+        const a = this.anyType();
+        return Object.assign({ never: "" }, {
+            any: `: ${a}`,
+            anyArray: `: ${a}[]`,
+            anyMap: `: { [k: string]: ${a} }`,
+            string: ": string",
+            stringArray: ": string[]",
+            boolean: ": boolean",
+        });
     }
 
     protected emitEnum(e: EnumType, enumName: Name): void {

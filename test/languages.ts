@@ -839,6 +839,7 @@ export const TypeScriptLanguage: Language = {
         { "acronym-style": "pascal" },
         { converters: "all-objects" },
         { readonly: "true" },
+        { "prefer-unknown": "true" },
     ],
     sourceFiles: ["src/language/TypeScript/index.ts"],
 };
