@@ -11,8 +11,8 @@ The schema puts comment-closing text in both an object `description` and a prope
 
 - `*/` for C-style block comments
 - `-}` for Elm/Haskell comments
-- `"""` for Python/Elixir docstrings
-- `\r}` for line-comment outputs that do not split on carriage return
+- `"""` on its own line for Python/Elixir docstrings/heredocs
+- `\r}` for line-comment outputs whose parsers treat carriage return as a line terminator
 
 Run:
 
@@ -45,10 +45,14 @@ Outputs are affected when raw schema descriptions are placed into comments/docst
 
 - C-style doc comments `/** ... */`: TypeScript, Flow, Java, C (`cjson`), C++, PHP, Kotlin, Scala 3. Trigger with `*/`.
 - Elm/Haskell doc comments `{-| ... -}`: Elm, Haskell. Trigger with `-}`.
-- Triple-quoted docstrings: Python, Elixir. Trigger with `"""`.
-- Line comments (`//`, `///`, `#`): C#, Go, Rust, Ruby, Swift, Objective-C, Dart, Pike, Crystal, and enum comments in TypeScript-Zod/TypeScript-Effect-Schema. Trigger with a carriage return (`\r`) because descriptions are split on `\n`, leaving raw CR in the generated source.
+- Triple-quoted docstrings/heredocs: Python, Elixir. Trigger with `"""` on its own description line.
+- Line comments (`//`, `///`): C# and enum comments in TypeScript-Zod/TypeScript-Effect-Schema. Trigger with a carriage return (`\r`) because descriptions are split on `\n`, leaving raw CR in the generated source.
 
 Plain JavaScript output did not emit the tested schema descriptions into model comments, so the object/property reproduction does not affect it the same way. TypeScript-Zod and TypeScript-Effect-Schema also did not emit the object/property descriptions from `comment-injection.schema`; they only emitted the enum description from `comment-injection-enum.schema`.
+
+The tree-sitter fixture includes Go, Rust, and Ruby even though their grammars did not reproduce a syntax break with the CR line-comment payload; this keeps parser coverage in place for those generated outputs and future payload/escaping changes.
+
+Still not covered by the tree-sitter fixture: Swift, Objective-C, Dart, Pike, Crystal, Elixir, Kotlin, and Elm. Swift/Objective-C/Dart/Pike/Crystal/Elixir need compiler/toolchain or better grammar coverage for this bug class. Kotlin and Elm are affected by block-comment-style delimiters, but the available npm grammars were not usable with the WASM tree-sitter test added here.
 
 ## Test cases added
 
@@ -56,5 +60,7 @@ Plain JavaScript output did not emit the tested schema descriptions into model c
 - `test/inputs/schema/comment-injection-enum.schema` covers enum descriptions via an enum-valued property.
 
 The existing `JSONSchemaFixture` instances pick these samples up for schema-based language tests. Additional narrow `comment-injection-*` fixtures cover affected outputs that did not already have full schema fixtures: PHP and Objective-C use both samples; TypeScript-Zod and TypeScript-Effect-Schema use only the enum-description sample.
+
+A parser-only fixture, `comment-injection-treesitter`, generates all configured targets and parses them with tree-sitter WASM grammars. It currently covers TypeScript, TypeScript-Zod, TypeScript-Effect-Schema, C#, Java, C (`cjson`), C++, PHP, Go, Rust, Ruby, Python, Scala 3, and Haskell. It is intentionally one fixture/test that loops over all configured languages and reports all parse failures together.
 
 They are expected to fail for affected languages until comment escaping/sanitization is implemented.

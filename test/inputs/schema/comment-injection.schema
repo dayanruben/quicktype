@@ -1,10 +1,10 @@
 {
   "type": "object",
-  "description": "Comment delimiters: */ -} \"\"\"\r}",
+  "description": "Comment delimiters:\n*/\n-}\n\"\"\"\n}\r}",
   "properties": {
     "value": {
       "type": "string",
-      "description": "Property delimiters: */ -} \"\"\"\r}"
+      "description": "Property delimiters:\n*/\n-}\n\"\"\"\n}\r}"
     }
   },
   "required": ["value"],

@@ -818,6 +818,150 @@ class JSONSchemaFixture extends LanguageFixture {
     }
 }
 
+type TreeSitterTarget = {
+    displayName: string;
+    language: languages.Language;
+    output: string;
+    wasmModule: string;
+    extensions: string[];
+    schema: string;
+    allowMissingNodes?: boolean;
+};
+
+type TreeSitterParseProblem = {
+    type: string;
+    startPosition: unknown;
+    endPosition: unknown;
+};
+
+type TreeSitterParseFailure = {
+    language: string;
+    filename: string;
+    problems: TreeSitterParseProblem[];
+};
+
+const commentInjectionSchema = "test/inputs/schema/comment-injection.schema";
+const commentInjectionEnumSchema =
+    "test/inputs/schema/comment-injection-enum.schema";
+
+const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
+    {
+        displayName: "typescript",
+        language: languages.TypeScriptLanguage,
+        output: "TopLevel.ts",
+        wasmModule: "tree-sitter-typescript/tree-sitter-typescript.wasm",
+        extensions: [".ts"],
+        schema: commentInjectionSchema,
+    },
+    {
+        displayName: "typescript-zod",
+        language: languages.TypeScriptZodLanguage,
+        output: "TopLevel.ts",
+        wasmModule: "tree-sitter-typescript/tree-sitter-typescript.wasm",
+        extensions: [".ts"],
+        schema: commentInjectionEnumSchema,
+    },
+    {
+        displayName: "typescript-effect-schema",
+        language: languages.TypeScriptEffectSchemaLanguage,
+        output: "TopLevel.ts",
+        wasmModule: "tree-sitter-typescript/tree-sitter-typescript.wasm",
+        extensions: [".ts"],
+        schema: commentInjectionEnumSchema,
+    },
+    {
+        displayName: "csharp",
+        language: languages.CSharpLanguage,
+        output: "QuickType.cs",
+        wasmModule: "tree-sitter-c-sharp/tree-sitter-c_sharp.wasm",
+        extensions: [".cs"],
+        schema: commentInjectionSchema,
+    },
+    {
+        displayName: "java",
+        language: languages.JavaLanguage,
+        output: "TopLevel.java",
+        wasmModule: "tree-sitter-java/tree-sitter-java.wasm",
+        extensions: [".java"],
+        schema: commentInjectionSchema,
+    },
+    {
+        displayName: "cjson",
+        language: languages.CJSONLanguage,
+        output: "TopLevel.c",
+        wasmModule: "tree-sitter-c/tree-sitter-c.wasm",
+        extensions: [".c", ".h"],
+        schema: commentInjectionSchema,
+        // The generated C currently leaves tree-sitter with a missing #endif
+        // node even for a benign schema, so only ERROR nodes are actionable.
+        allowMissingNodes: true,
+    },
+    {
+        displayName: "cplusplus",
+        language: languages.CPlusPlusLanguage,
+        output: "TopLevel.cpp",
+        wasmModule: "tree-sitter-cpp/tree-sitter-cpp.wasm",
+        extensions: [".cpp", ".hpp", ".h"],
+        schema: commentInjectionSchema,
+    },
+    {
+        displayName: "php",
+        language: languages.PHPLanguage,
+        output: "TopLevel.php",
+        wasmModule: "tree-sitter-php/tree-sitter-php.wasm",
+        extensions: [".php"],
+        schema: commentInjectionSchema,
+    },
+    {
+        displayName: "go",
+        language: languages.GoLanguage,
+        output: "quicktype.go",
+        wasmModule: "tree-sitter-go/tree-sitter-go.wasm",
+        extensions: [".go"],
+        schema: commentInjectionSchema,
+    },
+    {
+        displayName: "rust",
+        language: languages.RustLanguage,
+        output: "module_under_test.rs",
+        wasmModule: "tree-sitter-rust/tree-sitter-rust.wasm",
+        extensions: [".rs"],
+        schema: commentInjectionSchema,
+    },
+    {
+        displayName: "ruby",
+        language: languages.RubyLanguage,
+        output: "TopLevel.rb",
+        wasmModule: "tree-sitter-ruby/tree-sitter-ruby.wasm",
+        extensions: [".rb"],
+        schema: commentInjectionSchema,
+    },
+    {
+        displayName: "python",
+        language: languages.PythonLanguage,
+        output: "quicktype.py",
+        wasmModule: "tree-sitter-python/tree-sitter-python.wasm",
+        extensions: [".py"],
+        schema: commentInjectionSchema,
+    },
+    {
+        displayName: "scala3",
+        language: languages.Scala3Language,
+        output: "TopLevel.scala",
+        wasmModule: "tree-sitter-scala/tree-sitter-scala.wasm",
+        extensions: [".scala"],
+        schema: commentInjectionSchema,
+    },
+    {
+        displayName: "haskell",
+        language: languages.HaskellLanguage,
+        output: "QuickType.hs",
+        wasmModule: "tree-sitter-haskell/tree-sitter-haskell.wasm",
+        extensions: [".hs"],
+        schema: commentInjectionSchema,
+    },
+];
+
 function graphQLSchemaFilename(baseName: string): string {
     const baseMatch = baseName.match(/(.*\D)\d+$/);
     if (baseMatch === null) {
@@ -846,6 +990,176 @@ class CommentInjectionSchemaFixture extends JSONSchemaFixture {
 
     getSamples(sources: string[]): { priority: Sample[]; others: Sample[] } {
         return samplesFromSources(sources, this._samples, [], "schema");
+    }
+}
+
+function collectFilesWithExtensions(
+    directory: string,
+    extensions: string[],
+): string[] {
+    const result: string[] = [];
+    for (const entry of fs.readdirSync(directory)) {
+        const fullPath = path.join(directory, entry);
+        const stat = fs.statSync(fullPath);
+        if (stat.isDirectory()) {
+            result.push(...collectFilesWithExtensions(fullPath, extensions));
+        } else if (extensions.includes(path.extname(entry))) {
+            result.push(fullPath);
+        }
+    }
+    return result;
+}
+
+class CommentInjectionTreeSitterFixture extends Fixture {
+    name = "comment-injection-treesitter";
+
+    constructor() {
+        super(languages.TypeScriptLanguage);
+    }
+
+    runForName(name: string): boolean {
+        return this.name === name;
+    }
+
+    async setup(): Promise<void> {
+        return;
+    }
+
+    getSamples(sources: string[]): { priority: Sample[]; others: Sample[] } {
+        const sample = {
+            path: commentInjectionSchema,
+            additionalRendererOptions: {},
+            saveOutput: false,
+        };
+        if (sources.length === 0) {
+            return { priority: [sample], others: [] };
+        }
+
+        const sourcePaths = _.flatMap(sources, (source) =>
+            fs.existsSync(source) && fs.lstatSync(source).isDirectory()
+                ? testsInDir(source, "schema")
+                : [source],
+        );
+        const selected = sourcePaths.some((source) =>
+            [commentInjectionSchema, commentInjectionEnumSchema]
+                .map((schema) => path.basename(schema))
+                .includes(path.basename(source)),
+        );
+        return { priority: selected ? [sample] : [], others: [] };
+    }
+
+    private async parseGeneratedFiles(
+        TreeSitter: any,
+        target: TreeSitterTarget,
+        generatedFiles: string[],
+    ): Promise<TreeSitterParseFailure[]> {
+        const parser = new TreeSitter.Parser();
+        const language = await TreeSitter.Language.load(
+            require.resolve(target.wasmModule),
+        );
+        parser.setLanguage(language);
+
+        const failures: TreeSitterParseFailure[] = [];
+
+        for (const filename of generatedFiles) {
+            const source = fs.readFileSync(filename, "utf8");
+            const tree = parser.parse(source);
+            const problems: TreeSitterParseProblem[] = [];
+
+            function visit(node: any): void {
+                if (
+                    node.type === "ERROR" ||
+                    (node.isMissing && !target.allowMissingNodes)
+                ) {
+                    problems.push({
+                        type: node.isMissing
+                            ? `MISSING ${node.type}`
+                            : node.type,
+                        startPosition: node.startPosition,
+                        endPosition: node.endPosition,
+                    });
+                }
+
+                for (let i = 0; i < node.childCount; i++) {
+                    visit(node.child(i));
+                }
+            }
+
+            visit(tree.rootNode);
+
+            if (problems.length > 0) {
+                failures.push({
+                    language: target.displayName,
+                    filename,
+                    problems: problems.slice(0, 10),
+                });
+            }
+        }
+
+        return failures;
+    }
+
+    async runWithSample(
+        sample: Sample,
+        index: number,
+        total: number,
+    ): Promise<void> {
+        const cwd = this.getRunDirectory();
+        const message = this.runMessageStart(sample, index, total, cwd, false);
+        mkdirs(cwd);
+
+        const TreeSitter = require("web-tree-sitter");
+        await TreeSitter.Parser.init();
+
+        const repoRoot = process.cwd();
+        let parsedFileCount = 0;
+        const failures: TreeSitterParseFailure[] = [];
+        await inDir(cwd, async () => {
+            for (const target of commentInjectionTreeSitterTargets) {
+                const outputDir = path.join(target.displayName);
+                mkdirs(outputDir);
+                const targetLanguage = {
+                    ...target.language,
+                    output: path.join(outputDir, target.output),
+                };
+                await quicktypeForLanguage(
+                    targetLanguage,
+                    path.join(repoRoot, target.schema),
+                    "schema",
+                    false,
+                    {},
+                );
+
+                const generatedFiles = collectFilesWithExtensions(
+                    outputDir,
+                    target.extensions,
+                );
+                if (generatedFiles.length === 0) {
+                    failWith("No generated files to parse", {
+                        language: target.displayName,
+                        outputDir,
+                        extensions: target.extensions,
+                    });
+                }
+
+                failures.push(
+                    ...(await this.parseGeneratedFiles(
+                        TreeSitter,
+                        target,
+                        generatedFiles,
+                    )),
+                );
+                parsedFileCount += generatedFiles.length;
+            }
+        });
+
+        if (failures.length > 0) {
+            failWith("tree-sitter parse found syntax errors", {
+                failures,
+            });
+        }
+
+        this.runMessageEnd(message, parsedFileCount);
     }
 }
 
@@ -1123,6 +1437,7 @@ export const allFixtures: Fixture[] = [
     new CommentInjectionSchemaFixture(languages.TypeScriptEffectSchemaLanguage, [
         "test/inputs/schema/comment-injection-enum.schema",
     ]),
+    new CommentInjectionTreeSitterFixture(),
     // FIXME: Why are we missing so many language with GraphQL?
     new GraphQLFixture(languages.CSharpLanguage),
     new GraphQLFixture(languages.JavaLanguage),

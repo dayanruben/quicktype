@@ -4,7 +4,7 @@
     "kind": {
       "type": "string",
       "enum": ["ok"],
-      "description": "Comment delimiters: */ -} \"\"\"\r}"
+      "description": "Comment delimiters:\n*/\n-}\n\"\"\"\n}\r}"
     }
   },
   "required": ["kind"],
