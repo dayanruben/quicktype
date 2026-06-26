@@ -20,9 +20,9 @@ Run:
 CPUs=1 QUICKTEST=true FIXTURE=schema-typescript npm test -- test/inputs/schema/comment-injection.schema
 ```
 
-Expected after a fix: the generated TypeScript validates `comment-injection.1.json` and prints equivalent JSON.
+Expected result: the generated TypeScript validates `comment-injection.1.json` and prints equivalent JSON.
 
-Current result: the test fails before validation because `TopLevel.ts` is syntactically invalid; the schema `description` escapes the generated `/** ... */` comment.
+Before escaping was added, this test failed before validation because `TopLevel.ts` was syntactically invalid; the schema `description` escaped the generated `/** ... */` comment.
 
 ## Schema fields that can reach comments
 
@@ -41,12 +41,12 @@ Other non-schema inputs can also supply descriptions or leading comments, but th
 
 ## Potentially affected outputs and triggers
 
-Outputs are affected when raw schema descriptions are placed into comments/docstrings without escaping that target's comment delimiter or line terminators.
+Outputs are affected when raw schema descriptions are placed into comments/docstrings without escaping that target's comment delimiter or line terminators. The shared fix now normalizes description line endings and escapes delimiter text at comment-emission time.
 
-- C-style doc comments `/** ... */`: TypeScript, Flow, Java, C (`cjson`), C++, PHP, Kotlin, Scala 3. Trigger with `*/`.
-- Elm/Haskell doc comments `{-| ... -}`: Elm, Haskell. Trigger with `-}`.
-- Triple-quoted docstrings/heredocs: Python, Elixir. Trigger with `"""` on its own description line.
-- Line comments (`//`, `///`): C# and enum comments in TypeScript-Zod/TypeScript-Effect-Schema. Trigger with a carriage return (`\r`) because descriptions are split on `\n`, leaving raw CR in the generated source.
+- C-style doc comments `/** ... */`: TypeScript, Flow, JavaScript when descriptions are emitted, Java, C (`cjson`), C++, PHP, Kotlin, Scala 3, Smithy4s. Trigger with `*/`; escaped as `* /`.
+- Elm/Haskell doc comments `{-| ... -}`: Elm, Haskell. Trigger with `-}`; escaped as `- }`.
+- Triple-quoted docstrings/heredocs: Python, Elixir. Trigger with `"""` on its own description line; escaped as `\"\"\"`.
+- Line comments (`//`, `///`): C#, Go, Rust, Ruby, Swift, Objective-C, Dart, Pike, Crystal, and enum comments in TypeScript-Zod/TypeScript-Effect-Schema. Trigger with a carriage return (`\r`) when descriptions are split only on `\n`; fixed by normalizing `\r\n?` to `\n` before comment emission.
 
 Plain JavaScript output did not emit the tested schema descriptions into model comments, so the object/property reproduction does not affect it the same way. TypeScript-Zod and TypeScript-Effect-Schema also did not emit the object/property descriptions from `comment-injection.schema`; they only emitted the enum description from `comment-injection-enum.schema`.
 
@@ -63,4 +63,4 @@ The existing `JSONSchemaFixture` instances pick these samples up for schema-base
 
 A parser-only fixture, `comment-injection-treesitter`, generates all configured targets and parses them with tree-sitter WASM grammars. It currently covers TypeScript, TypeScript-Zod, TypeScript-Effect-Schema, C#, Java, C (`cjson`), C++, PHP, Go, Rust, Ruby, Python, Scala 3, and Haskell. It is intentionally one fixture/test that loops over all configured languages and reports all parse failures together.
 
-They are expected to fail for affected languages until comment escaping/sanitization is implemented.
+These are regression tests and should pass with the shared comment escaping/sanitization in place.
