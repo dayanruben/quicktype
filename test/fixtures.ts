@@ -829,6 +829,26 @@ function graphQLSchemaFilename(baseName: string): string {
     return `${baseMatch[1]}.gqlschema`;
 }
 
+class CommentInjectionSchemaFixture extends JSONSchemaFixture {
+    constructor(
+        language: languages.Language,
+        private readonly _samples: string[] = [
+            "test/inputs/schema/comment-injection.schema",
+            "test/inputs/schema/comment-injection-enum.schema",
+        ],
+    ) {
+        super(language, `comment-injection-${language.name}`);
+    }
+
+    runForName(name: string): boolean {
+        return this.name === name || name === "comment-injection";
+    }
+
+    getSamples(sources: string[]): { priority: Sample[]; others: Sample[] } {
+        return samplesFromSources(sources, this._samples, [], "schema");
+    }
+}
+
 class GraphQLFixture extends LanguageFixture {
     constructor(
         language: languages.Language,
@@ -1095,6 +1115,14 @@ export const allFixtures: Fixture[] = [
     new JSONSchemaFixture(languages.PikeLanguage),
     new JSONSchemaFixture(languages.HaskellLanguage),
     new JSONSchemaFixture(languages.ElixirLanguage),
+    new CommentInjectionSchemaFixture(languages.PHPLanguage),
+    new CommentInjectionSchemaFixture(languages.ObjectiveCLanguage),
+    new CommentInjectionSchemaFixture(languages.TypeScriptZodLanguage, [
+        "test/inputs/schema/comment-injection-enum.schema",
+    ]),
+    new CommentInjectionSchemaFixture(languages.TypeScriptEffectSchemaLanguage, [
+        "test/inputs/schema/comment-injection-enum.schema",
+    ]),
     // FIXME: Why are we missing so many language with GraphQL?
     new GraphQLFixture(languages.CSharpLanguage),
     new GraphQLFixture(languages.JavaLanguage),

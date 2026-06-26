@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "description": "Comment delimiters: */ -} \"\"\"\r}",
+  "properties": {
+    "value": {
+      "type": "string",
+      "description": "Property delimiters: */ -} \"\"\"\r}"
+    }
+  },
+  "required": ["value"],
+  "additionalProperties": false
+}
