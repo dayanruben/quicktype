@@ -10,7 +10,7 @@ Added a focused schema fixture:
 The schema puts comment-closing text in both an object `description` and a property `description`:
 
 - `*/` for C-style block comments
-- `-}` for Elm/Haskell comments
+- `{-` and `-}` for Elm/Haskell comments
 - `"""` on its own line for Python/Elixir docstrings/heredocs
 - `\r}` for line-comment outputs whose parsers treat carriage return as a line terminator
 
@@ -44,7 +44,7 @@ Other non-schema inputs can also supply descriptions or leading comments, but th
 Outputs are affected when raw schema descriptions are placed into comments/docstrings without escaping that target's comment delimiter or line terminators. The shared fix now normalizes description line endings and escapes delimiter text at comment-emission time.
 
 - C-style doc comments `/** ... */`: TypeScript, Flow, JavaScript when descriptions are emitted, Java, C (`cjson`), C++, PHP, Kotlin, Scala 3, Smithy4s. Trigger with `*/`; escaped as `* /`.
-- Elm/Haskell doc comments `{-| ... -}`: Elm, Haskell. Trigger with `-}`; escaped as `- }`.
+- Elm/Haskell doc comments `{-| ... -}`: Elm, Haskell. Trigger with `{-` or `-}`; escaped as `{ -` and `- }`.
 - Triple-quoted docstrings/heredocs: Python, Elixir. Trigger with `"""` on its own description line; escaped as `\"\"\"`.
 - Line comments (`//`, `///`): C#, Go, Rust, Ruby, Swift, Objective-C, Dart, Pike, Crystal, and enum comments in TypeScript-Zod/TypeScript-Effect-Schema. Trigger with a carriage return (`\r`) when descriptions are split only on `\n`; fixed by normalizing `\r\n?` to `\n` before comment emission.
 

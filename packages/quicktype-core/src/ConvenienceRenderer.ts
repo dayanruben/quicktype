@@ -44,7 +44,6 @@ import {
 } from "./Renderer";
 import {
     type Sourcelike,
-    modifySource,
     serializeRenderResult,
     sourcelikeToSource,
 } from "./Source";
@@ -1229,7 +1228,7 @@ export abstract class ConvenienceRenderer extends Renderer {
             replacements.push(["*/", "* /"]);
         }
         if (containsDelimiter("{-") || containsDelimiter("-}")) {
-            replacements.push(["-}", "- }"]);
+            replacements.push(["{-", "{ -"], ["-}", "- }"]);
         }
         if (containsDelimiter('"""')) {
             replacements.push(['"""', '\\"\\"\\"']);
@@ -1242,14 +1241,9 @@ export abstract class ConvenienceRenderer extends Renderer {
         replacements: ReadonlyArray<readonly [string, string]>,
     ): Sourcelike {
         if (replacements.length === 0) return line;
-        return modifySource(
-            (content) =>
-                replacements.reduce(
-                    (result, [unsafe, safe]) =>
-                        result.split(unsafe).join(safe),
-                    content,
-                ),
-            line,
+        return replacements.reduce(
+            (result, [unsafe, safe]) => result.split(unsafe).join(safe),
+            this.sourcelikeToString(line),
         );
     }
 
