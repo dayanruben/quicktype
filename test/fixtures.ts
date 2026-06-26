@@ -843,6 +843,8 @@ type TreeSitterParseFailure = {
 const commentInjectionSchema = "test/inputs/schema/comment-injection.schema";
 const commentInjectionEnumSchema =
     "test/inputs/schema/comment-injection-enum.schema";
+const commentInjectionNestedCommentSchema =
+    "test/inputs/schema/comment-injection-nested-comment.schema";
 
 const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
     {
@@ -979,6 +981,7 @@ class CommentInjectionSchemaFixture extends JSONSchemaFixture {
         private readonly _samples: string[] = [
             "test/inputs/schema/comment-injection.schema",
             "test/inputs/schema/comment-injection-enum.schema",
+            "test/inputs/schema/comment-injection-nested-comment.schema",
         ],
     ) {
         super(language, `comment-injection-${language.name}`);
@@ -1026,13 +1029,20 @@ class CommentInjectionTreeSitterFixture extends Fixture {
     }
 
     getSamples(sources: string[]): { priority: Sample[]; others: Sample[] } {
-        const sample = {
-            path: commentInjectionSchema,
+        const commentInjectionSamples = [
+            commentInjectionSchema,
+            commentInjectionNestedCommentSchema,
+        ];
+        const makeSample = (schema: string): Sample => ({
+            path: schema,
             additionalRendererOptions: {},
             saveOutput: false,
-        };
+        });
         if (sources.length === 0) {
-            return { priority: [sample], others: [] };
+            return {
+                priority: commentInjectionSamples.map(makeSample),
+                others: [],
+            };
         }
 
         const sourcePaths = _.flatMap(sources, (source) =>
@@ -1040,12 +1050,12 @@ class CommentInjectionTreeSitterFixture extends Fixture {
                 ? testsInDir(source, "schema")
                 : [source],
         );
-        const selected = sourcePaths.some((source) =>
-            [commentInjectionSchema, commentInjectionEnumSchema]
-                .map((schema) => path.basename(schema))
-                .includes(path.basename(source)),
+        const selected = commentInjectionSamples.filter((schema) =>
+            sourcePaths.some(
+                (source) => path.basename(source) === path.basename(schema),
+            ),
         );
-        return { priority: selected ? [sample] : [], others: [] };
+        return { priority: selected.map(makeSample), others: [] };
     }
 
     private async parseGeneratedFiles(
@@ -1122,9 +1132,13 @@ class CommentInjectionTreeSitterFixture extends Fixture {
                     ...target.language,
                     output: path.join(outputDir, target.output),
                 };
+                const schema =
+                    target.schema === commentInjectionEnumSchema
+                        ? target.schema
+                        : sample.path;
                 await quicktypeForLanguage(
                     targetLanguage,
-                    path.join(repoRoot, target.schema),
+                    path.join(repoRoot, schema),
                     "schema",
                     false,
                     {},

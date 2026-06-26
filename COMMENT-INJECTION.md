@@ -56,8 +56,9 @@ Still not covered by the tree-sitter fixture: Swift, Objective-C, Dart, Pike, Cr
 
 ## Test cases added
 
-- `test/inputs/schema/comment-injection.schema` covers object and property descriptions.
+- `test/inputs/schema/comment-injection.schema` covers object and property descriptions, including both Elm/Haskell nested-comment delimiters.
 - `test/inputs/schema/comment-injection-enum.schema` covers enum descriptions via an enum-valued property.
+- `test/inputs/schema/comment-injection-nested-comment.schema` specifically covers an unmatched Elm/Haskell nested-comment opener (`{-`) in object and property descriptions.
 
 The existing `JSONSchemaFixture` instances pick these samples up for schema-based language tests. Additional narrow `comment-injection-*` fixtures cover affected outputs that did not already have full schema fixtures: Objective-C uses both samples; TypeScript-Zod and TypeScript-Effect-Schema use only the enum-description sample.
 
