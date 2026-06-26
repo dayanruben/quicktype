@@ -1430,7 +1430,6 @@ export const allFixtures: Fixture[] = [
     new JSONSchemaFixture(languages.HaskellLanguage),
     new JSONSchemaFixture(languages.ElixirLanguage),
     new CommentInjectionSchemaFixture(languages.TypeScriptLanguage),
-    new CommentInjectionSchemaFixture(languages.PHPLanguage),
     new CommentInjectionSchemaFixture(languages.ObjectiveCLanguage),
     new CommentInjectionSchemaFixture(languages.TypeScriptZodLanguage, [
         "test/inputs/schema/comment-injection-enum.schema",

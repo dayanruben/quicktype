@@ -59,7 +59,7 @@ Still not covered by the tree-sitter fixture: Swift, Objective-C, Dart, Pike, Cr
 - `test/inputs/schema/comment-injection.schema` covers object and property descriptions.
 - `test/inputs/schema/comment-injection-enum.schema` covers enum descriptions via an enum-valued property.
 
-The existing `JSONSchemaFixture` instances pick these samples up for schema-based language tests. Additional narrow `comment-injection-*` fixtures cover affected outputs that did not already have full schema fixtures: PHP and Objective-C use both samples; TypeScript-Zod and TypeScript-Effect-Schema use only the enum-description sample.
+The existing `JSONSchemaFixture` instances pick these samples up for schema-based language tests. Additional narrow `comment-injection-*` fixtures cover affected outputs that did not already have full schema fixtures: Objective-C uses both samples; TypeScript-Zod and TypeScript-Effect-Schema use only the enum-description sample.
 
 A parser-only fixture, `comment-injection-treesitter`, generates all configured targets and parses them with tree-sitter WASM grammars. It currently covers TypeScript, TypeScript-Zod, TypeScript-Effect-Schema, C#, Java, C (`cjson`), C++, PHP, Go, Rust, Ruby, Python, Scala 3, and Haskell. It is intentionally one fixture/test that loops over all configured languages and reports all parse failures together.
 
