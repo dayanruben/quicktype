@@ -44,6 +44,7 @@ import {
 } from "./Renderer";
 import {
     type Sourcelike,
+    modifySource,
     serializeRenderResult,
     sourcelikeToSource,
 } from "./Source";
@@ -1200,8 +1201,37 @@ export abstract class ConvenienceRenderer extends Renderer {
         this.emitDescriptionBlock(description);
     }
 
+    protected escapeCommentLines(
+        lines: Sourcelike[],
+        replacements: ReadonlyArray<readonly [string, string]>,
+    ): Sourcelike[] {
+        return lines.map((line) =>
+            modifySource(
+                (content) =>
+                    replacements.reduce(
+                        (result, [unsafe, safe]) =>
+                            result.split(unsafe).join(safe),
+                        content,
+                    ),
+                line,
+            ),
+        );
+    }
+
     protected emitDescriptionBlock(lines: Sourcelike[]): void {
         this.emitCommentLines(lines);
+    }
+
+    protected escapeCStyleCommentLines(lines: Sourcelike[]): Sourcelike[] {
+        return this.escapeCommentLines(lines, [["*/", "* /"]]);
+    }
+
+    protected emitCStyleDescriptionBlock(lines: Sourcelike[]): void {
+        this.emitCommentLines(this.escapeCStyleCommentLines(lines), {
+            lineStart: " * ",
+            beforeComment: "/**",
+            afterComment: " */",
+        });
     }
 
     protected emitPropertyTable(

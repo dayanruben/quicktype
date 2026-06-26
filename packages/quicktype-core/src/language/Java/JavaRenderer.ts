@@ -274,11 +274,7 @@ export class JavaRenderer extends ConvenienceRenderer {
     }
 
     public emitDescriptionBlock(lines: Sourcelike[]): void {
-        this.emitCommentLines(lines, {
-            lineStart: " * ",
-            beforeComment: "/**",
-            afterComment: " */",
-        });
+        this.emitCStyleDescriptionBlock(lines);
     }
 
     public emitBlock(line: Sourcelike, f: () => void): void {

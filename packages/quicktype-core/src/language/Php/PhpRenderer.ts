@@ -221,11 +221,15 @@ export class PhpRenderer extends ConvenienceRenderer {
     }
 
     public emitDescriptionBlock(lines: Sourcelike[]): void {
-        this.emitCommentLines(lines, {
+        this.emitCStyleDescriptionBlock(lines);
+    }
+
+    private emitDocBlockDescription(desc: string[] | undefined): void {
+        if (desc === undefined) return;
+        this.emitCommentLines(this.escapeCStyleCommentLines(desc), {
             lineStart: " * ",
-            beforeComment: "/**",
-            afterComment: " */",
         });
+        this.emitLine(" *");
     }
 
     public emitBlock(line: Sourcelike, f: () => void): void {
@@ -825,10 +829,7 @@ export class PhpRenderer extends ConvenienceRenderer {
         desc?: string[],
     ): void {
         this.emitLine("/**");
-        if (desc !== undefined) {
-            this.emitLine(" * ", desc);
-            this.emitLine(" *");
-        }
+        this.emitDocBlockDescription(desc);
 
         // this.emitLine(" * @param ", this.phpType(false, p.type, false, "", "|null"));
         this.emitLine(
@@ -868,10 +869,7 @@ export class PhpRenderer extends ConvenienceRenderer {
         desc?: string[],
     ): void {
         this.emitLine("/**");
-        if (desc !== undefined) {
-            this.emitLine(" * ", desc);
-            this.emitLine(" *");
-        }
+        this.emitDocBlockDescription(desc);
 
         this.emitLine(" * @throws Exception");
         this.emitLine(" * @return ", this.phpConvertType(className, p.type));
@@ -922,10 +920,7 @@ export class PhpRenderer extends ConvenienceRenderer {
         desc?: string[],
     ): void {
         this.emitLine("/**");
-        if (desc !== undefined) {
-            this.emitLine(" * ", desc);
-            this.emitLine(" *");
-        }
+        this.emitDocBlockDescription(desc);
 
         this.emitLine(
             " * @param ",
@@ -958,10 +953,7 @@ export class PhpRenderer extends ConvenienceRenderer {
     ): void {
         if (this._options.withGet) {
             this.emitLine("/**");
-            if (desc !== undefined) {
-                this.emitLine(" * ", desc);
-                this.emitLine(" *");
-            }
+            this.emitDocBlockDescription(desc);
 
             if (!this._options.fastGet) {
                 this.emitLine(" * @throws Exception");
@@ -1014,10 +1006,7 @@ export class PhpRenderer extends ConvenienceRenderer {
     ): void {
         if (this._options.withSet) {
             this.emitLine("/**");
-            if (desc !== undefined) {
-                this.emitLine(" * ", desc);
-                this.emitLine(" *");
-            }
+            this.emitDocBlockDescription(desc);
 
             this.emitLine(
                 " * @param ",
@@ -1055,10 +1044,7 @@ export class PhpRenderer extends ConvenienceRenderer {
     ): void {
         if (this._options.withGet) {
             this.emitLine("/**");
-            if (desc !== undefined) {
-                this.emitLine(" * ", desc);
-                this.emitLine(" *");
-            }
+            this.emitDocBlockDescription(desc);
 
             const rendered = this.phpType(false, p.type);
             this.emitLine(" * @return ", rendered);

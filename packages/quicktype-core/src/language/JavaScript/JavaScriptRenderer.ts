@@ -101,11 +101,7 @@ export class JavaScriptRenderer extends ConvenienceRenderer {
     }
 
     protected emitDescriptionBlock(lines: Sourcelike[]): void {
-        this.emitCommentLines(lines, {
-            lineStart: " * ",
-            beforeComment: "/**",
-            afterComment: " */",
-        });
+        this.emitCStyleDescriptionBlock(lines);
     }
 
     private typeMapTypeFor(t: Type): Sourcelike {
