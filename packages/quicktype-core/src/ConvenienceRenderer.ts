@@ -1238,6 +1238,10 @@ export abstract class ConvenienceRenderer extends Renderer {
         return this.escapeCommentLines(lines, [["\"\"\"", "\\\"\\\"\\\""]]);
     }
 
+    protected escapeCurlyDashCommentLines(lines: Sourcelike[]): Sourcelike[] {
+        return this.escapeCommentLines(lines, [["-}", "- }"]]);
+    }
+
     protected emitPropertyTable(
         c: ClassType,
         makePropertyRow: (
