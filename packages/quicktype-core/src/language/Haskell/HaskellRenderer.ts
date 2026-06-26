@@ -93,13 +93,12 @@ export class HaskellRenderer extends ConvenienceRenderer {
     }
 
     protected emitDescriptionBlock(lines: Sourcelike[]): void {
-        const escapedLines = this.escapeCurlyDashCommentLines(lines);
-        if (escapedLines.length === 1) {
+        if (lines.length === 1) {
             this.emitComments([
-                { customLines: escapedLines, lineStart: "{-| ", lineEnd: " -}" },
+                { customLines: lines, lineStart: "{-| ", lineEnd: " -}" },
             ]);
         } else {
-            this.emitCommentLines(escapedLines, {
+            this.emitCommentLines(lines, {
                 firstLineStart: "{-| ",
                 lineStart: "",
                 afterComment: "-}",

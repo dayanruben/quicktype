@@ -221,13 +221,22 @@ export class PhpRenderer extends ConvenienceRenderer {
     }
 
     public emitDescriptionBlock(lines: Sourcelike[]): void {
-        this.emitCStyleDescriptionBlock(lines);
+        this.emitCommentLines(lines, {
+            lineStart: " * ",
+            beforeComment: "/**",
+            afterComment: " */",
+        });
     }
 
     private emitDocBlockDescription(desc: string[] | undefined): void {
-        if (desc === undefined) return;
-        this.emitCommentLines(this.escapeCStyleCommentLines(desc), {
+        if (desc === undefined) {
+            this.emitLine("/**");
+            return;
+        }
+
+        this.emitCommentLines(desc, {
             lineStart: " * ",
+            beforeComment: "/**",
         });
         this.emitLine(" *");
     }
@@ -828,7 +837,6 @@ export class PhpRenderer extends ConvenienceRenderer {
         _name: Name,
         desc?: string[],
     ): void {
-        this.emitLine("/**");
         this.emitDocBlockDescription(desc);
 
         // this.emitLine(" * @param ", this.phpType(false, p.type, false, "", "|null"));
@@ -868,7 +876,6 @@ export class PhpRenderer extends ConvenienceRenderer {
         name: Name,
         desc?: string[],
     ): void {
-        this.emitLine("/**");
         this.emitDocBlockDescription(desc);
 
         this.emitLine(" * @throws Exception");
@@ -919,7 +926,6 @@ export class PhpRenderer extends ConvenienceRenderer {
         name: Name,
         desc?: string[],
     ): void {
-        this.emitLine("/**");
         this.emitDocBlockDescription(desc);
 
         this.emitLine(
@@ -952,7 +958,6 @@ export class PhpRenderer extends ConvenienceRenderer {
         desc?: string[],
     ): void {
         if (this._options.withGet) {
-            this.emitLine("/**");
             this.emitDocBlockDescription(desc);
 
             if (!this._options.fastGet) {
@@ -1005,7 +1010,6 @@ export class PhpRenderer extends ConvenienceRenderer {
         desc?: string[],
     ): void {
         if (this._options.withSet) {
-            this.emitLine("/**");
             this.emitDocBlockDescription(desc);
 
             this.emitLine(
@@ -1043,7 +1047,6 @@ export class PhpRenderer extends ConvenienceRenderer {
         idx: number,
     ): void {
         if (this._options.withGet) {
-            this.emitLine("/**");
             this.emitDocBlockDescription(desc);
 
             const rendered = this.phpType(false, p.type);

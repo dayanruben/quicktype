@@ -1170,6 +1170,14 @@ export abstract class ConvenienceRenderer extends Renderer {
             afterComment,
         }: CommentOptions = {},
     ): void {
+        const replacements = this.commentLineEscapes({
+            lineStart,
+            firstLineStart,
+            lineEnd,
+            beforeComment,
+            afterComment,
+        });
+
         if (beforeComment !== undefined) {
             this.emitLine(beforeComment);
         }
@@ -1178,15 +1186,16 @@ export abstract class ConvenienceRenderer extends Renderer {
         for (const line of lines) {
             let start = first ? firstLineStart : lineStart;
             first = false;
+            const escapedLine = this.escapeCommentLine(line, replacements);
 
-            if (this.sourcelikeToString(line) === "") {
+            if (this.sourcelikeToString(escapedLine) === "") {
                 start = trimEnd(start);
             }
 
             if (lineEnd) {
-                this.emitLine(start, line, lineEnd);
+                this.emitLine(start, escapedLine, lineEnd);
             } else {
-                this.emitLine(start, line);
+                this.emitLine(start, escapedLine);
             }
         }
 
@@ -1201,45 +1210,51 @@ export abstract class ConvenienceRenderer extends Renderer {
         this.emitDescriptionBlock(description);
     }
 
-    protected escapeCommentLines(
-        lines: Sourcelike[],
+    private commentLineEscapes(
+        options: Required<Pick<CommentOptions, "lineStart" | "firstLineStart">> &
+            Pick<CommentOptions, "lineEnd" | "beforeComment" | "afterComment">,
+    ): ReadonlyArray<readonly [string, string]> {
+        const delimiters = [
+            options.lineStart,
+            options.firstLineStart,
+            options.lineEnd,
+            options.beforeComment,
+            options.afterComment,
+        ];
+        const containsDelimiter = (delimiter: string): boolean =>
+            delimiters.some((part) => part?.includes(delimiter) ?? false);
+
+        const replacements: Array<readonly [string, string]> = [];
+        if (containsDelimiter("/*") || containsDelimiter("*/")) {
+            replacements.push(["*/", "* /"]);
+        }
+        if (containsDelimiter("{-") || containsDelimiter("-}")) {
+            replacements.push(["-}", "- }"]);
+        }
+        if (containsDelimiter('"""')) {
+            replacements.push(['"""', '\\"\\"\\"']);
+        }
+        return replacements;
+    }
+
+    private escapeCommentLine(
+        line: Sourcelike,
         replacements: ReadonlyArray<readonly [string, string]>,
-    ): Sourcelike[] {
-        return lines.map((line) =>
-            modifySource(
-                (content) =>
-                    replacements.reduce(
-                        (result, [unsafe, safe]) =>
-                            result.split(unsafe).join(safe),
-                        content,
-                    ),
-                line,
-            ),
+    ): Sourcelike {
+        if (replacements.length === 0) return line;
+        return modifySource(
+            (content) =>
+                replacements.reduce(
+                    (result, [unsafe, safe]) =>
+                        result.split(unsafe).join(safe),
+                    content,
+                ),
+            line,
         );
     }
 
     protected emitDescriptionBlock(lines: Sourcelike[]): void {
         this.emitCommentLines(lines);
-    }
-
-    protected escapeCStyleCommentLines(lines: Sourcelike[]): Sourcelike[] {
-        return this.escapeCommentLines(lines, [["*/", "* /"]]);
-    }
-
-    protected emitCStyleDescriptionBlock(lines: Sourcelike[]): void {
-        this.emitCommentLines(this.escapeCStyleCommentLines(lines), {
-            lineStart: " * ",
-            beforeComment: "/**",
-            afterComment: " */",
-        });
-    }
-
-    protected escapeTripleQuoteCommentLines(lines: Sourcelike[]): Sourcelike[] {
-        return this.escapeCommentLines(lines, [["\"\"\"", "\\\"\\\"\\\""]]);
-    }
-
-    protected escapeCurlyDashCommentLines(lines: Sourcelike[]): Sourcelike[] {
-        return this.escapeCommentLines(lines, [["-}", "- }"]]);
     }
 
     protected emitPropertyTable(
