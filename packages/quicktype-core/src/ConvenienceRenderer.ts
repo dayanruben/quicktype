@@ -97,7 +97,10 @@ function splitDescription(
     descriptions: Iterable<string> | undefined,
 ): string[] | undefined {
     if (descriptions === undefined) return undefined;
-    const description = Array.from(descriptions).join("\n\n").trim();
+    const description = Array.from(descriptions)
+        .join("\n\n")
+        .replace(/\r\n?/g, "\n")
+        .trim();
     if (description === "") return undefined;
     return wordWrap(description)
         .split("\n")
