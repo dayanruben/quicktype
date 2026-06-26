@@ -87,19 +87,20 @@ export class PythonRenderer extends ConvenienceRenderer {
     }
 
     protected emitDescriptionBlock(lines: Sourcelike[]): void {
-        if (lines.length === 1) {
+        const escapedLines = this.escapeTripleQuoteCommentLines(lines);
+        if (escapedLines.length === 1) {
             const docstring = modifySource((content) => {
                 if (content.endsWith('"')) {
                     return content.slice(0, -1) + '\\"';
                 }
 
                 return content;
-            }, lines[0]);
+            }, escapedLines[0]);
             this.emitComments([
                 { customLines: [docstring], lineStart: '"""', lineEnd: '"""' },
             ]);
         } else {
-            this.emitCommentLines(lines, {
+            this.emitCommentLines(escapedLines, {
                 firstLineStart: '"""',
                 lineStart: "",
                 afterComment: '"""',

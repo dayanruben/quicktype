@@ -773,7 +773,7 @@ export class ElixirRenderer extends ConvenienceRenderer {
     }
 
     protected emitDescriptionBlock(lines: Sourcelike[]): void {
-        this.emitCommentLines(lines, {
+        this.emitCommentLines(this.escapeTripleQuoteCommentLines(lines), {
             firstLineStart: '@moduledoc """\n',
             lineStart: "",
             afterComment: '"""',

@@ -1234,6 +1234,10 @@ export abstract class ConvenienceRenderer extends Renderer {
         });
     }
 
+    protected escapeTripleQuoteCommentLines(lines: Sourcelike[]): Sourcelike[] {
+        return this.escapeCommentLines(lines, [["\"\"\"", "\\\"\\\"\\\""]]);
+    }
+
     protected emitPropertyTable(
         c: ClassType,
         makePropertyRow: (
