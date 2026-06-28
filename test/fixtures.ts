@@ -933,6 +933,14 @@ const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
         schema: commentInjectionSchema,
     },
     {
+        displayName: "pike",
+        language: languages.PikeLanguage,
+        output: "TopLevel.pmod",
+        wasmModule: treeSitterWasm("tree-sitter-pike.wasm"),
+        extensions: [".pmod"],
+        schema: commentInjectionSchema,
+    },
+    {
         displayName: "rust",
         language: languages.RustLanguage,
         output: "module_under_test.rs",
