@@ -957,6 +957,14 @@ const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
         schema: commentInjectionSchema,
     },
     {
+        displayName: "elixir",
+        language: languages.ElixirLanguage,
+        output: "QuickType.ex",
+        wasmModule: treeSitterWasm("tree-sitter-elixir.wasm"),
+        extensions: [".ex"],
+        schema: commentInjectionSchema,
+    },
+    {
         displayName: "scala3",
         language: languages.Scala3Language,
         output: "TopLevel.scala",
