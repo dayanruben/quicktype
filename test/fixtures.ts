@@ -845,6 +845,8 @@ const commentInjectionEnumSchema =
     "test/inputs/schema/comment-injection-enum.schema";
 const commentInjectionNestedCommentSchema =
     "test/inputs/schema/comment-injection-nested-comment.schema";
+const treeSitterWasm = (filename: string): string =>
+    path.join(__dirname, "tree-sitter-wasms", filename);
 
 const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
     {
@@ -912,6 +914,14 @@ const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
         output: "TopLevel.php",
         wasmModule: "tree-sitter-php/tree-sitter-php.wasm",
         extensions: [".php"],
+        schema: commentInjectionSchema,
+    },
+    {
+        displayName: "kotlin",
+        language: languages.KotlinLanguage,
+        output: "TopLevel.kt",
+        wasmModule: treeSitterWasm("tree-sitter-kotlin.wasm"),
+        extensions: [".kt"],
         schema: commentInjectionSchema,
     },
     {
