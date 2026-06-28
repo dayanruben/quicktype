@@ -890,6 +890,14 @@ const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
         schema: commentInjectionSchema,
     },
     {
+        displayName: "dart",
+        language: languages.DartLanguage,
+        output: "TopLevel.dart",
+        wasmModule: treeSitterWasm("tree-sitter-dart.wasm"),
+        extensions: [".dart"],
+        schema: commentInjectionSchema,
+    },
+    {
         displayName: "cjson",
         language: languages.CJSONLanguage,
         output: "TopLevel.c",
