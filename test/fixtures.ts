@@ -874,6 +874,14 @@ const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
         schema: commentInjectionEnumSchema,
     },
     {
+        displayName: "swift",
+        language: languages.SwiftLanguage,
+        output: "quicktype.swift",
+        wasmModule: treeSitterWasm("tree-sitter-swift.wasm"),
+        extensions: [".swift"],
+        schema: commentInjectionSchema,
+    },
+    {
         displayName: "csharp",
         language: languages.CSharpLanguage,
         output: "QuickType.cs",

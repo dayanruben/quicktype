@@ -52,7 +52,7 @@ Plain JavaScript output did not emit the tested schema descriptions into model c
 
 The tree-sitter fixture includes Go, Rust, and Ruby even though their grammars did not reproduce a syntax break with the CR line-comment payload; this keeps parser coverage in place for those generated outputs and future payload/escaping changes.
 
-Still not covered by the tree-sitter fixture: Swift, Objective-C, Crystal, and Elm. Swift/Objective-C/Crystal need compiler/toolchain or better grammar coverage for this bug class. Elm is affected by block-comment-style delimiters, but the available npm grammar was not usable with the WASM tree-sitter test added here.
+Still not covered by the tree-sitter fixture: Objective-C, Crystal, and Elm. Objective-C/Crystal need compiler/toolchain or better grammar coverage for this bug class. Elm is affected by block-comment-style delimiters, but the available npm grammar was not usable with the WASM tree-sitter test added here.
 
 ## Test cases added
 
@@ -62,6 +62,6 @@ Still not covered by the tree-sitter fixture: Swift, Objective-C, Crystal, and E
 
 The existing `JSONSchemaFixture` instances pick these samples up for schema-based language tests. Additional narrow `comment-injection-*` fixtures cover affected outputs that did not already have full schema fixtures: Objective-C uses both samples; TypeScript-Zod and TypeScript-Effect-Schema use only the enum-description sample.
 
-A parser-only fixture, `comment-injection-treesitter`, generates all configured targets and parses them with tree-sitter WASM grammars. It currently covers TypeScript, TypeScript-Zod, TypeScript-Effect-Schema, C#, Java, Dart, C (`cjson`), C++, PHP, Kotlin, Go, Pike, Rust, Ruby, Python, Elixir, Scala 3, and Haskell. It is intentionally one fixture/test that loops over all configured languages and reports all parse failures together.
+A parser-only fixture, `comment-injection-treesitter`, generates all configured targets and parses them with tree-sitter WASM grammars. It currently covers TypeScript, TypeScript-Zod, TypeScript-Effect-Schema, Swift, C#, Java, Dart, C (`cjson`), C++, PHP, Kotlin, Go, Pike, Rust, Ruby, Python, Elixir, Scala 3, and Haskell. It is intentionally one fixture/test that loops over all configured languages and reports all parse failures together.
 
 These are regression tests and should pass with the shared comment escaping/sanitization in place.
