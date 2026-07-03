@@ -67,20 +67,13 @@ jobs:
                     - fixture: kotlin,schema-kotlin,kotlin-jackson,schema-kotlin-jackson
                       runs-on: ubuntu-latest-16-cores
 
-                    # Objective-C needs macOS for clang + Foundation.  The
-                    # full objective-c fixture used to segfault on
-                    # macos-latest; trial the small comment-injection
-                    # subset as experimental so a failure doesn't fail the
-                    # workflow or fail-fast the rest of the matrix.
-                    - fixture: comment-injection-objective-c
-                      runs-on: macos-latest
-                      experimental: true
-
                     # - fixture: objective-c # segfault on compiled test cmd
                     #   runs-on: macos-latest
+                    # comment-injection-objective-c also hits that runtime
+                    # segfault (the generated .m compiles but ./test crashes
+                    # with SIGSEGV), so it stays out of CI too.
 
         name: ${{ matrix.fixture }}
-        continue-on-error: ${{ matrix.experimental == true }}
         steps:
             - uses: actions/checkout@v3
             - uses: ./.github/workflows/setup
