@@ -9,7 +9,9 @@
         "node": ">=18.12.0"
     },
     "scripts": {
-        "pub": "script/publish.sh",
+        "pub": "script/publish-npm.sh && script/publish-vscode.sh",
+        "pub:npm": "script/publish-npm.sh",
+        "pub:vscode": "script/publish-vscode.sh",
         "build": "npm run clean && npm run build --workspaces --if-present && tsc",
         "test": "script/test",
         "start": "script/watch",

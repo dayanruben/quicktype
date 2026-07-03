@@ -1,11 +1,11 @@
-name: Build and Release
+name: Publish npm packages
 on:
     push:
         branches:
             - master
 
 jobs:
-    publish:
+    publish-npm:
         runs-on: ubuntu-22.04
         permissions:
             # Required for npm Trusted Publishing (OIDC): npm mints
@@ -16,11 +16,7 @@ jobs:
         steps:
             - uses: actions/checkout@v3
             - uses: ./.github/workflows/setup
-              env:
-                PUBLISH: true
             # Trusted Publishing requires npm >= 11.5.1; the pinned Node
             # runtime ships an older npm, so upgrade it before publishing.
             - run: npm install -g npm@latest
-            - run: npm run pub
-              env:
-                  VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
+            - run: ./script/publish-npm.sh

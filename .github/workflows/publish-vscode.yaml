@@ -1,0 +1,15 @@
+name: Publish VS Code extension
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    publish-vscode:
+        runs-on: ubuntu-22.04
+        steps:
+            - uses: actions/checkout@v3
+            - uses: ./.github/workflows/setup
+            - run: ./script/publish-vscode.sh
+              env:
+                  VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
