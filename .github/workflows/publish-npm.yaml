@@ -19,4 +19,6 @@ jobs:
             # Trusted Publishing requires npm >= 11.5.1; the pinned Node
             # runtime ships an older npm, so upgrade it before publishing.
             - run: npm install -g npm@latest
-            - run: ./script/publish-npm.sh
+            # Run via npm so node_modules/.bin is on PATH (patch-npm-version.ts
+            # is executed through its ts-node shebang).
+            - run: npm run pub:npm
