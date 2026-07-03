@@ -826,6 +826,31 @@ type TreeSitterTarget = {
     extensions: string[];
     schema: string;
     allowMissingNodes?: boolean;
+    // Rewrite the generated source before parsing, to work around
+    // false positives in a buggy tree-sitter grammar.
+    preprocessSource?: (source: string) => string;
+    // Raw substrings that must not survive into the generated output.
+    // Used for injection classes the tree-sitter grammars can't catch,
+    // because their lexers are more lenient than the real compiler
+    // (e.g. XML metacharacters in C# doc comments, which parse fine as
+    // comment text but break the XML doc tooling).
+    forbiddenSubstrings?: string[];
+};
+
+// Line terminators that a language's real lexer honors but which are
+// not `\n`, so they must never survive into a generated single-line
+// comment.  The tree-sitter grammars treat them as ordinary
+// characters, so this is checked by content scan rather than parsing.
+const unicodeLineTerminators: ReadonlyArray<readonly [string, number]> = [
+    ["U+0085 NEL", 0x0085],
+    ["U+2028 LINE SEPARATOR", 0x2028],
+    ["U+2029 PARAGRAPH SEPARATOR", 0x2029],
+];
+
+type TreeSitterContentFailure = {
+    language: string;
+    filename: string;
+    forbidden: string;
 };
 
 type TreeSitterParseProblem = {
@@ -845,6 +870,8 @@ const commentInjectionEnumSchema =
     "test/inputs/schema/comment-injection-enum.schema";
 const commentInjectionNestedCommentSchema =
     "test/inputs/schema/comment-injection-nested-comment.schema";
+const commentInjectionEnumNestedCommentSchema =
+    "test/inputs/schema/comment-injection-enum-nested-comment.schema";
 const treeSitterWasm = (filename: string): string =>
     path.join(__dirname, "tree-sitter-wasms", filename);
 
@@ -888,6 +915,10 @@ const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
         wasmModule: "tree-sitter-c-sharp/tree-sitter-c_sharp.wasm",
         extensions: [".cs"],
         schema: commentInjectionSchema,
+        // C# doc comments are XML; the payload's markup must be entity
+        // escaped.  tree-sitter parses it as comment text either way,
+        // so the escaping is verified by content scan.
+        forbiddenSubstrings: ["</summary> & <br>", "<summary> & <br>"],
     },
     {
         displayName: "java",
@@ -904,6 +935,14 @@ const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
         wasmModule: treeSitterWasm("tree-sitter-dart.wasm"),
         extensions: [".dart"],
         schema: commentInjectionSchema,
+        // tree-sitter-dart wrongly treats a block-comment opener inside
+        // a line comment as opening a block comment (`// /*` parses as
+        // an ERROR), whereas real Dart runs line comments to the end of
+        // the line.  Neutralize openers in comment text before parsing.
+        preprocessSource: (source) =>
+            source.replace(/\/\/[^\n]*/g, (comment) =>
+                comment.replace(/\/\*/g, "/ *"),
+            ),
     },
     {
         displayName: "cjson",
@@ -912,9 +951,17 @@ const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
         wasmModule: "tree-sitter-c/tree-sitter-c.wasm",
         extensions: [".c", ".h"],
         schema: commentInjectionSchema,
-        // The generated C currently leaves tree-sitter with a missing #endif
-        // node even for a benign schema, so only ERROR nodes are actionable.
-        allowMissingNodes: true,
+        // tree-sitter-c parses `#ifdef`/`#endif` as real structure and
+        // can't match the `extern "C" {` brace across the two separate
+        // `#ifdef __cplusplus` guard blocks, so it reports a spurious
+        // MISSING `#endif` even for benign output.  Strip the guard
+        // blocks (they only wrap the file) so a real injection that
+        // leaves a MISSING node is still caught.
+        preprocessSource: (source) =>
+            source.replace(
+                /#ifdef __cplusplus\n(?:extern "C" \{|\})\n#endif\n/g,
+                "",
+            ),
     },
     {
         displayName: "cplusplus",
@@ -1024,6 +1071,7 @@ class CommentInjectionSchemaFixture extends JSONSchemaFixture {
             "test/inputs/schema/comment-injection.schema",
             "test/inputs/schema/comment-injection-enum.schema",
             "test/inputs/schema/comment-injection-nested-comment.schema",
+            "test/inputs/schema/comment-injection-enum-nested-comment.schema",
         ],
     ) {
         super(language, `comment-injection-${language.name}`);
@@ -1100,21 +1148,42 @@ class CommentInjectionTreeSitterFixture extends Fixture {
         return { priority: selected.map(makeSample), others: [] };
     }
 
+    private readonly _treeSitterLanguages = new Map<string, unknown>();
+
+    private async loadTreeSitterLanguage(
+        TreeSitter: any,
+        wasmModule: string,
+    ): Promise<unknown> {
+        const wasmPath = require.resolve(wasmModule);
+        let language = this._treeSitterLanguages.get(wasmPath);
+        if (language === undefined) {
+            language = await TreeSitter.Language.load(wasmPath);
+            this._treeSitterLanguages.set(wasmPath, language);
+        }
+
+        return language;
+    }
+
     private async parseGeneratedFiles(
         TreeSitter: any,
         target: TreeSitterTarget,
         generatedFiles: string[],
     ): Promise<TreeSitterParseFailure[]> {
         const parser = new TreeSitter.Parser();
-        const language = await TreeSitter.Language.load(
-            require.resolve(target.wasmModule),
+        const language = await this.loadTreeSitterLanguage(
+            TreeSitter,
+            target.wasmModule,
         );
         parser.setLanguage(language);
 
         const failures: TreeSitterParseFailure[] = [];
 
         for (const filename of generatedFiles) {
-            const source = fs.readFileSync(filename, "utf8");
+            let source = fs.readFileSync(filename, "utf8");
+            if (target.preprocessSource !== undefined) {
+                source = target.preprocessSource(source);
+            }
+
             const tree = parser.parse(source);
             const problems: TreeSitterParseProblem[] = [];
 
@@ -1151,6 +1220,42 @@ class CommentInjectionTreeSitterFixture extends Fixture {
         return failures;
     }
 
+    // Injection classes the tree-sitter grammars can't detect, because
+    // their lexers are more lenient than the real compiler: Unicode
+    // line terminators surviving into a comment, and per-target markup
+    // that parses as comment text but is dangerous downstream.  These
+    // are verified by scanning the generated bytes directly.
+    private scanGeneratedFiles(
+        target: TreeSitterTarget,
+        generatedFiles: string[],
+    ): TreeSitterContentFailure[] {
+        const failures: TreeSitterContentFailure[] = [];
+        for (const filename of generatedFiles) {
+            const source = fs.readFileSync(filename, "utf8");
+            for (const [name, codePoint] of unicodeLineTerminators) {
+                if (source.includes(String.fromCodePoint(codePoint))) {
+                    failures.push({
+                        language: target.displayName,
+                        filename,
+                        forbidden: name,
+                    });
+                }
+            }
+
+            for (const forbidden of target.forbiddenSubstrings ?? []) {
+                if (source.includes(forbidden)) {
+                    failures.push({
+                        language: target.displayName,
+                        filename,
+                        forbidden: JSON.stringify(forbidden),
+                    });
+                }
+            }
+        }
+
+        return failures;
+    }
+
     async runWithSample(
         sample: Sample,
         index: number,
@@ -1166,6 +1271,7 @@ class CommentInjectionTreeSitterFixture extends Fixture {
         const repoRoot = process.cwd();
         let parsedFileCount = 0;
         const failures: TreeSitterParseFailure[] = [];
+        const contentFailures: TreeSitterContentFailure[] = [];
         await inDir(cwd, async () => {
             for (const target of commentInjectionTreeSitterTargets) {
                 const outputDir = path.join(target.displayName);
@@ -1174,9 +1280,13 @@ class CommentInjectionTreeSitterFixture extends Fixture {
                     ...target.language,
                     output: path.join(outputDir, target.output),
                 };
+                // Enum targets can't render the regular schemas, so they
+                // get the enum variant of whichever sample is running.
                 const schema =
                     target.schema === commentInjectionEnumSchema
-                        ? target.schema
+                        ? sample.path === commentInjectionNestedCommentSchema
+                            ? commentInjectionEnumNestedCommentSchema
+                            : commentInjectionEnumSchema
                         : sample.path;
                 await quicktypeForLanguage(
                     targetLanguage,
@@ -1205,6 +1315,9 @@ class CommentInjectionTreeSitterFixture extends Fixture {
                         generatedFiles,
                     )),
                 );
+                contentFailures.push(
+                    ...this.scanGeneratedFiles(target, generatedFiles),
+                );
                 parsedFileCount += generatedFiles.length;
             }
         });
@@ -1212,6 +1325,12 @@ class CommentInjectionTreeSitterFixture extends Fixture {
         if (failures.length > 0) {
             failWith("tree-sitter parse found syntax errors", {
                 failures,
+            });
+        }
+
+        if (contentFailures.length > 0) {
+            failWith("generated output contains forbidden comment content", {
+                contentFailures,
             });
         }
 
@@ -1489,10 +1608,15 @@ export const allFixtures: Fixture[] = [
     new CommentInjectionSchemaFixture(languages.ObjectiveCLanguage),
     new CommentInjectionSchemaFixture(languages.TypeScriptZodLanguage, [
         "test/inputs/schema/comment-injection-enum.schema",
+        "test/inputs/schema/comment-injection-enum-nested-comment.schema",
     ]),
-    new CommentInjectionSchemaFixture(languages.TypeScriptEffectSchemaLanguage, [
-        "test/inputs/schema/comment-injection-enum.schema",
-    ]),
+    new CommentInjectionSchemaFixture(
+        languages.TypeScriptEffectSchemaLanguage,
+        [
+            "test/inputs/schema/comment-injection-enum.schema",
+            "test/inputs/schema/comment-injection-enum-nested-comment.schema",
+        ],
+    ),
     new CommentInjectionTreeSitterFixture(),
     // FIXME: Why are we missing so many language with GraphQL?
     new GraphQLFixture(languages.CSharpLanguage),
