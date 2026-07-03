@@ -2,7 +2,7 @@
     "name": "quicktype",
     "displayName": "Paste JSON as Code",
     "description": "Copy JSON, paste as Go, TypeScript, C#, C++ and more.",
-    "version": "23.3.0",
+    "version": "23.0.122",
     "publisher": "quicktype",
     "icon": "media/icon.png",
     "galleryBanner": {
