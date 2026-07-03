@@ -7,12 +7,20 @@ on:
 jobs:
     publish:
         runs-on: ubuntu-22.04
+        permissions:
+            # Required for npm Trusted Publishing (OIDC): npm mints
+            # short-lived, per-run credentials from this token instead
+            # of a long-lived NPM_TOKEN, and attaches provenance.
+            id-token: write
+            contents: read
         steps:
             - uses: actions/checkout@v3
             - uses: ./.github/workflows/setup
               env:
                 PUBLISH: true
+            # Trusted Publishing requires npm >= 11.5.1; the pinned Node
+            # runtime ships an older npm, so upgrade it before publishing.
+            - run: npm install -g npm@latest
             - run: npm run pub
               env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
                   VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
