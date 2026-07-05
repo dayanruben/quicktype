@@ -1006,11 +1006,8 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                     GlobalNames.CheckConstraint,
                 );
                 if (
-                    (property.type instanceof UnionType &&
-                        property.type.findMember("null") !== undefined) ||
-                    (property.isOptional &&
-                        property.type.kind !== "null" &&
-                        property.type.kind !== "any")
+                    property.type instanceof UnionType &&
+                    property.type.findMember("null") !== undefined
                 ) {
                     this.emitLine(
                         rendered,
@@ -2311,6 +2308,29 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
             },
         );
         this.ensureBlankLine();
+
+        this.emitBlock(
+            [
+                "inline void ",
+                checkConst,
+                "(",
+                this._stringType.getConstType(),
+                " name, ",
+                this.withConst(classConstraint),
+                " & c, const ",
+                this._optionalType,
+                "<",
+                cppType,
+                "> & value)",
+            ],
+            false,
+            () => {
+                this.emitBlock(["if (value)"], false, () => {
+                    this.emitLine(checkConst, "(name, c, *value);");
+                });
+            },
+        );
+        this.ensureBlankLine();
     }
 
     protected emitConstraintClasses(): void {
@@ -2588,6 +2608,29 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                     },
                 );
                 this.ensureBlankLine();
+            },
+        );
+        this.ensureBlankLine();
+
+        this.emitBlock(
+            [
+                "inline void ",
+                checkConst,
+                "(",
+                this._stringType.getConstType(),
+                " name, ",
+                this.withConst(classConstraint),
+                " & c, const ",
+                this._optionalType,
+                "<",
+                this._stringType.getType(),
+                "> & value)",
+            ],
+            false,
+            () => {
+                this.emitBlock(["if (value)"], false, () => {
+                    this.emitLine(checkConst, "(name, c, *value);");
+                });
             },
         );
     }
