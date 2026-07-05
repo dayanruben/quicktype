@@ -514,6 +514,7 @@ export const CJSONLanguage: Language = {
         /* Constraints (min/max and regex) are not supported (for the current implementation, can be added later, should abord parsing and return NULL) */
         "minmaxlength.schema",
         "minmax.schema",
+        "optional-const-ref.schema",
         "pattern.schema",
         /* Required properties absent are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "intersection.schema",
