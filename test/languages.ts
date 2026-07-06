@@ -93,9 +93,9 @@ export const CSharpLanguageSystemTextJson: Language = {
     name: "csharp",
     base: "test/fixtures/csharp-SystemTextJson",
     // https://github.com/dotnet/cli/issues/1582
-    setupCommand: "dotnet restore --no-cache",
+    setupCommand: "dotnet restore -p:CheckEolTargetFramework=false --no-cache",
     runCommand(sample: string) {
-        return `dotnet run -- "${sample}"`;
+        return `dotnet run -p:CheckEolTargetFramework=false -- "${sample}"`;
     },
     diffViaSchema: true,
     skipDiffViaSchema: ["34702.json", "437e7.json"],
@@ -302,6 +302,7 @@ export const CrystalLanguage: Language = {
     skipSchema: [
         // Crystal does not handle enum mapping
         "enum.schema",
+        "enum-large.schema",
         // Crystal does not support top-level primitives
         "top-level-enum.schema",
         "keyword-unions.schema",
@@ -514,6 +515,7 @@ export const CJSONLanguage: Language = {
         "integer-float-union.schema",
         /* Enum with invalid values are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "enum.schema",
+        "enum-large.schema",
         /* Union, Map and Arrays with invalid types are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "class-with-additional.schema",
         "go-schema-pattern-properties.schema",
@@ -523,6 +525,9 @@ export const CJSONLanguage: Language = {
         /* Constraints (min/max and regex) are not supported (for the current implementation, can be added later, should abord parsing and return NULL) */
         "minmaxlength.schema",
         "minmax.schema",
+        "optional-const-ref.schema",
+        /* Same unsupported min/max, length and regex constraints, applied to optional properties */
+        "optional-constraints.schema",
         "pattern.schema",
         /* Required properties absent are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "intersection.schema",
@@ -746,6 +751,7 @@ export const SwiftLanguage: Language = {
         "intersection.schema",
         "go-schema-pattern-properties.schema",
         "enum.schema",
+        "enum-large.schema",
         "date-time.schema",
         "class-with-additional.schema",
         "class-map-union.schema",
@@ -1010,6 +1016,7 @@ I havea no idea how to encode these tests correctly.
         "implicit-one-of.schema",
         "go-schema-pattern-properties.schema",
         "enum.schema",
+        "enum-large.schema",
         "class-with-additional.schema",
         "class-map-union.schema",
         "keyword-unions.schema",
@@ -1287,6 +1294,7 @@ export const DartLanguage: Language = {
     skipSchema: [
         "enum-with-null.schema",
         "enum.schema",
+        "enum-large.schema",
         "bool-string.schema",
         "intersection.schema",
         "keyword-enum.schema",
@@ -1298,6 +1306,9 @@ export const DartLanguage: Language = {
         "keyword-unions.schema",
         "ref-remote.schema",
         "uuid.schema",
+        /* Absent optional lists don't round-trip: the generated fromJson/toJson
+           turn them into [], so the output no longer matches the input */
+        "optional-const-ref.schema",
     ],
     skipMiscJSON: true,
     rendererOptions: {},
@@ -1433,6 +1444,7 @@ export const HaskellLanguage: Language = {
         "class-map-union.schema",
         "direct-union.schema",
         "enum.schema",
+        "enum-large.schema",
         "go-schema-pattern-properties.schema",
         "implicit-class-array-union.schema",
         "intersection.schema",
@@ -1454,10 +1466,10 @@ export const PHPLanguage: Language = {
     diffViaSchema: false,
     skipDiffViaSchema: [],
     allowMissingNull: true,
-    features: ["enum"],
+    features: ["enum", "uuid"],
     output: "TopLevel.php",
     topLevel: "TopLevel",
-    includeJSON: easySampleJSONs,
+    includeJSON: [...easySampleJSONs, "uuids.json"],
     skipMiscJSON: true,
     skipSchema: [],
     rendererOptions: {},
@@ -1569,6 +1581,7 @@ export const TypeScriptZodLanguage: Language = {
         "class-map-union.schema",
         "direct-union.schema",
         "enum.schema",
+        "enum-large.schema",
         "go-schema-pattern-properties.schema",
         "implicit-class-array-union.schema",
         "intersection.schema",
@@ -1685,6 +1698,7 @@ export const TypeScriptEffectSchemaLanguage: Language = {
         "class-map-union.schema",
         "direct-union.schema",
         "enum.schema",
+        "enum-large.schema",
         "go-schema-pattern-properties.schema",
         "implicit-class-array-union.schema",
         "intersection.schema",
