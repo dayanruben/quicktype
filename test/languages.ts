@@ -305,6 +305,7 @@ export const CrystalLanguage: Language = {
         // Crystal does not handle enum mapping
         "enum.schema",
         "enum-large.schema",
+        "const-non-string.schema",
         // Crystal does not support top-level primitives
         "top-level-enum.schema",
         "keyword-unions.schema",
@@ -519,6 +520,7 @@ export const CJSONLanguage: Language = {
         /* Enum with invalid values are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "enum.schema",
         "enum-large.schema",
+        "const-non-string.schema",
         /* Union, Map and Arrays with invalid types are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "class-with-additional.schema",
         "go-schema-pattern-properties.schema",
@@ -755,6 +757,7 @@ export const SwiftLanguage: Language = {
         "go-schema-pattern-properties.schema",
         "enum.schema",
         "enum-large.schema",
+        "const-non-string.schema",
         "date-time.schema",
         "class-with-additional.schema",
         "class-map-union.schema",
@@ -1020,6 +1023,7 @@ I havea no idea how to encode these tests correctly.
         "go-schema-pattern-properties.schema",
         "enum.schema",
         "enum-large.schema",
+        "const-non-string.schema",
         "class-with-additional.schema",
         "class-map-union.schema",
         "keyword-unions.schema",
@@ -1298,6 +1302,7 @@ export const DartLanguage: Language = {
         "enum-with-null.schema",
         "enum.schema",
         "enum-large.schema",
+        "const-non-string.schema",
         "bool-string.schema",
         "intersection.schema",
         "keyword-enum.schema",
@@ -1449,6 +1454,7 @@ export const HaskellLanguage: Language = {
         "direct-union.schema",
         "enum.schema",
         "enum-large.schema",
+        "const-non-string.schema",
         "go-schema-pattern-properties.schema",
         "implicit-class-array-union.schema",
         "intersection.schema",
@@ -1586,6 +1592,7 @@ export const TypeScriptZodLanguage: Language = {
         "direct-union.schema",
         "enum.schema",
         "enum-large.schema",
+        "const-non-string.schema",
         "go-schema-pattern-properties.schema",
         "implicit-class-array-union.schema",
         "intersection.schema",
@@ -1703,6 +1710,7 @@ export const TypeScriptEffectSchemaLanguage: Language = {
         "direct-union.schema",
         "enum.schema",
         "enum-large.schema",
+        "const-non-string.schema",
         "go-schema-pattern-properties.schema",
         "implicit-class-array-union.schema",
         "intersection.schema",
