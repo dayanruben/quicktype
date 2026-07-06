@@ -516,6 +516,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         xfer: Transformer | undefined,
         targetType: Type,
         emitFinish: (value: Sourcelike) => void,
+        varGen?: { counter: number },
     ): void {
         if (xfer === undefined) return;
 
@@ -529,6 +530,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                 targetType,
                 emitFinish,
                 variableName,
+                varGen,
             );
             if (!allHandled) {
                 this.emitLine("break;");
@@ -555,6 +557,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         targetType: Type,
         emitFinish: (value: Sourcelike) => void,
         variableName = "value",
+        varGen: { counter: number } = { counter: 0 },
     ): boolean {
         if (xfer instanceof DecodingTransformer) {
             const source = xfer.sourceType;
@@ -617,6 +620,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     xfer.itemTargetType,
                     (v) => this.emitLine(variableName, ".Add(", v, ");"),
                     "arrayItem",
+                    varGen,
                 );
                 // FIXME: handle EOF
                 this.emitLine("reader.Read();");
@@ -641,6 +645,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                             targetType,
                             emitFinish,
                             "null",
+                            varGen,
                         );
                         if (!allHandled) {
                             this.emitLine("break");
@@ -648,27 +653,77 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     });
                 }
 
-                this.emitDecoderTransformerCase(
-                    ["Number"],
-                    "integerValue",
-                    xfer.integerTransformer,
-                    targetType,
-                    emitFinish,
-                );
-                this.emitDecoderTransformerCase(
-                    ["Number"],
-                    // xfer.integerTransformer === undefined ? ["Integer", "Float"] : ["Float"],
-                    "doubleValue",
-                    xfer.doubleTransformer,
-                    targetType,
-                    emitFinish,
-                );
+                // Handle number (integer/double) union properly
+                if (xfer.integerTransformer !== undefined && xfer.doubleTransformer !== undefined) {
+                    varGen.counter++;
+                    const intTryVar = `intTryValue${varGen.counter}`;
+                    varGen.counter++;
+                    const intVar = `intValue${varGen.counter}`;
+                    varGen.counter++;
+                    const doubleVar = `doubleValue${varGen.counter}`;
+                    this.emitTokenCase("Number");
+                    this.indent(() => {
+                        this.emitLine(`if (reader.TryGetInt64(out long ${intTryVar}))`);
+                        this.emitBlock(() => {
+                            const allHandled = this.emitDecodeTransformer(
+                                xfer.integerTransformer!,
+                                targetType,
+                                emitFinish,
+                                intVar,
+                                varGen,
+                            );
+                            if (!allHandled) {
+                                this.emitLine("break;");
+                            }
+                        });
+                        this.emitLine("else");
+                        this.emitBlock(() => {
+                            const allHandled = this.emitDecodeTransformer(
+                                xfer.doubleTransformer!,
+                                targetType,
+                                emitFinish,
+                                doubleVar,
+                                varGen,
+                            );
+                            if (!allHandled) {
+                                this.emitLine("break;");
+                            }
+                        });
+                    });
+                } else {
+                    // Only one present, emit as before
+                    if (xfer.integerTransformer !== undefined) {
+                        varGen.counter++;
+                        const intVar = `intValue${varGen.counter}`;
+                        this.emitDecoderTransformerCase(
+                            ["Number"],
+                            intVar,
+                            xfer.integerTransformer,
+                            targetType,
+                            emitFinish,
+                            varGen,
+                        );
+                    } else if (xfer.doubleTransformer !== undefined) {
+                        varGen.counter++;
+                        const doubleVar = `doubleValue${varGen.counter}`;
+                        this.emitDecoderTransformerCase(
+                            ["Number"],
+                            doubleVar,
+                            xfer.doubleTransformer,
+                            targetType,
+                            emitFinish,
+                            varGen,
+                        );
+                    }
+                }
+
                 this.emitDecoderTransformerCase(
                     ["True", "False"],
                     "boolValue",
                     xfer.boolTransformer,
                     targetType,
                     emitFinish,
+                    varGen,
                 );
                 this.emitDecoderTransformerCase(
                     // ["String", "Date"],
@@ -677,6 +732,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     xfer.stringTransformer,
                     targetType,
                     emitFinish,
+                    varGen,
                 );
                 this.emitDecoderTransformerCase(
                     ["StartObject"],
@@ -684,6 +740,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     xfer.objectTransformer,
                     targetType,
                     emitFinish,
+                    varGen,
                 );
                 this.emitDecoderTransformerCase(
                     ["StartArray"],
@@ -691,6 +748,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     xfer.arrayTransformer,
                     targetType,
                     emitFinish,
+                    varGen,
                 );
             });
             return false;
