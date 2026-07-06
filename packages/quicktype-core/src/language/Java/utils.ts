@@ -44,8 +44,8 @@ export function javaNameStyle(
         upperUnderscore
             ? allUpperWordStyle
             : startWithUpper
-                ? firstUpperWordStyle
-                : allLowerWordStyle,
+              ? firstUpperWordStyle
+              : allLowerWordStyle,
         upperUnderscore ? allUpperWordStyle : firstUpperWordStyle,
         upperUnderscore || startWithUpper
             ? allUpperWordStyle
