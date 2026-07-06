@@ -93,9 +93,9 @@ export const CSharpLanguageSystemTextJson: Language = {
     name: "csharp",
     base: "test/fixtures/csharp-SystemTextJson",
     // https://github.com/dotnet/cli/issues/1582
-    setupCommand: "dotnet restore --no-cache",
+    setupCommand: "dotnet restore -p:CheckEolTargetFramework=false --no-cache",
     runCommand(sample: string) {
-        return `dotnet run -- "${sample}"`;
+        return `dotnet run -p:CheckEolTargetFramework=false -- "${sample}"`;
     },
     diffViaSchema: true,
     skipDiffViaSchema: ["34702.json", "437e7.json"],
@@ -514,6 +514,9 @@ export const CJSONLanguage: Language = {
         /* Constraints (min/max and regex) are not supported (for the current implementation, can be added later, should abord parsing and return NULL) */
         "minmaxlength.schema",
         "minmax.schema",
+        "optional-const-ref.schema",
+        /* Same unsupported min/max, length and regex constraints, applied to optional properties */
+        "optional-constraints.schema",
         "pattern.schema",
         /* Required properties absent are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "intersection.schema",
@@ -1289,6 +1292,9 @@ export const DartLanguage: Language = {
         "keyword-unions.schema",
         "ref-remote.schema",
         "uuid.schema",
+        /* Absent optional lists don't round-trip: the generated fromJson/toJson
+           turn them into [], so the output no longer matches the input */
+        "optional-const-ref.schema",
     ],
     skipMiscJSON: true,
     rendererOptions: {},
@@ -1445,10 +1451,10 @@ export const PHPLanguage: Language = {
     diffViaSchema: false,
     skipDiffViaSchema: [],
     allowMissingNull: true,
-    features: ["enum"],
+    features: ["enum", "uuid"],
     output: "TopLevel.php",
     topLevel: "TopLevel",
-    includeJSON: easySampleJSONs,
+    includeJSON: [...easySampleJSONs, "uuids.json"],
     skipMiscJSON: true,
     skipSchema: [],
     rendererOptions: {},
