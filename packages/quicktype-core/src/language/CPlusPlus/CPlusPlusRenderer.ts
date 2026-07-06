@@ -586,6 +586,10 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
         return kind === "class";
     }
 
+    protected get commentLinesSpliceOnBackslash(): boolean {
+        return true;
+    }
+
     protected emitDescriptionBlock(lines: Sourcelike[]): void {
         this.emitCommentLines(lines, {
             lineStart: " * ",
@@ -1104,6 +1108,10 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
             const { minMax, minMaxLength, pattern } = constraints;
 
             // TODO is there a better way to check if property.type is an integer or a number?
+            // We only generate this to classify the underlying type, so we
+            // always pass `false` for `isOptional` — otherwise `cppType`
+            // wraps the type in the optional<> container and the comparisons
+            // below never match.
             const cppType = this.cppType(
                 property.type,
                 {
@@ -1113,31 +1121,37 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                 },
                 true,
                 false,
-                property.isOptional,
+                false,
             );
 
+            // Compare bounds against `undefined` explicitly, since 0 is a
+            // valid constraint value too.
             res.set(jsonName, [
                 this.constraintMember(jsonName),
                 "(",
-                minMax?.[0] && cppType === "int64_t"
+                minMax?.[0] !== undefined && cppType === "int64_t"
                     ? String(minMax[0])
                     : this._nulloptType,
                 ", ",
-                minMax?.[1] && cppType === "int64_t"
+                minMax?.[1] !== undefined && cppType === "int64_t"
                     ? String(minMax[1])
                     : this._nulloptType,
                 ", ",
-                minMax?.[0] && cppType === "double"
+                minMax?.[0] !== undefined && cppType === "double"
                     ? String(minMax[0])
                     : this._nulloptType,
                 ", ",
-                minMax?.[1] && cppType === "double"
+                minMax?.[1] !== undefined && cppType === "double"
                     ? String(minMax[1])
                     : this._nulloptType,
                 ", ",
-                minMaxLength?.[0] ? String(minMaxLength[0]) : this._nulloptType,
+                minMaxLength?.[0] !== undefined
+                    ? String(minMaxLength[0])
+                    : this._nulloptType,
                 ", ",
-                minMaxLength?.[1] ? String(minMaxLength[1]) : this._nulloptType,
+                minMaxLength?.[1] !== undefined
+                    ? String(minMaxLength[1])
+                    : this._nulloptType,
                 ", ",
                 pattern === undefined
                     ? this._nulloptType
