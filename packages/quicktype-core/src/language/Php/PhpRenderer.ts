@@ -291,10 +291,6 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return "DateTime";
                 }
 
-                if (transformedStringType.kind === "uuid") {
-                    throw Error('transformedStringType.kind === "uuid"');
-                }
-
                 return "string";
             },
         );
@@ -332,6 +328,10 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return "DateTime";
                 }
 
+                if (transformedStringType.kind === "uuid") {
+                    return "string";
+                }
+
                 throw Error('transformedStringType.kind === "unknown"');
             },
         );
@@ -360,6 +360,10 @@ export class PhpRenderer extends ConvenienceRenderer {
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
+                    return "string";
+                }
+
+                if (transformedStringType.kind === "uuid") {
                     return "string";
                 }
 
@@ -443,6 +447,11 @@ export class PhpRenderer extends ConvenienceRenderer {
                         ...args,
                         "->format(DateTimeInterface::ISO8601);",
                     );
+                    return;
+                }
+
+                if (transformedStringType.kind === "uuid") {
+                    this.emitLine(...lhs, ...args, "; /*uuid*/");
                     return;
                 }
 
@@ -555,6 +564,11 @@ export class PhpRenderer extends ConvenienceRenderer {
                     );
                     this.transformDateTime(className, "", ["$tmp"]);
                     this.emitLine("return $tmp;");
+                    return;
+                }
+
+                if (transformedStringType.kind === "uuid") {
+                    this.emitLine(...lhs, ...args, "; /*uuid*/");
                     return;
                 }
 
@@ -728,6 +742,20 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return;
                 }
 
+                if (transformedStringType.kind === "uuid") {
+                    this.emitLine(
+                        ...lhs,
+                        "'9277b8fb-2a65-4663-a36c-8d417e2d284b'",
+                        suffix,
+                        " /*",
+                        `${idx}`,
+                        ":",
+                        args,
+                        "*/",
+                    );
+                    return;
+                }
+
                 throw Error('transformedStringType.kind === "unknown"');
             },
         );
@@ -820,6 +848,26 @@ export class PhpRenderer extends ConvenienceRenderer {
                     this.transformDateTime(className, attrName, [
                         scopeAttrName,
                     ]);
+                    return;
+                }
+
+                if (transformedStringType.kind === "uuid") {
+                    is("is_string");
+                    this.emitBlock(
+                        [
+                            "if (!preg_match('/^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/', ",
+                            scopeAttrName,
+                            "))",
+                        ],
+                        () =>
+                            this.emitLine(
+                                'throw new Exception("Attribute Error:',
+                                className,
+                                "::",
+                                attrName,
+                                '");',
+                            ),
+                    );
                     return;
                 }
 

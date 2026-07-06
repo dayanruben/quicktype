@@ -515,6 +515,8 @@ export const CJSONLanguage: Language = {
         "minmaxlength.schema",
         "minmax.schema",
         "optional-const-ref.schema",
+        /* Same unsupported min/max, length and regex constraints, applied to optional properties */
+        "optional-constraints.schema",
         "pattern.schema",
         /* Required properties absent are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "intersection.schema",
@@ -1446,10 +1448,10 @@ export const PHPLanguage: Language = {
     diffViaSchema: false,
     skipDiffViaSchema: [],
     allowMissingNull: true,
-    features: ["enum"],
+    features: ["enum", "uuid"],
     output: "TopLevel.php",
     topLevel: "TopLevel",
-    includeJSON: easySampleJSONs,
+    includeJSON: [...easySampleJSONs, "uuids.json"],
     skipMiscJSON: true,
     skipSchema: [],
     rendererOptions: {},
