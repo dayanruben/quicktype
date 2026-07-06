@@ -1,0 +1,17 @@
+name: Publish VS Code extension
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    publish-vscode:
+        runs-on: ubuntu-22.04
+        steps:
+            - uses: actions/checkout@v3
+            - uses: ./.github/workflows/setup
+            # Run via npm so node_modules/.bin is on PATH (patch-npm-version.ts
+            # is executed through its ts-node shebang).
+            - run: npm run pub:vscode
+              env:
+                  VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
