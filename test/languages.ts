@@ -25,6 +25,7 @@ const skipsEnumValueValidation = [
     "enum.schema",
     "enum-large.schema",
     "optional-enum.schema",
+    "const-non-string.schema",
 ];
 
 // The language makes no int/double distinction in unions (e.g. an integer is
@@ -1326,6 +1327,7 @@ export const DartLanguage: Language = {
         // so only these two enum schemas are skipped.
         "enum.schema",
         "enum-large.schema",
+        "const-non-string.schema",
         "bool-string.schema",
         "intersection.schema",
         "keyword-enum.schema",
