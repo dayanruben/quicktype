@@ -93,9 +93,9 @@ export const CSharpLanguageSystemTextJson: Language = {
     name: "csharp",
     base: "test/fixtures/csharp-SystemTextJson",
     // https://github.com/dotnet/cli/issues/1582
-    setupCommand: "dotnet restore --no-cache",
+    setupCommand: "dotnet restore -p:CheckEolTargetFramework=false --no-cache",
     runCommand(sample: string) {
-        return `dotnet run -- "${sample}"`;
+        return `dotnet run -p:CheckEolTargetFramework=false -- "${sample}"`;
     },
     diffViaSchema: true,
     skipDiffViaSchema: ["34702.json", "437e7.json"],
@@ -1445,10 +1445,10 @@ export const PHPLanguage: Language = {
     diffViaSchema: false,
     skipDiffViaSchema: [],
     allowMissingNull: true,
-    features: ["enum"],
+    features: ["enum", "uuid"],
     output: "TopLevel.php",
     topLevel: "TopLevel",
-    includeJSON: easySampleJSONs,
+    includeJSON: [...easySampleJSONs, "uuids.json"],
     skipMiscJSON: true,
     skipSchema: [],
     rendererOptions: {},

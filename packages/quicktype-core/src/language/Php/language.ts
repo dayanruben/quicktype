@@ -53,7 +53,7 @@ export class PhpTargetLanguage extends TargetLanguage<
             new Map();
         mapping.set("date", "date"); // TODO is not implemented yet
         mapping.set("time", "time"); // TODO is not implemented yet
-        mapping.set("uuid", "uuid"); // TODO is not implemented yet
+        mapping.set("uuid", "uuid");
         mapping.set("date-time", "date-time");
         return mapping;
     }

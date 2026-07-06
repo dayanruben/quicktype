@@ -586,6 +586,10 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
         return kind === "class";
     }
 
+    protected get commentLinesSpliceOnBackslash(): boolean {
+        return true;
+    }
+
     protected emitDescriptionBlock(lines: Sourcelike[]): void {
         this.emitCommentLines(lines, {
             lineStart: " * ",
