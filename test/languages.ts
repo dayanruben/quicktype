@@ -514,6 +514,7 @@ export const CJSONLanguage: Language = {
         /* Constraints (min/max and regex) are not supported (for the current implementation, can be added later, should abord parsing and return NULL) */
         "minmaxlength.schema",
         "minmax.schema",
+        "optional-const-ref.schema",
         /* Same unsupported min/max, length and regex constraints, applied to optional properties */
         "optional-constraints.schema",
         "pattern.schema",
@@ -1291,6 +1292,9 @@ export const DartLanguage: Language = {
         "keyword-unions.schema",
         "ref-remote.schema",
         "uuid.schema",
+        /* Absent optional lists don't round-trip: the generated fromJson/toJson
+           turn them into [], so the output no longer matches the input */
+        "optional-const-ref.schema",
     ],
     skipMiscJSON: true,
     rendererOptions: {},
