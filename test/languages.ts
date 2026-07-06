@@ -118,6 +118,17 @@ export const CSharpLanguageSystemTextJson: Language = {
     skipMiscJSON: false,
     skipSchema: [
         "top-level-enum.schema", // The code we generate for top-level enums is incompatible with the driver
+        // The following skips are pre-existing System.Text.Json renderer issues,
+        // found when first enabling the schema fixture for this language:
+        "bool-string.schema", // emits Newtonsoft-style code (JsonToken, serializer) for transformed string types: CS0103
+        "integer-string.schema", // emits Newtonsoft-style code (JsonToken, serializer) for transformed string types: CS0103
+        "keyword-unions.schema", // a property named "JsonSerializer" collides with System.Text.Json.JsonSerializer: CS0120
+        "minmaxlength.schema", // generated converter triggers CS8602 warnings, which "dotnet run" prints to stdout, breaking the JSON comparison
+        "optional-constraints.schema", // same CS8602 stdout issue; also min/max on integers and pattern on optional strings aren't checked, so expected-failure samples don't fail
+        "optional-const-ref.schema", // same CS8602 stdout issue; also min/max on integers isn't checked, so the expected-failure sample doesn't fail
+        "required.schema", // the renderer doesn't implement check-required, so the expected-failure sample doesn't fail
+        "strict-optional.schema", // the renderer doesn't implement check-required, so the expected-failure sample doesn't fail
+        "intersection.schema", // the renderer doesn't implement check-required, so the expected-failure sample doesn't fail
     ],
     rendererOptions: { "check-required": "true", framework: "SystemTextJson" },
     quickTestRendererOptions: [
@@ -504,6 +515,7 @@ export const CJSONLanguage: Language = {
         "top-level-enum.schema",
         /* Union with Number and Integer are not supported */
         "integer-float-union.schema",
+        "union-int-double.schema",
         /* Enum with invalid values are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "enum.schema",
         "enum-large.schema",
@@ -1347,6 +1359,7 @@ export const PikeLanguage: Language = {
         "top-level-enum.schema", // output generated properly, but not a class
         "keyword-unions.schema", // seems like a problem with deserializing
         "integer-float-union.schema", // no implicit cast int <-> float in Pike
+        "union-int-double.schema", // no implicit cast int <-> float in Pike
         "minmax.schema", // no implicit cast int <-> float in Pike
         // all below: not failing on expected failure. That's because Pike's quite tolerant with assignments.
         "go-schema-pattern-properties.schema",

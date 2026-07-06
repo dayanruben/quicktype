@@ -1574,6 +1574,10 @@ export const allFixtures: Fixture[] = [
     new JSONTypeScriptFixture(languages.CSharpLanguage),
     // new JSONSchemaFixture(languages.CrystalLanguage),
     new JSONSchemaFixture(languages.CSharpLanguage),
+    new JSONSchemaFixture(
+        languages.CSharpLanguageSystemTextJson,
+        "schema-csharp-SystemTextJson",
+    ),
     new JSONSchemaFixture(languages.JavaLanguage),
     new JSONSchemaFixture(
         languages.JavaLanguageWithLegacyDateTime,
