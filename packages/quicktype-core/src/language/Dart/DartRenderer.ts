@@ -603,7 +603,8 @@ export class DartRenderer extends ConvenienceRenderer {
                             (transformedStringType.isNullable || isNullable)
                         ) {
                             return [
-                                '"${',
+                                dynamic,
+                                ' == null ? null : "${',
                                 dynamic,
                                 "!.year.toString().padLeft(4, '0')",
                                 "}-${",
