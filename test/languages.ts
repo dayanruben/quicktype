@@ -293,6 +293,7 @@ export const CrystalLanguage: Language = {
     skipSchema: [
         // Crystal does not handle enum mapping
         "enum.schema",
+        "enum-large.schema",
         // Crystal does not support top-level primitives
         "top-level-enum.schema",
         "keyword-unions.schema",
@@ -505,6 +506,7 @@ export const CJSONLanguage: Language = {
         "integer-float-union.schema",
         /* Enum with invalid values are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "enum.schema",
+        "enum-large.schema",
         /* Union, Map and Arrays with invalid types are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "class-with-additional.schema",
         "go-schema-pattern-properties.schema",
@@ -737,6 +739,7 @@ export const SwiftLanguage: Language = {
         "intersection.schema",
         "go-schema-pattern-properties.schema",
         "enum.schema",
+        "enum-large.schema",
         "date-time.schema",
         "class-with-additional.schema",
         "class-map-union.schema",
@@ -1001,6 +1004,7 @@ I havea no idea how to encode these tests correctly.
         "implicit-one-of.schema",
         "go-schema-pattern-properties.schema",
         "enum.schema",
+        "enum-large.schema",
         "class-with-additional.schema",
         "class-map-union.schema",
         "keyword-unions.schema",
@@ -1278,6 +1282,7 @@ export const DartLanguage: Language = {
     skipSchema: [
         "enum-with-null.schema",
         "enum.schema",
+        "enum-large.schema",
         "bool-string.schema",
         "intersection.schema",
         "keyword-enum.schema",
@@ -1424,6 +1429,7 @@ export const HaskellLanguage: Language = {
         "class-map-union.schema",
         "direct-union.schema",
         "enum.schema",
+        "enum-large.schema",
         "go-schema-pattern-properties.schema",
         "implicit-class-array-union.schema",
         "intersection.schema",
@@ -1560,6 +1566,7 @@ export const TypeScriptZodLanguage: Language = {
         "class-map-union.schema",
         "direct-union.schema",
         "enum.schema",
+        "enum-large.schema",
         "go-schema-pattern-properties.schema",
         "implicit-class-array-union.schema",
         "intersection.schema",
@@ -1676,6 +1683,7 @@ export const TypeScriptEffectSchemaLanguage: Language = {
         "class-map-union.schema",
         "direct-union.schema",
         "enum.schema",
+        "enum-large.schema",
         "go-schema-pattern-properties.schema",
         "implicit-class-array-union.schema",
         "intersection.schema",
