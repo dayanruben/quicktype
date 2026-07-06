@@ -684,19 +684,16 @@ export class PhpRenderer extends ConvenienceRenderer {
                     "*/",
                 ),
             (mapType) => {
-                this.emitBlock(["function sample(): stdClass"], () => {
-                    this.emitLine("$out = new stdClass();");
-                    this.phpSampleConvert(
-                        className,
-                        mapType.values,
-                        ["$out->{'", className, "'} = "],
-                        args,
-                        idx,
-                        ";",
-                    );
-                    this.emitLine("return $out;");
-                });
-                this.emitLine("return sample();");
+                this.emitLine("$out = new stdClass();");
+                this.phpSampleConvert(
+                    className,
+                    mapType.values,
+                    ["$out->{'", className, "'} = "],
+                    args,
+                    idx,
+                    ";",
+                );
+                this.emitLine("return $out;");
             },
             (enumType) =>
                 this.emitLine(
