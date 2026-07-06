@@ -5,6 +5,7 @@ import { inParallel } from "./lib/multicore";
 import { execAsync, type Sample } from "./utils";
 import { type Fixture, allFixtures } from "./fixtures";
 import { affectedFixtures, divideParallelJobs } from "./buildkite";
+import { checkJavaEnumAcronymCasing } from "./check-java-acronym-names";
 import { checkCoreHasNoNodePrefixedImports } from "./check-no-node-imports";
 
 const exit = require("exit");
@@ -20,6 +21,11 @@ async function main(sources: string[]) {
     // Cheap sanity check, run before any fixture: quicktype-core must not
     // use "node:"-prefixed imports or it breaks web bundlers (issue #2763).
     checkCoreHasNoNodePrefixedImports();
+
+    // Regression check for issue #2850: Java enum constants must keep
+    // acronyms uppercase for every --acronym-style. The fixture harness
+    // can't catch this (mangled constants still compile and round-trip).
+    await checkJavaEnumAcronymCasing();
 
     let fixtures = affectedFixtures();
     const fixturesFromCmdline = process.env.FIXTURE;
