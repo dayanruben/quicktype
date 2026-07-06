@@ -1473,7 +1473,7 @@ export const PHPLanguage: Language = {
     features: ["enum", "uuid"],
     output: "TopLevel.php",
     topLevel: "TopLevel",
-    includeJSON: [...easySampleJSONs, "uuids.json"],
+    includeJSON: [...easySampleJSONs, "uuids.json", "nested-objects.json"],
     skipMiscJSON: true,
     skipSchema: [],
     rendererOptions: {},
