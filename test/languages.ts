@@ -513,6 +513,7 @@ export const CJSONLanguage: Language = {
         "top-level-enum.schema",
         /* Union with Number and Integer are not supported */
         "integer-float-union.schema",
+        "union-int-double.schema",
         /* Enum with invalid values are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "enum.schema",
         "enum-large.schema",
@@ -1356,6 +1357,7 @@ export const PikeLanguage: Language = {
         "top-level-enum.schema", // output generated properly, but not a class
         "keyword-unions.schema", // seems like a problem with deserializing
         "integer-float-union.schema", // no implicit cast int <-> float in Pike
+        "union-int-double.schema", // no implicit cast int <-> float in Pike
         "minmax.schema", // no implicit cast int <-> float in Pike
         // all below: not failing on expected failure. That's because Pike's quite tolerant with assignments.
         "go-schema-pattern-properties.schema",
