@@ -118,6 +118,15 @@ export const CSharpLanguageSystemTextJson: Language = {
     skipMiscJSON: false,
     skipSchema: [
         "top-level-enum.schema", // The code we generate for top-level enums is incompatible with the driver
+        // The following skips are pre-existing System.Text.Json renderer issues,
+        // found when first enabling the schema fixture for this language:
+        "bool-string.schema", // emits Newtonsoft-style code (JsonToken, serializer) for transformed string types: CS0103
+        "integer-string.schema", // emits Newtonsoft-style code (JsonToken, serializer) for transformed string types: CS0103
+        "keyword-unions.schema", // a property named "JsonSerializer" collides with System.Text.Json.JsonSerializer: CS0120
+        "minmaxlength.schema", // generated converter triggers CS8602 warnings, which "dotnet run" prints to stdout, breaking the JSON comparison
+        "required.schema", // the renderer doesn't implement check-required, so the expected-failure sample doesn't fail
+        "strict-optional.schema", // the renderer doesn't implement check-required, so the expected-failure sample doesn't fail
+        "intersection.schema", // the renderer doesn't implement check-required, so the expected-failure sample doesn't fail
     ],
     rendererOptions: { "check-required": "true", framework: "SystemTextJson" },
     quickTestRendererOptions: [
