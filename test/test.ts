@@ -5,6 +5,7 @@ import { inParallel } from "./lib/multicore";
 import { execAsync, type Sample } from "./utils";
 import { type Fixture, allFixtures } from "./fixtures";
 import { affectedFixtures, divideParallelJobs } from "./buildkite";
+import { checkCoreHasNoNodePrefixedImports } from "./check-no-node-imports";
 
 const exit = require("exit");
 const CPUs = Number.parseInt(process.env.CPUs || "0", 10) || os.cpus().length;
@@ -16,6 +17,10 @@ const CPUs = Number.parseInt(process.env.CPUs || "0", 10) || os.cpus().length;
 export type WorkItem = { sample: Sample; fixtureName: string };
 
 async function main(sources: string[]) {
+    // Cheap sanity check, run before any fixture: quicktype-core must not
+    // use "node:"-prefixed imports or it breaks web bundlers (issue #2763).
+    checkCoreHasNoNodePrefixedImports();
+
     let fixtures = affectedFixtures();
     const fixturesFromCmdline = process.env.FIXTURE;
     if (fixturesFromCmdline) {
