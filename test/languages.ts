@@ -11,6 +11,42 @@ const easySampleJSONs = [
     "getting-started.json",
 ];
 
+// Shared `skipSchema` lists for failure modes that many languages have in
+// common.  Spread these into a language's `skipSchema` instead of repeating
+// the individual entries.  When a new test schema hits one of these failure
+// modes, add it to the shared list so every affected language skips it at
+// once.
+
+// The generated code does not reject invalid enum values, so the
+// `.fail.enum.json` samples for these enum-bearing schemas do not fail as
+// expected.  Add any new schema whose fail sample relies on enum-value
+// rejection.
+const skipsEnumValueValidation = [
+    "enum.schema",
+    "enum-large.schema",
+    "optional-enum.schema",
+    "const-non-string.schema",
+];
+
+// The language makes no int/double distinction in unions (e.g. an integer is
+// implicitly accepted where a float union member is expected), so fail
+// samples that rely on rejecting an int where a double is expected (or vice
+// versa) do not fail.  Add any new schema whose fail sample relies on the
+// int/float distinction.
+const skipsIntFloatUnions = [
+    "integer-float-union.schema",
+    "minmax.schema",
+    "union-int-double.schema",
+];
+
+// Untyped unions are unsupported: class|map unions and implicit class|array
+// unions either don't compile or don't fail on the expected-failure samples.
+// Add any new schema that relies on such unions.
+const skipsUntypedUnions = [
+    "class-map-union.schema",
+    "implicit-class-array-union.schema",
+];
+
 export type LanguageFeature =
     | "enum"
     | "union"
@@ -303,10 +339,7 @@ export const CrystalLanguage: Language = {
     ],
     skipSchema: [
         // Crystal does not handle enum mapping
-        "enum.schema",
-        "enum-large.schema",
-        "const-non-string.schema",
-        "optional-enum.schema",
+        ...skipsEnumValueValidation,
         // Crystal does not support top-level primitives
         "top-level-enum.schema",
         "keyword-unions.schema",
@@ -515,23 +548,16 @@ export const CJSONLanguage: Language = {
         "vega-lite.schema",
         /* Enum as TopLevel is not supported */
         "top-level-enum.schema",
-        /* Union with Number and Integer are not supported */
-        "integer-float-union.schema",
-        "union-int-double.schema",
+        /* Union with Number and Integer are not supported; min/max constraints on numbers rely on the same distinction */
+        ...skipsIntFloatUnions,
         /* Enum with invalid values are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
-        "enum.schema",
-        "enum-large.schema",
-        "const-non-string.schema",
-        "optional-enum.schema",
+        ...skipsEnumValueValidation,
         /* Union, Map and Arrays with invalid types are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "class-with-additional.schema",
         "go-schema-pattern-properties.schema",
         "multi-type-enum.schema",
-        /* Class elements with invalid type are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
-        "class-map-union.schema",
         /* Constraints (min/max and regex) are not supported (for the current implementation, can be added later, should abord parsing and return NULL) */
         "minmaxlength.schema",
-        "minmax.schema",
         "optional-const-ref.schema",
         /* Same unsupported min/max, length and regex constraints, applied to optional properties */
         "optional-constraints.schema",
@@ -544,8 +570,8 @@ export const CJSONLanguage: Language = {
         "direct-union.schema",
         "optional-any.schema",
         "required-non-properties.schema",
-        /* Other cases not supported */
-        "implicit-class-array-union.schema",
+        /* Class elements with invalid type are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
+        ...skipsUntypedUnions,
     ],
     rendererOptions: {},
     quickTestRendererOptions: [{ "source-style": "single-source" }],
@@ -752,18 +778,14 @@ export const SwiftLanguage: Language = {
         // The code we generate for top-level enums is incompatible with the driver
         "top-level-enum.schema",
         // This works on macOS, but on Linux one of the failure test cases doesn't fail
-        "implicit-class-array-union.schema",
+        ...skipsUntypedUnions,
         "required.schema",
         "multi-type-enum.schema",
         "intersection.schema",
         "go-schema-pattern-properties.schema",
-        "enum.schema",
-        "enum-large.schema",
-        "const-non-string.schema",
-        "optional-enum.schema",
+        ...skipsEnumValueValidation,
         "date-time.schema",
         "class-with-additional.schema",
-        "class-map-union.schema",
         "vega-lite.schema",
         "top-level-primitive.schema",
     ],
@@ -1020,16 +1042,12 @@ I havea no idea how to encode these tests correctly.
         "multi-type-enum.schema", // I think it doesn't correctly realise this is an array of enums.
         "integer-string.schema",
         "intersection.schema",
-        "implicit-class-array-union.schema",
+        ...skipsUntypedUnions,
         "date-time-or-string.schema",
         "implicit-one-of.schema",
         "go-schema-pattern-properties.schema",
-        "enum.schema",
-        "enum-large.schema",
-        "const-non-string.schema",
-        "optional-enum.schema",
+        ...skipsEnumValueValidation,
         "class-with-additional.schema",
-        "class-map-union.schema",
         "keyword-unions.schema",
     ],
     skipMiscJSON: false,
@@ -1159,9 +1177,10 @@ export const KotlinLanguage: Language = {
     ],
     skipSchema: [
         // Very weird - the types are correct, but it can (de)serialize the string,
-        // which is not represented in the types.
+        // which is not represented in the types (implicit-class-array-union);
+        // class-map-union: KlaxonException: Couldn't find a suitable constructor for class UnionValue to initialize with {}
+        ...skipsUntypedUnions,
         "class-with-additional.schema",
-        "implicit-class-array-union.schema",
         "go-schema-pattern-properties.schema",
         // IllegalArgumentException
         "accessors.schema",
@@ -1174,7 +1193,6 @@ export const KotlinLanguage: Language = {
         // produces {"foo" : "java.lang.Object@48d61b48"}
         "any.schema",
         // KlaxonException: Couldn't find a suitable constructor for class UnionValue to initialize with {}
-        "class-map-union.schema",
         "direct-union.schema",
         // Some weird name collision
         "keyword-enum.schema",
@@ -1243,9 +1261,10 @@ export const KotlinJacksonLanguage: Language = {
     ],
     skipSchema: [
         // Very weird - the types are correct, but it can (de)serialize the string,
-        // which is not represented in the types.
+        // which is not represented in the types (implicit-class-array-union);
+        // class-map-union: KlaxonException: Couldn't find a suitable constructor for class UnionValue to initialize with {}
+        ...skipsUntypedUnions,
         "class-with-additional.schema",
-        "implicit-class-array-union.schema",
         "go-schema-pattern-properties.schema",
         // IllegalArgumentException
         "accessors.schema",
@@ -1258,7 +1277,6 @@ export const KotlinJacksonLanguage: Language = {
         // produces {"foo" : "java.lang.Object@48d61b48"}
         "any.schema",
         // KlaxonException: Couldn't find a suitable constructor for class UnionValue to initialize with {}
-        "class-map-union.schema",
         "direct-union.schema",
         // Some weird name collision
         "keyword-enum.schema",
@@ -1304,6 +1322,9 @@ export const DartLanguage: Language = {
     ],
     skipSchema: [
         "enum-with-null.schema",
+        // Deliberately NOT ...skipsEnumValueValidation: Dart runs
+        // optional-enum.schema as its own regression test (see PR #2720),
+        // so only these two enum schemas are skipped.
         "enum.schema",
         "enum-large.schema",
         "const-non-string.schema",
@@ -1367,15 +1388,13 @@ export const PikeLanguage: Language = {
     skipSchema: [
         "top-level-enum.schema", // output generated properly, but not a class
         "keyword-unions.schema", // seems like a problem with deserializing
-        "integer-float-union.schema", // no implicit cast int <-> float in Pike
-        "union-int-double.schema", // no implicit cast int <-> float in Pike
-        "minmax.schema", // no implicit cast int <-> float in Pike
+        // no implicit cast int <-> float in Pike
+        ...skipsIntFloatUnions,
         // all below: not failing on expected failure. That's because Pike's quite tolerant with assignments.
         "go-schema-pattern-properties.schema",
         "class-with-additional.schema",
         "multi-type-enum.schema",
-        "class-map-union.schema",
-        "implicit-class-array-union.schema",
+        ...skipsUntypedUnions,
     ],
     rendererOptions: {},
     quickTestRendererOptions: [],
@@ -1454,14 +1473,10 @@ export const HaskellLanguage: Language = {
     skipMiscJSON: false,
     skipSchema: [
         "any.schema",
-        "class-map-union.schema",
+        ...skipsUntypedUnions,
         "direct-union.schema",
-        "enum.schema",
-        "enum-large.schema",
-        "const-non-string.schema",
-        "optional-enum.schema",
+        ...skipsEnumValueValidation,
         "go-schema-pattern-properties.schema",
-        "implicit-class-array-union.schema",
         "intersection.schema",
         "multi-type-enum.schema",
         "keyword-unions.schema",
@@ -1593,14 +1608,10 @@ export const TypeScriptZodLanguage: Language = {
     skipMiscJSON: false,
     skipSchema: [
         "any.schema",
-        "class-map-union.schema",
+        ...skipsUntypedUnions,
         "direct-union.schema",
-        "enum.schema",
-        "enum-large.schema",
-        "const-non-string.schema",
-        "optional-enum.schema",
+        ...skipsEnumValueValidation,
         "go-schema-pattern-properties.schema",
-        "implicit-class-array-union.schema",
         "intersection.schema",
         "multi-type-enum.schema",
         "keyword-unions.schema",
@@ -1712,14 +1723,10 @@ export const TypeScriptEffectSchemaLanguage: Language = {
     skipMiscJSON: false,
     skipSchema: [
         "any.schema",
-        "class-map-union.schema",
+        ...skipsUntypedUnions,
         "direct-union.schema",
-        "enum.schema",
-        "enum-large.schema",
-        "const-non-string.schema",
-        "optional-enum.schema",
+        ...skipsEnumValueValidation,
         "go-schema-pattern-properties.schema",
-        "implicit-class-array-union.schema",
         "intersection.schema",
         "multi-type-enum.schema",
         "keyword-unions.schema",
