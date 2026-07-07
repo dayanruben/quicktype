@@ -1555,20 +1555,13 @@ export const TypeScriptZodLanguage: Language = {
     output: "TopLevel.ts",
     topLevel: "TopLevel",
     skipJSON: [
-        // Uses generated schema before it's defined
-        "be234.json",
-        "76ae1.json",
-        "6de06.json",
+        // The test driver can't find the top-level schema among the
+        // prefixed names (FluffyTopLevelSchema etc.)
         "2df80.json",
-        "29f47.json",
-        "spotify-album.json",
-        "reddit.json",
-        "github-events.json",
 
-        // Does not handle recursive
-        "direct-recursive.json",
-        "list.json",
-        "bug790.json",
+        // z.coerce.date() serializes timestamps with milliseconds, the
+        // input has none
+        "github-events.json",
 
         // Does not handle top level array
         "bug863.json",
@@ -1610,7 +1603,6 @@ export const TypeScriptZodLanguage: Language = {
         "combinations4.json",
         "identifiers.json",
         "blns-object.json",
-        "recursive.json",
         "bug427.json",
         "nst-test-suite.json",
         "keywords.json",
@@ -1624,6 +1616,11 @@ export const TypeScriptZodLanguage: Language = {
         ...skipsUntypedUnions,
         "direct-union.schema",
         ...skipsEnumValueValidation,
+        // zod validates the inherited Object.prototype.constructor when an
+        // optional "constructor" property is absent
+        "constructor.schema",
+        // z.coerce.date() serializes back as ISO UTC, not the input string
+        "date-time.schema",
         "go-schema-pattern-properties.schema",
         "intersection.schema",
         "multi-type-enum.schema",
