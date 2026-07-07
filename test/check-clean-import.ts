@@ -3,16 +3,15 @@ import * as path from "node:path";
 
 // Guard: importing the built quicktype-core must not write to stdout.
 //
-// quicktype-core's build (packages/quicktype-core/env.sh) swaps in a CI-only
-// fetch shim ($fetch.ci.ts) whenever $CI is set. That shim used to start with
-// a top-level console.info, so every published package since 23.3.1 printed
-// "=== RUNNING IN CI, USE FETCH.CI ===" on import — corrupting redirected CLI
-// output (`quicktype ... > out.ts` produced non-compiling code). See
-// https://github.com/glideapps/quicktype/issues/2874.
+// quicktype-core's build used to swap in a CI-only fetch shim ($fetch.ci.ts)
+// whenever $CI was set — that substitution is gone now — and the shim used to
+// start with a top-level console.info, so every published package since
+// 23.3.1 printed "=== RUNNING IN CI, USE FETCH.CI ===" on import — corrupting
+// redirected CLI output (`quicktype ... > out.ts` produced non-compiling
+// code). See https://github.com/glideapps/quicktype/issues/2874.
 //
 // This check requires the built package in a child process and fails the test
-// run if the import produces any stdout output. CI builds with $CI set, so it
-// exercises exactly the shim that used to do the printing.
+// run if the import produces any stdout output.
 
 export function checkCoreImportKeepsStdoutClean(): void {
     const coreDir = path.join(__dirname, "..", "packages", "quicktype-core");
