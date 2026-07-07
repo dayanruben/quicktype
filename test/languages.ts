@@ -1033,6 +1033,11 @@ I havea no idea how to encode these tests correctly.
         "combinations4.json",
         "unions.json",
         "nst-test-suite.json",
+
+        // Scala3 has the same prelude-shadowing bug that this input
+        // guards against in Rust (issue #2521): a field named "options"
+        // generates `case class Option`, which shadows scala.Option.
+        "bug2521.json",
     ],
     skipSchema: [
         // 12 skips
