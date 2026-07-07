@@ -5,6 +5,7 @@ import { inParallel } from "./lib/multicore";
 import { execAsync, type Sample } from "./utils";
 import { type Fixture, allFixtures } from "./fixtures";
 import { affectedFixtures, divideParallelJobs } from "./buildkite";
+import { checkCoreImportKeepsStdoutClean } from "./check-clean-import";
 import { checkJavaEnumAcronymCasing } from "./check-java-acronym-names";
 import { checkCoreHasNoNodePrefixedImports } from "./check-no-node-imports";
 
@@ -21,6 +22,11 @@ async function main(sources: string[]) {
     // Cheap sanity check, run before any fixture: quicktype-core must not
     // use "node:"-prefixed imports or it breaks web bundlers (issue #2763).
     checkCoreHasNoNodePrefixedImports();
+
+    // Regression check for issue #2874: importing the built quicktype-core
+    // must not write to stdout — CI builds used to swap in a fetch shim that
+    // printed a banner on import, corrupting redirected CLI output.
+    checkCoreImportKeepsStdoutClean();
 
     // Regression check for issue #2850: Java enum constants must keep
     // acronyms uppercase for every --acronym-style. The fixture harness
