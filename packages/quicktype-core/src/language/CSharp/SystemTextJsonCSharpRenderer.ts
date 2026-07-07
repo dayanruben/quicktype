@@ -569,14 +569,23 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     this.converterObject(converter),
                     ";",
                 );
+                // The converter is for the non-null type, so if the target
+                // type is nullable we have to handle null ourselves.
+                const isNullable =
+                    targetType instanceof UnionType &&
+                    nullableFromUnion(targetType) !== null;
                 this.emitLine(
                     "var ",
                     variableName,
-                    " = (",
+                    " = ",
+                    isNullable
+                        ? "reader.TokenType == JsonTokenType.Null ? null : "
+                        : "",
+                    "(",
                     typeSource,
-                    ")converter.ReadJson(reader, typeof(",
+                    ")converter.Read(ref reader, typeof(",
                     typeSource,
-                    "), null, serializer);",
+                    "), options);",
                 );
             } else if (source.kind !== "null") {
                 const output =
@@ -613,7 +622,9 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                 this.csType(targetType.items),
                 ">();",
             );
-            this.emitLine("while (reader.TokenType != JsonToken.EndArray)");
+            this.emitLine(
+                "while (reader.TokenType != JsonTokenType.EndArray)",
+            );
             this.emitBlock(() => {
                 this.emitDecodeTransformer(
                     xfer.itemTransformer,
@@ -888,11 +899,37 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     this.converterObject(converter),
                     ";",
                 );
-                this.emitLine(
-                    "converter.WriteJson(writer, ",
-                    variable,
-                    ", serializer);",
-                );
+                // The converter is for the non-null type, so if the source
+                // type is nullable we have to handle null ourselves.
+                const maybeNullable =
+                    xfer.sourceType instanceof UnionType
+                        ? nullableFromUnion(xfer.sourceType)
+                        : null;
+                if (maybeNullable !== null) {
+                    let member: Sourcelike = variable;
+                    if (isValueType(followTargetType(maybeNullable))) {
+                        member = [member, ".Value"];
+                    }
+
+                    this.emitLine("if (", variable, " == null)");
+                    this.emitBlock(() =>
+                        this.emitLine("writer.WriteNullValue();"),
+                    );
+                    this.emitLine("else");
+                    this.emitBlock(() =>
+                        this.emitLine(
+                            "converter.Write(writer, ",
+                            member,
+                            ", options);",
+                        ),
+                    );
+                } else {
+                    this.emitLine(
+                        "converter.Write(writer, ",
+                        variable,
+                        ", options);",
+                    );
+                }
             } else {
                 this.emitLine(this.serializeValueCode(variable), ";");
             }
