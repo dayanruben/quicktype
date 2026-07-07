@@ -146,7 +146,15 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
     }
 
     /** TypeScript type for `t`, used to annotate recursive schemas for
-     * which zod cannot infer the type. */
+     * which zod cannot infer the type.
+     *
+     * This intentionally duplicates neither `typeMapTypeFor` above nor
+     * `sourceFor` in the plain TypeScript renderer
+     * (`TypeScriptFlowBaseRenderer`): it must mirror exactly what
+     * `z.infer` would derive from the schemas emitted by
+     * `typeMapTypeFor` (e.g. `z.coerce.date()` implies `Date`), while
+     * `sourceFor` is shaped by ts/flow-specific options like
+     * `preferConstValues` and `declareUnions` that don't exist here. */
     protected underlyingTypeFor(t: Type): Sourcelike {
         if (["class", "object", "enum"].includes(t.kind)) {
             return this.nameForNamedType(t);
