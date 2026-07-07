@@ -7,6 +7,7 @@ import { type Fixture, allFixtures } from "./fixtures";
 import { affectedFixtures, divideParallelJobs } from "./buildkite";
 import { checkJavaEnumAcronymCasing } from "./check-java-acronym-names";
 import { checkCoreHasNoNodePrefixedImports } from "./check-no-node-imports";
+import { checkWindowsSchemaPaths } from "./check-windows-schema-paths";
 
 const exit = require("exit");
 const CPUs = Number.parseInt(process.env.CPUs || "0", 10) || os.cpus().length;
@@ -26,6 +27,11 @@ async function main(sources: string[]) {
     // acronyms uppercase for every --acronym-style. The fixture harness
     // can't catch this (mangled constants still compile and round-trip).
     await checkJavaEnumAcronymCasing();
+
+    // Regression check for issue #2869: schema inputs given as Windows
+    // absolute paths must work. The fixture harness can't catch this
+    // because its inputs are always plain POSIX paths.
+    await checkWindowsSchemaPaths();
 
     let fixtures = affectedFixtures();
     const fixturesFromCmdline = process.env.FIXTURE;

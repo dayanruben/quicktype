@@ -136,6 +136,25 @@ function checkJSONSchema(x: unknown, refOrLoc: Ref | (() => Ref)): JSONSchema {
 
 const numberRegexp = /^[0-9]+$/;
 
+// Windows absolute paths are not valid URIs: urijs parses the drive letter
+// of e.g. "C:\Users\me\top.schema.json" as a URI scheme (and lowercases it,
+// and treats the backslashes as an opaque path), so relative refs resolve to
+// bogus addresses (issue #2869). Convert drive-letter and UNC paths to
+// "file:" URIs, which NodeIO knows how to read.
+function fixWindowsPath(pathOrURI: string): string {
+    if (/^[A-Za-z]:[/\\]/.test(pathOrURI)) {
+        // Drive-letter path, e.g. "C:\dir\x.json" -> "file:///C:/dir/x.json"
+        return `file:///${pathOrURI.replace(/\\/g, "/")}`;
+    }
+
+    if (pathOrURI.startsWith("\\\\")) {
+        // UNC path, e.g. "\\server\share\x.json" -> "file://server/share/x.json"
+        return `file:${pathOrURI.replace(/\\/g, "/")}`;
+    }
+
+    return pathOrURI;
+}
+
 function normalizeURI(uri: string | URI): URI {
     // FIXME: This is overly complicated and a bit shady.  The problem is
     // that `normalize` will URL-escape, with the result that if we want to
@@ -143,7 +162,7 @@ function normalizeURI(uri: string | URI): URI {
     // JSONSchemaStore should take a URI, not a string, and if it reads from
     // a file it can decode by itself.
     if (typeof uri === "string") {
-        uri = new URI(uri);
+        uri = new URI(fixWindowsPath(uri));
     }
 
     return new URI(URI.decode(uri.clone().normalize().toString()));
@@ -151,7 +170,7 @@ function normalizeURI(uri: string | URI): URI {
 
 export class Ref {
     public static root(address: string | undefined): Ref {
-        const uri = definedMap(address, (a) => new URI(a));
+        const uri = definedMap(address, (a) => new URI(fixWindowsPath(a)));
         return new Ref(uri, []);
     }
 
@@ -189,7 +208,7 @@ export class Ref {
     }
 
     public static parse(ref: string): Ref {
-        return Ref.parseURI(new URI(ref), true);
+        return Ref.parseURI(new URI(fixWindowsPath(ref)), true);
     }
 
     public addressURI: URI | undefined;

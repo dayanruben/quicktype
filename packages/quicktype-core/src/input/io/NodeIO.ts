@@ -39,6 +39,28 @@ function parseHeaders(httpHeaders?: string[]): HttpHeaders {
     }, {} as HttpHeaders);
 }
 
+// "file:" URIs come from JSONSchemaInput, which converts Windows absolute
+// schema paths to them because they are not valid URIs (issue #2869). We
+// don't use `url.fileURLToPath` because its result is platform-dependent:
+// drive-letter URIs must also be readable on POSIX (as paths relative to the
+// working directory), which is how the tests exercise this, and Node's fs
+// accepts forward slashes on Windows anyway. The addresses were URI-decoded
+// when they were normalized, so there's no percent-decoding to do here.
+function filePathFromFileURI(fileURI: string): string {
+    const path = fileURI.slice("file://".length);
+    if (/^\/[A-Za-z]:\//.test(path)) {
+        // Drive-letter path, e.g. "file:///C:/dir/x.json" -> "C:/dir/x.json"
+        return path.slice(1);
+    }
+
+    if (!path.startsWith("/")) {
+        // UNC path, e.g. "file://server/share/x.json" -> "//server/share/x.json"
+        return `//${path}`;
+    }
+
+    return path;
+}
+
 function resolveSymbolicLink(filePath: string): string {
     if (!fs.lstatSync(filePath).isSymbolicLink()) {
         return filePath;
@@ -56,7 +78,9 @@ export async function readableFromFileOrURL(
     httpHeaders?: string[],
 ): Promise<Readable> {
     try {
-        if (isURL(fileOrURL)) {
+        if (fileOrURL.startsWith("file://")) {
+            fileOrURL = filePathFromFileURI(fileOrURL);
+        } else if (isURL(fileOrURL)) {
             const response = await fetch(fileOrURL, {
                 headers: parseHeaders(httpHeaders),
             });
