@@ -8,6 +8,7 @@ import { affectedFixtures, divideParallelJobs } from "./buildkite";
 import { checkCoreImportKeepsStdoutClean } from "./check-clean-import";
 import { checkJavaEnumAcronymCasing } from "./check-java-acronym-names";
 import { checkCoreHasNoNodePrefixedImports } from "./check-no-node-imports";
+import { checkURLInput } from "./check-url-input";
 
 const exit = require("exit");
 const CPUs = Number.parseInt(process.env.CPUs || "0", 10) || os.cpus().length;
@@ -32,6 +33,11 @@ async function main(sources: string[]) {
     // acronyms uppercase for every --acronym-style. The fixture harness
     // can't catch this (mangled constants still compile and round-trip).
     await checkJavaEnumAcronymCasing();
+
+    // Regression check for issues #2613, #2678, #2821: URL inputs must work
+    // with the native (WHATWG) fetch on Node >= 18. The fixture harness only
+    // uses local files, so it can't catch this.
+    await checkURLInput();
 
     let fixtures = affectedFixtures();
     const fixturesFromCmdline = process.env.FIXTURE;
