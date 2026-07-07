@@ -1,3 +1,5 @@
+import cluster from "node:cluster";
+
 import * as os from "os";
 import * as _ from "lodash";
 
@@ -36,8 +38,14 @@ async function main(sources: string[]) {
 
     // Regression check for issues #2613, #2678, #2821: URL inputs must work
     // with the native (WHATWG) fetch on Node >= 18. The fixture harness only
-    // uses local files, so it can't catch this.
-    await checkURLInput();
+    // uses local files, so it can't catch this. Only run it in the cluster
+    // primary: forked workers re-execute main() too, and in a cluster worker
+    // `server.listen(0)` gives every worker the *same* shared port, with
+    // connections round-robined between them — concurrent workers cross-talk
+    // and hit each others' closing servers.
+    if (cluster.isPrimary) {
+        await checkURLInput();
+    }
 
     let fixtures = affectedFixtures();
     const fixturesFromCmdline = process.env.FIXTURE;
