@@ -7,6 +7,12 @@ on:
 jobs:
     publish-vscode:
         runs-on: ubuntu-22.04
+        env:
+            # quicktype-core's build (packages/quicktype-core/env.sh) swaps in
+            # a CI-only fetch shim whenever $CI is set — which GitHub Actions
+            # always sets. PUBLISH=true makes it skip that swap so the bundled
+            # extension ships the real $fetch (issue #2874).
+            PUBLISH: "true"
         steps:
             - uses: actions/checkout@v3
             - uses: ./.github/workflows/setup
