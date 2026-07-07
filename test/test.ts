@@ -9,6 +9,7 @@ import { type Fixture, allFixtures } from "./fixtures";
 import { affectedFixtures, divideParallelJobs } from "./buildkite";
 import { checkCoreImportKeepsStdoutClean } from "./check-clean-import";
 import { checkJavaEnumAcronymCasing } from "./check-java-acronym-names";
+import { checkLanguageNamed } from "./check-language-named";
 import { checkCoreHasNoNodePrefixedImports } from "./check-no-node-imports";
 import { checkURLInput } from "./check-url-input";
 
@@ -46,6 +47,11 @@ async function main(sources: string[]) {
     if (cluster.isPrimary) {
         await checkURLInput();
     }
+
+    // Regression check for issue #2769: languageNamed() must accept display
+    // names and extensions and return undefined for unknown names instead
+    // of throwing. The fixture harness only ever uses exact lowercase names.
+    checkLanguageNamed();
 
     let fixtures = affectedFixtures();
     const fixturesFromCmdline = process.env.FIXTURE;
