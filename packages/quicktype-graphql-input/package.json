@@ -5,7 +5,7 @@
     "license": "Apache-2.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
-    "repository": "https://github.com/quicktype/quicktype",
+    "repository": "https://github.com/glideapps/quicktype",
     "scripts": {
         "clean": "rm -rf dist node_modules *~",
         "build": "tsc"
@@ -16,11 +16,9 @@
         "graphql": "^0.11.7"
     },
     "devDependencies": {
-        "@types/node": "18.19.31",
+        "@types/node": "~22.14.0",
         "@types/graphql": "^0.11.7",
-        "typescript": "4.9.5"
+        "typescript": "~5.8.3"
     },
-    "files": [
-        "dist"
-    ]
+    "files": ["dist"]
 }
