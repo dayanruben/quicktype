@@ -43,15 +43,6 @@ For the best CLI, we recommend installing `quicktype` globally via `npm`:
 npm install -g quicktype
 ```
 
-Other options:
-
--   [Homebrew](http://formulae.brew.sh/formula/quicktype) _(infrequently updated)_
--   [Xcode extension](https://itunes.apple.com/us/app/paste-json-as-code-quicktype/id1330801220?mt=12)\*
--   [VSCode extension](https://marketplace.visualstudio.com/items/quicktype.quicktype)\*
--   [Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=typeguard.quicktype-vs)\*
-
-<small>\* limited functionality</small>
-
 ## Using `quicktype`
 
 ```bash
@@ -194,6 +185,11 @@ main();
 ```
 
 The argument to `quicktype` is a complex object with many optional properties. [Explore its definition](https://github.com/quicktype/quicktype/blob/master/packages/quicktype-core/src/Run.ts#L637) to understand what options are allowed.
+
+### Adding Custom logic or Rendering:
+
+Quicktype supports creating your own custom languages and rendering output, you can extend existing classes or create your own to be using by the `quicktype function`.<br/>
+Check out [this guide](./doc/CustomRenderer.md) for more info.
 
 ## Contributing
 
