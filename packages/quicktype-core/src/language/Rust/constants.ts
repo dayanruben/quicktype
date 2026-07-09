@@ -72,5 +72,21 @@ export const keywords = [
     "union",
 
     // Conflict between `std::Option` and potentially generated Option
-    "option"
+    "option",
+
+    // Prelude and standard-library names that generated code refers to
+    // unqualified; a generated type with one of these names would shadow
+    // them and break compilation (e.g. a struct named `Option`).
+    "Option",
+    "Some",
+    "None",
+    "Result",
+    "Ok",
+    "Err",
+    "String",
+    "Vec",
+    "Box",
+    // Generated code contains `use std::collections::HashMap;`, which a
+    // type of the same name would conflict with.
+    "HashMap",
 ] as const;
