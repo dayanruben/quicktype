@@ -7,6 +7,12 @@ on:
 jobs:
     publish-npm:
         runs-on: ubuntu-22.04
+        env:
+            # quicktype-core's build (packages/quicktype-core/env.sh) swaps in
+            # a CI-only fetch shim whenever $CI is set — which GitHub Actions
+            # always sets. PUBLISH=true makes it skip that swap so releases
+            # ship the real $fetch (issue #2874).
+            PUBLISH: "true"
         permissions:
             # Required for npm Trusted Publishing (OIDC): npm mints
             # short-lived, per-run credentials from this token instead

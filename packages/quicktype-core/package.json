@@ -8,7 +8,7 @@
     "repository": "https://github.com/glideapps/quicktype",
     "scripts": {
         "clean": "rm -rf dist node_modules *~",
-        "build": "./env.sh && tsc"
+        "build": "tsc"
     },
     "dependencies": {
         "@glideapps/ts-necessities": "2.2.3",

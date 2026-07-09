@@ -4,7 +4,7 @@ import * as path from "path";
 import { defined, exceptionToString } from "@glideapps/ts-necessities";
 import { isNode } from "browser-or-node";
 import isURL from "is-url";
-import type { Readable } from "readable-stream";
+import { Readable } from "readable-stream";
 
 import { messageError } from "../../Messages";
 import { panic } from "../../support/Support";
@@ -61,6 +61,54 @@ function filePathFromFileURI(fileURI: string): string {
     return path;
 }
 
+// Minimal structural type for a WHATWG ReadableStream — our TS lib doesn't
+// include "dom", and on Node we only get the type via undici's fetch.
+interface WebReadableStream {
+    getReader: () => {
+        read: () => Promise<{ done: boolean; value?: Uint8Array }>;
+        releaseLock: () => void;
+    };
+}
+
+async function* webStreamChunks(
+    stream: WebReadableStream,
+): AsyncGenerator<Uint8Array> {
+    const reader = stream.getReader();
+    try {
+        for (;;) {
+            const { done, value } = await reader.read();
+            if (done) return;
+            yield defined(value);
+        }
+    } finally {
+        reader.releaseLock();
+    }
+}
+
+// readable-stream implements Readable.from (it can't do Readable.fromWeb),
+// but @types/readable-stream doesn't declare it, hence this cast.
+const ReadableWithFrom = Readable as unknown as {
+    from: (
+        iterable: AsyncIterable<Uint8Array>,
+        options: { objectMode: boolean },
+    ) => Readable;
+};
+
+function readableFromResponseBody(body: unknown): Readable {
+    // Native fetch (Node >= 18, browsers) returns a WHATWG ReadableStream,
+    // which lacks the Node stream API that our consumers rely on, so we have
+    // to wrap it.  The cross-fetch fallback (node-fetch) already returns a
+    // Node stream, which we pass through unchanged.
+    if (typeof (body as WebReadableStream).getReader === "function") {
+        return ReadableWithFrom.from(
+            webStreamChunks(body as WebReadableStream),
+            { objectMode: false },
+        );
+    }
+
+    return body as Readable;
+}
+
 function resolveSymbolicLink(filePath: string): string {
     if (!fs.lstatSync(filePath).isSymbolicLink()) {
         return filePath;
@@ -85,7 +133,7 @@ export async function readableFromFileOrURL(
                 headers: parseHeaders(httpHeaders),
             });
 
-            return defined(response.body) as unknown as Readable;
+            return readableFromResponseBody(defined(response.body));
         }
 
         if (isNode) {
