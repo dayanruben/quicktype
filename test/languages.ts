@@ -567,6 +567,7 @@ export const CJSONLanguage: Language = {
         "any.schema",
         "direct-union.schema",
         "optional-any.schema",
+        "recursive-union-flattening.schema",
         "required-non-properties.schema",
         /* Class elements with invalid type are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         ...skipsUntypedUnions,
@@ -629,6 +630,8 @@ export const CPlusPlusLanguage: Language = {
     skipSchema: [
         // uses too much memory
         "keyword-unions.schema",
+        // Recursive top-level unions produce aliases that can refer to later aliases.
+        "recursive-union-flattening.schema",
     ],
     rendererOptions: {},
     quickTestRendererOptions: [
@@ -1202,9 +1205,10 @@ export const KotlinLanguage: Language = {
         // Some weird name collision
         "keyword-enum.schema",
         "keyword-unions.schema",
-        // Klaxon does not support top-level primitives
+        // Klaxon does not support top-level primitives/unions
         "top-level-enum.schema",
         "top-level-primitive.schema",
+        "recursive-union-flattening.schema",
     ],
     skipMiscJSON: false,
     rendererOptions: {},
@@ -1286,9 +1290,10 @@ export const KotlinJacksonLanguage: Language = {
         // Some weird name collision
         "keyword-enum.schema",
         "keyword-unions.schema",
-        // Klaxon does not support top-level primitives
+        // Klaxon does not support top-level primitives/unions
         "top-level-enum.schema",
         "top-level-primitive.schema",
+        "recursive-union-flattening.schema",
     ],
     skipMiscJSON: false,
     rendererOptions: { framework: "jackson" },
@@ -1555,20 +1560,13 @@ export const TypeScriptZodLanguage: Language = {
     output: "TopLevel.ts",
     topLevel: "TopLevel",
     skipJSON: [
-        // Uses generated schema before it's defined
-        "be234.json",
-        "76ae1.json",
-        "6de06.json",
+        // The test driver can't find the top-level schema among the
+        // prefixed names (FluffyTopLevelSchema etc.)
         "2df80.json",
-        "29f47.json",
-        "spotify-album.json",
-        "reddit.json",
-        "github-events.json",
 
-        // Does not handle recursive
-        "direct-recursive.json",
-        "list.json",
-        "bug790.json",
+        // z.coerce.date() serializes timestamps with milliseconds, the
+        // input has none
+        "github-events.json",
 
         // Does not handle top level array
         "bug863.json",
@@ -1610,7 +1608,6 @@ export const TypeScriptZodLanguage: Language = {
         "combinations4.json",
         "identifiers.json",
         "blns-object.json",
-        "recursive.json",
         "bug427.json",
         "nst-test-suite.json",
         "keywords.json",
@@ -1624,11 +1621,17 @@ export const TypeScriptZodLanguage: Language = {
         ...skipsUntypedUnions,
         "direct-union.schema",
         ...skipsEnumValueValidation,
+        // zod validates the inherited Object.prototype.constructor when an
+        // optional "constructor" property is absent
+        "constructor.schema",
+        // z.coerce.date() serializes back as ISO UTC, not the input string
+        "date-time.schema",
         "go-schema-pattern-properties.schema",
         "intersection.schema",
         "multi-type-enum.schema",
         "keyword-unions.schema",
         "optional-any.schema",
+        "recursive-union-flattening.schema",
         "required.schema",
         "required-non-properties.schema",
     ],
@@ -1807,6 +1810,9 @@ export const ElixirLanguage: Language = {
         // The test incorrectly succeeds due to the emitter being permissive for unions that contain only primitives. A future enhancement
         // for the Elixir emitter could be a user-controlled 'strict' mode that pattern matches even on unions of only primitive types.
         "go-schema-pattern-properties.schema",
+
+        // The generated top-level type is not emitted as a TopLevel module the fixture can call.
+        "recursive-union-flattening.schema",
     ],
     rendererOptions: {},
     quickTestRendererOptions: [],
