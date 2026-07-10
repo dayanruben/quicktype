@@ -8,6 +8,7 @@ import { Readable } from "readable-stream";
 
 import { messageError } from "../../Messages";
 import { panic } from "../../support/Support";
+import { filePathFromFileURI } from "../../support/WindowsPaths";
 
 import { getStream } from "./get-stream";
 
@@ -100,7 +101,9 @@ export async function readableFromFileOrURL(
     httpHeaders?: string[],
 ): Promise<Readable> {
     try {
-        if (isURL(fileOrURL)) {
+        if (fileOrURL.startsWith("file://")) {
+            fileOrURL = filePathFromFileURI(fileOrURL);
+        } else if (isURL(fileOrURL)) {
             const response = await globalThis.fetch(fileOrURL, {
                 headers: parseHeaders(httpHeaders),
             });

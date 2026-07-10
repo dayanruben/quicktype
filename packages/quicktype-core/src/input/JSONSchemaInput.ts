@@ -54,6 +54,7 @@ import {
     panic,
     parseJSON,
 } from "../support/Support";
+import { fixWindowsPath } from "../support/WindowsPaths";
 import {
     type PrimitiveTypeKind,
     type TransformedStringTypeKind,
@@ -143,7 +144,7 @@ function normalizeURI(uri: string | URI): URI {
     // JSONSchemaStore should take a URI, not a string, and if it reads from
     // a file it can decode by itself.
     if (typeof uri === "string") {
-        uri = new URI(uri);
+        uri = new URI(fixWindowsPath(uri));
     }
 
     return new URI(URI.decode(uri.clone().normalize().toString()));
@@ -151,7 +152,7 @@ function normalizeURI(uri: string | URI): URI {
 
 export class Ref {
     public static root(address: string | undefined): Ref {
-        const uri = definedMap(address, (a) => new URI(a));
+        const uri = definedMap(address, (a) => new URI(fixWindowsPath(a)));
         return new Ref(uri, []);
     }
 
@@ -189,7 +190,7 @@ export class Ref {
     }
 
     public static parse(ref: string): Ref {
-        return Ref.parseURI(new URI(ref), true);
+        return Ref.parseURI(new URI(fixWindowsPath(ref)), true);
     }
 
     public addressURI: URI | undefined;
