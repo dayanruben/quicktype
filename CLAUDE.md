@@ -2,15 +2,16 @@
 
 ## Releasing / version bumps
 
-Bump the version in the **root `package.json` only**. Do **not** bump the
-`version` fields in the workspace packages (`packages/quicktype-core`,
-`packages/quicktype-graphql-input`, `packages/quicktype-typescript-input`,
-`packages/quicktype-vscode`) — those are intentionally left at their older,
-independent numbers.
+Do not bump versions in any `package.json` before a release. Package manifest
+versions are intentionally allowed to be stale in the repository.
 
-At publish time `script/publish.sh` runs `npm version $VERSION --workspaces
---force` to sync the workspaces up to the root version. `npm version` errors
-with **"Version not changed"** (even with `--force`) if a workspace already
-equals the target, so pre-bumping the workspaces in lockstep with root breaks
-the release publish. Leave the workspaces stale and let the publish script
-sync them.
+To publish, create a stable GitHub Release targeting the commit to release and
+give it a tag in the form `vMAJOR.MINOR.PATCH`, for example `v24.0.0`. Publishing
+the release triggers the npm and VS Code Marketplace workflows. They derive the
+version exclusively from the release tag and stamp all manifests in the Actions
+checkout before publishing; those changes are not committed.
+
+The release version must be greater than every previous stable GitHub Release
+and every version already published for the npm packages and VS Code extension.
+Rerunning a partially completed release is safe: packages already published at
+the exact release version are skipped.

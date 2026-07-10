@@ -1,9 +1,9 @@
-name: Test PR
+name: Test
 on:
-    pull_request:
+    push:
         branches:
             - master
-            - "release/**"
+    pull_request:
 jobs:
     build:
         runs-on: ubuntu-22.04
