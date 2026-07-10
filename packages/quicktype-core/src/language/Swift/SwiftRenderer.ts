@@ -3,19 +3,19 @@ import { arrayIntercalate } from "collection-utils";
 import {
     anyTypeIssueAnnotation,
     nullTypeIssueAnnotation,
-} from "../../Annotation";
+} from "../../Annotation.js";
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import { type Name, type Namer, funPrefixNamer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, maybeAnnotated, modifySource } from "../../Source";
-import { acronymStyle } from "../../support/Acronyms";
-import { camelCase } from "../../support/Strings";
-import { assert, defined, panic } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../ConvenienceRenderer.js";
+import { type Name, type Namer, funPrefixNamer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, maybeAnnotated, modifySource } from "../../Source.js";
+import { acronymStyle } from "../../support/Acronyms.js";
+import { camelCase } from "../../support/Strings.js";
+import { assert, defined, panic } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -25,21 +25,21 @@ import {
     type Type,
     type TypeKind,
     type UnionType,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     matchType,
     nullableFromUnion,
     removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import { keywords } from "./constants";
-import type { swiftOptions } from "./language";
+import { keywords } from "./constants.js";
+import type { swiftOptions } from "./language.js";
 import {
     MAX_SAMELINE_PROPERTIES,
     type SwiftProperty,
     stringEscape,
     swiftNameStyle,
-} from "./utils";
+} from "./utils.js";
 
 export class SwiftRenderer extends ConvenienceRenderer {
     private _currentFilename: string | undefined;

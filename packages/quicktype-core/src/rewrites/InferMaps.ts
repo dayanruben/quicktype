@@ -1,20 +1,20 @@
 import { iterableEvery, iterableFirst, setMap } from "collection-utils";
 
-import type { GraphRewriteBuilder } from "../GraphRewriting";
-import { type MarkovChain, evaluate, load } from "../MarkovChain";
-import { defined, panic } from "../support/Support";
+import type { GraphRewriteBuilder } from "../GraphRewriting.js";
+import { type MarkovChain, evaluate, load } from "../MarkovChain.js";
+import { defined, panic } from "../support/Support.js";
 import {
     type ClassProperty,
     ClassType,
     type Type,
     isPrimitiveStringTypeKind,
     setOperationCasesEqual,
-} from "../Type";
-import type { StringTypeMapping } from "../Type/TypeBuilderUtils";
-import type { TypeGraph } from "../Type/TypeGraph";
-import type { TypeRef } from "../Type/TypeRef";
-import { removeNullFromType } from "../Type/TypeUtils";
-import { unifyTypes, unionBuilderForUnification } from "../UnifyClasses";
+} from "../Type/index.js";
+import type { StringTypeMapping } from "../Type/TypeBuilderUtils.js";
+import type { TypeGraph } from "../Type/TypeGraph.js";
+import type { TypeRef } from "../Type/TypeRef.js";
+import { removeNullFromType } from "../Type/TypeUtils.js";
+import { unifyTypes, unionBuilderForUnification } from "../UnifyClasses.js";
 
 const mapSizeThreshold = 20;
 const stringMapSizeThreshold = 50;

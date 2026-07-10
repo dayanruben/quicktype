@@ -1,10 +1,10 @@
-import { messageError } from "../Messages";
-import { assert } from "../support/Support";
-import type { LanguageName, RendererOptions } from "../types";
+import { messageError } from "../Messages.js";
+import { assert } from "../support/Support.js";
+import type { LanguageName, RendererOptions } from "../types.js";
 
-import type { OptionDefinition, OptionKind, OptionValues } from "./types";
+import type { OptionDefinition, OptionKind, OptionValues } from "./types.js";
 
-export * from "./types";
+export * from "./types.js";
 
 /**
  * The superclass for target language options.  You probably want to use one of its

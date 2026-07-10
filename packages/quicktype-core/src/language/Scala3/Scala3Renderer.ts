@@ -1,16 +1,21 @@
 import {
     anyTypeIssueAnnotation,
     nullTypeIssueAnnotation,
-} from "../../Annotation";
+} from "../../Annotation.js";
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import { type Name, type Namer, funPrefixNamer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, maybeAnnotated } from "../../Source";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../ConvenienceRenderer.js";
+import { type Name, type Namer, funPrefixNamer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, maybeAnnotated } from "../../Source.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
+import {
+    matchType,
+    nullableFromUnion,
+    removeNullFromUnion,
+} from "../../Type/TypeUtils.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -20,22 +25,17 @@ import {
     type ObjectType,
     type Type,
     type UnionType,
-} from "../../Type";
-import {
-    matchType,
-    nullableFromUnion,
-    removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/index.js";
 
-import { keywords } from "./constants";
-import type { scala3Options } from "./language";
+import { keywords } from "./constants.js";
+import type { scala3Options } from "./language.js";
 import {
     lowerNamingFunction,
     scalaNameStyle,
     shouldAddBacktick,
     upperNamingFunction,
     wrapOption,
-} from "./utils";
+} from "./utils.js";
 
 export class Scala3Renderer extends ConvenienceRenderer {
     public constructor(

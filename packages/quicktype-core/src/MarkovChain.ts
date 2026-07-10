@@ -1,5 +1,5 @@
-import { encodedMarkovChain } from "./EncodedMarkovChain";
-import { assert, inflateBase64, panic } from "./support/Support";
+import { encodedMarkovChain } from "./EncodedMarkovChain.js";
+import { assert, inflateBase64, panic } from "./support/Support.js";
 
 // This must be null, not undefined, because we read it from JSON.
 export type SubTrie = number | null | Trie;

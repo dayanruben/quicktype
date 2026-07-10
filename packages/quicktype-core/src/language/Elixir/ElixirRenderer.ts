@@ -1,12 +1,13 @@
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import { type Name, Namer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import type { Sourcelike } from "../../Source";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../ConvenienceRenderer.js";
+import { type Name, Namer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import type { Sourcelike } from "../../Source.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
+import { matchType, nullableFromUnion } from "../../Type/TypeUtils.js";
 import {
     ArrayType,
     ClassType,
@@ -15,11 +16,10 @@ import {
     PrimitiveType,
     type Type,
     UnionType,
-} from "../../Type";
-import { matchType, nullableFromUnion } from "../../Type/TypeUtils";
+} from "../../Type/index.js";
 
-import { forbiddenModuleNames, reservedWords } from "./constants";
-import type { elixirOptions } from "./language";
+import { forbiddenModuleNames, reservedWords } from "./constants.js";
+import type { elixirOptions } from "./language.js";
 import {
     capitalizeFirstLetter,
     escapeDoubleQuotes,
@@ -27,7 +27,7 @@ import {
     memberNameStyle,
     simpleNameStyle,
     stringEscape,
-} from "./utils";
+} from "./utils.js";
 
 export class ElixirRenderer extends ConvenienceRenderer {
     public constructor(

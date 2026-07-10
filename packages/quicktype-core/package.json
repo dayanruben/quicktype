@@ -5,13 +5,29 @@
     "license": "Apache-2.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/esm/index.d.ts",
+                "default": "./dist/esm/index.js"
+            },
+            "require": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            }
+        },
+        "./dist/*": "./dist/*",
+        "./package.json": "./package.json"
+    },
     "repository": "https://github.com/glideapps/quicktype",
     "engines": {
         "node": ">=20.0.0"
     },
     "scripts": {
         "clean": "rm -rf dist node_modules *~",
-        "build": "node ../../node_modules/typescript/bin/tsc"
+        "build": "npm run build:cjs && npm run build:esm",
+        "build:cjs": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json",
+        "build:esm": "node ../../node_modules/typescript/bin/tsc -p tsconfig.esm.json && node script/write-esm-package-json.mjs"
     },
     "dependencies": {
         "@glideapps/ts-necessities": "2.2.3",

@@ -1,23 +1,23 @@
 import { iterableSome } from "collection-utils";
 
-import type { RenderContext } from "../../Renderer";
+import type { RenderContext } from "../../Renderer.js";
 import {
     BooleanOption,
     EnumOption,
     getOptionValues,
-} from "../../RendererOptions";
-import { TargetLanguage } from "../../TargetLanguage";
+} from "../../RendererOptions/index.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
+import type { StringTypeMapping } from "../../Type/TypeBuilderUtils.js";
 import {
     type PrimitiveStringTypeKind,
     type TransformedStringTypeKind,
     type Type,
     UnionType,
-} from "../../Type";
-import type { StringTypeMapping } from "../../Type/TypeBuilderUtils";
-import type { LanguageName, RendererOptions } from "../../types";
+} from "../../Type/index.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { JSONPythonRenderer } from "./JSONPythonRenderer";
-import { PythonRenderer } from "./PythonRenderer";
+import { JSONPythonRenderer } from "./JSONPythonRenderer.js";
+import { PythonRenderer } from "./PythonRenderer.js";
 
 export interface PythonFeatures {
     dataClasses: boolean;

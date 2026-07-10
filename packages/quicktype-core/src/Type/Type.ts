@@ -19,17 +19,17 @@ import {
     toReadonlySet,
 } from "collection-utils";
 
-import type { TypeAttributes } from "../attributes/TypeAttributes";
+import type { TypeAttributes } from "../attributes/TypeAttributes.js";
 import {
     type TypeNames,
     namesTypeAttributeKind,
-} from "../attributes/TypeNames";
+} from "../attributes/TypeNames.js";
 import type {
     BaseGraphRewriteBuilder,
     TypeReconstituter,
-} from "../GraphRewriting";
-import { messageAssert } from "../Messages";
-import { assert, defined, panic } from "../support/Support";
+} from "../GraphRewriting.js";
+import { messageAssert } from "../Messages.js";
+import { assert, defined, panic } from "../support/Support.js";
 
 import {
     type ObjectTypeKind,
@@ -37,14 +37,14 @@ import {
     type TypeKind,
     isPrimitiveStringTypeKind,
     triviallyStructurallyCompatible,
-} from "./TransformedStringType";
-import type { TypeGraph } from "./TypeGraph";
+} from "./TransformedStringType.js";
+import type { TypeGraph } from "./TypeGraph.js";
 import {
     type TypeRef,
     attributesForTypeRef,
     derefTypeRef,
     typeRefIndex,
-} from "./TypeRef";
+} from "./TypeRef.js";
 
 export class TypeIdentity {
     private readonly _hashCode: number;

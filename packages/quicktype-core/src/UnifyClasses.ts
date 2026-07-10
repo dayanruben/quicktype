@@ -4,23 +4,23 @@ import {
     type TypeAttributes,
     combineTypeAttributes,
     emptyTypeAttributes,
-} from "./attributes/TypeAttributes";
+} from "./attributes/TypeAttributes.js";
 import type {
     BaseGraphRewriteBuilder,
     GraphRewriteBuilder,
     TypeLookerUp,
-} from "./GraphRewriting";
-import { assert, defined, panic } from "./support/Support";
+} from "./GraphRewriting.js";
+import { assert, defined, panic } from "./support/Support.js";
 import {
     type ClassProperty,
     type ObjectType,
     type Type,
     UnionType,
-} from "./Type/Type";
-import type { TypeBuilder } from "./Type/TypeBuilder";
-import { type TypeRef, derefTypeRef } from "./Type/TypeRef";
-import { assertIsObject } from "./Type/TypeUtils";
-import { TypeRefUnionAccumulator, UnionBuilder } from "./UnionBuilder";
+} from "./Type/Type.js";
+import type { TypeBuilder } from "./Type/TypeBuilder.js";
+import { type TypeRef, derefTypeRef } from "./Type/TypeRef.js";
+import { assertIsObject } from "./Type/TypeUtils.js";
+import { TypeRefUnionAccumulator, UnionBuilder } from "./UnionBuilder.js";
 
 function getCliqueProperties(
     clique: ObjectType[],

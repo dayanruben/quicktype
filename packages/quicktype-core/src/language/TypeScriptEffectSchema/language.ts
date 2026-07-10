@@ -1,9 +1,9 @@
-import type { RenderContext } from "../../Renderer";
-import { BooleanOption, getOptionValues } from "../../RendererOptions";
-import { TargetLanguage } from "../../TargetLanguage";
-import type { LanguageName, RendererOptions } from "../../types";
+import type { RenderContext } from "../../Renderer.js";
+import { BooleanOption, getOptionValues } from "../../RendererOptions/index.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { TypeScriptEffectSchemaRenderer } from "./TypeScriptEffectSchemaRenderer";
+import { TypeScriptEffectSchemaRenderer } from "./TypeScriptEffectSchemaRenderer.js";
 
 export const typeScriptEffectSchemaOptions = {
     justSchema: new BooleanOption("just-schema", "Schema only", false),

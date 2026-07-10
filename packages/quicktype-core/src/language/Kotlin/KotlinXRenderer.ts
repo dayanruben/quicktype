@@ -1,19 +1,19 @@
-import type { Name } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, modifySource } from "../../Source";
-import { camelCase } from "../../support/Strings";
-import type { TargetLanguage } from "../../TargetLanguage";
+import type { Name } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, modifySource } from "../../Source.js";
+import { camelCase } from "../../support/Strings.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import type {
     ArrayType,
     EnumType,
     MapType,
     Type,
-} from "../../Type";
+} from "../../Type/index.js";
 
-import { KotlinRenderer } from "./KotlinRenderer";
-import type { kotlinOptions } from "./language";
-import { stringEscape } from "./utils";
+import { KotlinRenderer } from "./KotlinRenderer.js";
+import type { kotlinOptions } from "./language.js";
+import { stringEscape } from "./utils.js";
 
 /**
  * Currently supports simple classes, enums, and TS string unions (which are also enums).

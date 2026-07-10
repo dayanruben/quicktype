@@ -8,7 +8,7 @@
 import {
     filePathFromFileURI,
     fixWindowsPath,
-} from "quicktype-core/dist/support/WindowsPaths";
+} from "quicktype-core/dist/support/WindowsPaths.js";
 import { describe, expect, test } from "vitest";
 
 describe("fixWindowsPath", () => {

@@ -1,19 +1,19 @@
-import type { GraphRewriteBuilder } from "../GraphRewriting";
-import type { RunContext } from "../Run";
-import { assert, panic } from "../support/Support";
+import type { GraphRewriteBuilder } from "../GraphRewriting.js";
+import type { RunContext } from "../Run.js";
+import { assert, panic } from "../support/Support.js";
 import {
     type ClassProperty,
     ClassType,
     type Type,
     setOperationCasesEqual,
-} from "../Type/Type";
-import type { TypeGraph } from "../Type/TypeGraph";
-import type { TypeRef } from "../Type/TypeRef";
+} from "../Type/Type.js";
+import type { TypeGraph } from "../Type/TypeGraph.js";
+import type { TypeRef } from "../Type/TypeRef.js";
 import {
     combineTypeAttributesOfTypes,
     nonNullTypeCases,
-} from "../Type/TypeUtils";
-import { unifyTypes, unionBuilderForUnification } from "../UnifyClasses";
+} from "../Type/TypeUtils.js";
+import { unifyTypes, unionBuilderForUnification } from "../UnifyClasses.js";
 
 const REQUIRED_OVERLAP = 3 / 4;
 

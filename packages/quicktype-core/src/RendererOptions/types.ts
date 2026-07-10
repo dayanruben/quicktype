@@ -1,4 +1,4 @@
-import type { EnumOption, Option } from "./index";
+import type { EnumOption, Option } from "./index.js";
 
 /**
  * Primary options show up in the web UI in the "Language" settings tab,

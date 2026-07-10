@@ -1,15 +1,15 @@
-import type { ConvenienceRenderer } from "../../ConvenienceRenderer";
-import type { RenderContext } from "../../Renderer";
+import type { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
+import type { RenderContext } from "../../Renderer.js";
 import {
     EnumOption,
     StringOption,
     getOptionValues,
-} from "../../RendererOptions";
-import { assertNever } from "../../support/Support";
-import { TargetLanguage } from "../../TargetLanguage";
-import type { LanguageName, RendererOptions } from "../../types";
+} from "../../RendererOptions/index.js";
+import { assertNever } from "../../support/Support.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { Smithy4sRenderer } from "./Smithy4sRenderer";
+import { Smithy4sRenderer } from "./Smithy4sRenderer.js";
 
 export enum Framework {
     None = "None",

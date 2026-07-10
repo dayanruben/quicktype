@@ -1,7 +1,7 @@
 import { iterableEnumerate } from "collection-utils";
 
-import { type AnnotationData, IssueAnnotationData } from "./Annotation";
-import { type Name, type Namespace, assignNames } from "./Naming";
+import { type AnnotationData, IssueAnnotationData } from "./Annotation.js";
+import { type Name, type Namespace, assignNames } from "./Naming.js";
 import {
     type NewlineSource,
     type Source,
@@ -9,11 +9,11 @@ import {
     annotated,
     newline,
     sourcelikeToSource,
-} from "./Source";
-import type { Comment } from "./support/Comments";
-import { assert, panic } from "./support/Support";
-import type { TargetLanguage } from "./TargetLanguage";
-import type { TypeGraph } from "./Type/TypeGraph";
+} from "./Source.js";
+import type { Comment } from "./support/Comments.js";
+import { assert, panic } from "./support/Support.js";
+import type { TargetLanguage } from "./TargetLanguage.js";
+import type { TypeGraph } from "./Type/TypeGraph.js";
 
 export interface RenderResult {
     names: ReadonlyMap<Name, string>;

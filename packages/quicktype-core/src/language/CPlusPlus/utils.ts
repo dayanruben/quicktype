@@ -3,15 +3,15 @@ import {
     minMaxLengthForType,
     minMaxValueForType,
     patternForType,
-} from "../../attributes/Constraints";
-import type { Name } from "../../Naming";
-import type { Sourcelike } from "../../Source";
+} from "../../attributes/Constraints.js";
+import type { Name } from "../../Naming.js";
+import type { Sourcelike } from "../../Source.js";
 import {
     isAscii,
     isLetterOrUnderscoreOrDigit,
     legalizeCharacters,
-} from "../../support/Strings";
-import type { Type, TypeKind } from "../../Type";
+} from "../../support/Strings.js";
+import type { Type, TypeKind } from "../../Type/index.js";
 
 export function constraintsForType(t: Type):
     | {

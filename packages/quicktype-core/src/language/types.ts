@@ -1,6 +1,6 @@
-import type { TargetLanguage } from "../TargetLanguage";
+import type { TargetLanguage } from "../TargetLanguage.js";
 
-import type { all } from "./All";
+import type { all } from "./All.js";
 
 type AllLanguages = (typeof all)[number];
 

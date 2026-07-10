@@ -1,13 +1,13 @@
 import { addHashCode, hashCodeInit, hashString } from "collection-utils";
 
-import { inferTransformedStringTypeKindForString } from "../attributes/StringTypes";
-import type { DateTimeRecognizer } from "../DateTime";
-import { assert, defined, panic } from "../support/Support";
+import { inferTransformedStringTypeKindForString } from "../attributes/StringTypes.js";
+import type { DateTimeRecognizer } from "../DateTime.js";
+import { assert, defined, panic } from "../support/Support.js";
 import {
     type TransformedStringTypeKind,
     isPrimitiveStringTypeKind,
     transformedStringTypeTargetTypeKindsMap,
-} from "../Type";
+} from "../Type/index.js";
 
 export enum Tag {
     Null = 1,

@@ -1,12 +1,12 @@
-import type { RenderContext } from "../../Renderer";
-import { TargetLanguage } from "../../TargetLanguage";
+import type { RenderContext } from "../../Renderer.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
 import {
     type StringTypeMapping,
     getNoStringTypeMapping,
-} from "../../Type/TypeBuilderUtils";
-import type { LanguageName, RendererOptions } from "../../types";
+} from "../../Type/TypeBuilderUtils.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { JSONSchemaRenderer } from "./JSONSchemaRenderer";
+import { JSONSchemaRenderer } from "./JSONSchemaRenderer.js";
 
 export const JSONSchemaLanguageConfig = {
     displayName: "JSON Schema",

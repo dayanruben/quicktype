@@ -21,16 +21,16 @@
  * See test/languages.ts for the test cases which are not implmented/checked.
  */
 
-import type { RenderContext } from "../../Renderer";
+import type { RenderContext } from "../../Renderer.js";
 import {
     EnumOption,
     StringOption,
     getOptionValues,
-} from "../../RendererOptions";
-import { TargetLanguage } from "../../TargetLanguage";
-import type { LanguageName, RendererOptions } from "../../types";
+} from "../../RendererOptions/index.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { CJSONRenderer } from "./CJSONRenderer";
+import { CJSONRenderer } from "./CJSONRenderer.js";
 
 /* Naming styles */
 const namingStyles = {

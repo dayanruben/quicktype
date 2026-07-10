@@ -1,14 +1,14 @@
-import type { RenderContext } from "../../Renderer";
+import type { RenderContext } from "../../Renderer.js";
 import {
     BooleanOption,
     EnumOption,
     StringOption,
     getOptionValues,
-} from "../../RendererOptions";
-import { TargetLanguage } from "../../TargetLanguage";
-import type { LanguageName, RendererOptions } from "../../types";
+} from "../../RendererOptions/index.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { CPlusPlusRenderer } from "./CPlusPlusRenderer";
+import { CPlusPlusRenderer } from "./CPlusPlusRenderer.js";
 
 // FIXME: share with CJSON
 const namingStyles = {

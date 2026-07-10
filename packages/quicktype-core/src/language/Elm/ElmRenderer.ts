@@ -3,14 +3,14 @@ import { arrayIntercalate, mapContains } from "collection-utils";
 import {
     anyTypeIssueAnnotation,
     nullTypeIssueAnnotation,
-} from "../../Annotation";
+} from "../../Annotation.js";
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import { DependencyName, type Name, type Namer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
+} from "../../ConvenienceRenderer.js";
+import { DependencyName, type Name, type Namer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
 import {
     type MultiWord,
     type Sourcelike,
@@ -18,26 +18,26 @@ import {
     multiWord,
     parenIfNeeded,
     singleWord,
-} from "../../Source";
-import { decapitalize, stringEscape } from "../../support/Strings";
-import { defined } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../Source.js";
+import { decapitalize, stringEscape } from "../../support/Strings.js";
+import { defined } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import type {
     ClassProperty,
     ClassType,
     EnumType,
     Type,
     UnionType,
-} from "../../Type";
-import { matchType, nullableFromUnion } from "../../Type/TypeUtils";
+} from "../../Type/index.js";
+import { matchType, nullableFromUnion } from "../../Type/TypeUtils.js";
 
-import { forbiddenNames } from "./constants";
-import type { elmOptions } from "./language";
+import { forbiddenNames } from "./constants.js";
+import type { elmOptions } from "./language.js";
 import {
     lowerNamingFunction,
     requiredOrOptional,
     upperNamingFunction,
-} from "./utils";
+} from "./utils.js";
 
 interface TopLevelDependent {
     decoder?: Name;
