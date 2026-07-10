@@ -54,6 +54,7 @@ import {
     panic,
     parseJSON,
 } from "../support/Support";
+import { fixWindowsPath } from "../support/WindowsPaths";
 import {
     type PrimitiveTypeKind,
     type TransformedStringTypeKind,
@@ -135,25 +136,6 @@ function checkJSONSchema(x: unknown, refOrLoc: Ref | (() => Ref)): JSONSchema {
 }
 
 const numberRegexp = /^[0-9]+$/;
-
-// Windows absolute paths are not valid URIs: urijs parses the drive letter
-// of e.g. "C:\Users\me\top.schema.json" as a URI scheme (and lowercases it,
-// and treats the backslashes as an opaque path), so relative refs resolve to
-// bogus addresses (issue #2869). Convert drive-letter and UNC paths to
-// "file:" URIs, which NodeIO knows how to read.
-function fixWindowsPath(pathOrURI: string): string {
-    if (/^[A-Za-z]:[/\\]/.test(pathOrURI)) {
-        // Drive-letter path, e.g. "C:\dir\x.json" -> "file:///C:/dir/x.json"
-        return `file:///${pathOrURI.replace(/\\/g, "/")}`;
-    }
-
-    if (pathOrURI.startsWith("\\\\")) {
-        // UNC path, e.g. "\\server\share\x.json" -> "file://server/share/x.json"
-        return `file:${pathOrURI.replace(/\\/g, "/")}`;
-    }
-
-    return pathOrURI;
-}
 
 function normalizeURI(uri: string | URI): URI {
     // FIXME: This is overly complicated and a bit shady.  The problem is

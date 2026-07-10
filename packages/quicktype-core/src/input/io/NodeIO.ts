@@ -8,6 +8,7 @@ import { Readable } from "readable-stream";
 
 import { messageError } from "../../Messages";
 import { panic } from "../../support/Support";
+import { filePathFromFileURI } from "../../support/WindowsPaths";
 
 import { getStream } from "./get-stream";
 
@@ -35,28 +36,6 @@ function parseHeaders(httpHeaders?: string[]): HttpHeaders {
 
         return result;
     }, {} as HttpHeaders);
-}
-
-// "file:" URIs come from JSONSchemaInput, which converts Windows absolute
-// schema paths to them because they are not valid URIs (issue #2869). We
-// don't use `url.fileURLToPath` because its result is platform-dependent:
-// drive-letter URIs must also be readable on POSIX (as paths relative to the
-// working directory), which is how the tests exercise this, and Node's fs
-// accepts forward slashes on Windows anyway. The addresses were URI-decoded
-// when they were normalized, so there's no percent-decoding to do here.
-function filePathFromFileURI(fileURI: string): string {
-    const path = fileURI.slice("file://".length);
-    if (/^\/[A-Za-z]:\//.test(path)) {
-        // Drive-letter path, e.g. "file:///C:/dir/x.json" -> "C:/dir/x.json"
-        return path.slice(1);
-    }
-
-    if (!path.startsWith("/")) {
-        // UNC path, e.g. "file://server/share/x.json" -> "//server/share/x.json"
-        return `//${path}`;
-    }
-
-    return path;
 }
 
 // Minimal structural type for a WHATWG ReadableStream — our TS lib doesn't
