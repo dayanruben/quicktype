@@ -12,10 +12,11 @@ export type OptionType = "string" | "boolean" | "enum";
 // that package is a dependency of the quicktype CLI, not of quicktype-core,
 // so the type-only import leaked into the published declarations and broke
 // consumers that compile with `skipLibCheck: false` (issue #2904).  The
-// fields below that have no quicktype-specific meaning (`alias`, `group`,
-// `defaultOption`, `lazyMultiple`, `type`) mirror the previously inherited
-// fields of command-line-args' `OptionDefinition`, so option definitions
-// remain directly consumable by `commandLineArgs` in the CLI.
+// `alias` and `defaultOption` fields below mirror the previously inherited
+// command-line-args fields of the same names, so the CLI's option
+// definitions remain directly consumable by `commandLineArgs` (the CLI adds
+// `type` itself at the call site).  The other previously inherited fields
+// (`group`, `lazyMultiple`, `type`) were dropped as unused.
 export interface OptionDefinition<Name extends string = string, T = unknown> {
     /** Option Name */
     name: Name;
@@ -23,12 +24,6 @@ export interface OptionDefinition<Name extends string = string, T = unknown> {
     alias?: string;
     /** Whether the CLI treats this option as the default positional argument */
     defaultOption?: boolean;
-    /** CLI option group(s) this option belongs to */
-    group?: string | string[];
-    /** Whether repeated CLI values require repeating the option name */
-    lazyMultiple?: boolean;
-    /** Converts a CLI string input to the option's value type */
-    type?: (input: string) => unknown;
     /** Option Description */
     description: string;
     /** Category of Option */
