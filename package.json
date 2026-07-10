@@ -32,6 +32,7 @@
     ],
     "dependencies": {
         "@glideapps/ts-necessities": "^2.2.3",
+        "@types/readable-stream": "4.0.10",
         "chalk": "^4.1.2",
         "collection-utils": "^1.0.1",
         "command-line-args": "^5.2.1",
