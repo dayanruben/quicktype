@@ -1,4 +1,4 @@
-// Regression check for issue #2869: schema inputs given as Windows absolute
+// Regression test for issue #2869: schema inputs given as Windows absolute
 // paths must work.
 //
 // urijs parses the drive letter of a Windows absolute path such as
@@ -17,9 +17,9 @@
 // path the issue reported. The fixture harness cannot cover this because its
 // inputs are always plain POSIX paths.
 
-import * as fs from "fs";
-import * as os from "os";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 
 import {
     FetchingJSONSchemaStore,
@@ -27,6 +27,7 @@ import {
     JSONSchemaInput,
     quicktype,
 } from "quicktype-core";
+import { describe, test } from "vitest";
 
 const topLevelSchema = JSON.stringify({
     $schema: "http://json-schema.org/draft-07/schema#",
@@ -79,70 +80,44 @@ async function generateTypeScript(schemaURI: string): Promise<string> {
     return result.lines.join("\n");
 }
 
-async function runCase(c: SchemaPathCase): Promise<string | undefined> {
-    const tempDir = fs.mkdtempSync(
-        path.join(os.tmpdir(), "quicktype-windows-paths-"),
-    );
-    const previousCwd = process.cwd();
-    try {
-        const schemaDir = path.join(tempDir, c.schemaDir);
-        fs.mkdirSync(schemaDir, { recursive: true });
-        fs.writeFileSync(
-            path.join(schemaDir, "top.schema.json"),
-            topLevelSchema,
-        );
-        fs.writeFileSync(path.join(schemaDir, "item.schema.json"), itemSchema);
-
-        // On POSIX the drive-letter path is read relative to the working
-        // directory, so the "C:/Users/quicktype" tree must be under the cwd.
-        process.chdir(tempDir);
-        const output = await generateTypeScript(c.schemaArg(tempDir));
-
-        // The item schema is only reachable through the relative $ref, so
-        // this asserts that $ref resolution against the address works, too.
-        if (!/name\s*:\s*string/.test(output)) {
-            return `    ${c.description}: generated output does not contain the type from the $ref'd schema:\n${output}`;
-        }
-
-        return undefined;
-    } catch (e) {
-        return `    ${c.description}: quicktype failed: ${e}`;
-    } finally {
-        process.chdir(previousCwd);
-        fs.rmSync(tempDir, { recursive: true, force: true });
-    }
-}
-
-export async function checkWindowsSchemaPaths(): Promise<void> {
-    const failures: string[] = [];
+describe("schema inputs given as absolute paths (issue #2869)", () => {
+    // Sequential, not concurrent: the cases chdir into their temp dirs.
     for (const c of cases) {
-        const failure = await runCase(c);
-        if (failure !== undefined) {
-            failures.push(failure);
-        }
+        test(c.description, async () => {
+            const tempDir = fs.mkdtempSync(
+                path.join(os.tmpdir(), "quicktype-windows-paths-"),
+            );
+            const previousCwd = process.cwd();
+            try {
+                const schemaDir = path.join(tempDir, c.schemaDir);
+                fs.mkdirSync(schemaDir, { recursive: true });
+                fs.writeFileSync(
+                    path.join(schemaDir, "top.schema.json"),
+                    topLevelSchema,
+                );
+                fs.writeFileSync(
+                    path.join(schemaDir, "item.schema.json"),
+                    itemSchema,
+                );
+
+                // On POSIX the drive-letter path is read relative to the
+                // working directory, so the "C:/Users/quicktype" tree must
+                // be under the cwd.
+                process.chdir(tempDir);
+                const output = await generateTypeScript(c.schemaArg(tempDir));
+
+                // The item schema is only reachable through the relative
+                // $ref, so this asserts that $ref resolution against the
+                // address works, too.
+                if (!/name\s*:\s*string/.test(output)) {
+                    throw new Error(
+                        `generated output does not contain the type from the $ref'd schema:\n${output}`,
+                    );
+                }
+            } finally {
+                process.chdir(previousCwd);
+                fs.rmSync(tempDir, { recursive: true, force: true });
+            }
+        });
     }
-
-    if (failures.length > 0) {
-        console.error(
-            `error: schema inputs given as absolute paths must work (issue #2869):
-
-${failures.join("\n")}
-
-Windows absolute paths (drive-letter and UNC) must be converted to "file:"
-URIs before urijs parses them — see normalizeURI and friends in
-packages/quicktype-core/src/input/JSONSchemaInput.ts and the "file:" URI
-handling in packages/quicktype-core/src/input/io/NodeIO.ts.`,
-        );
-        process.exit(1);
-    }
-}
-
-// Allow running the check standalone:
-//   NODE_PATH=`pwd`/node_modules npx ts-node --project test/tsconfig.json test/check-windows-schema-paths.ts
-if (require.main === module) {
-    checkWindowsSchemaPaths().then(() => {
-        console.error(
-            "* Schema inputs given as Windows and POSIX absolute paths work",
-        );
-    });
-}
+});
