@@ -17,15 +17,6 @@ runs:
               fi
               echo "node_version=$NODE_VERSION" >> $GITHUB_ENV
 
-              # Create keys to control caching
-              BASE_KEY="${{ runner.os }}"
-
-              NODE_MODULES_KEY="$BASE_KEY-${{ hashFiles('package-lock.json') }}"
-              echo "node_modules_key=$NODE_MODULES_KEY" >> $GITHUB_ENV
-
-              SOURCE_KEY="$NODE_MODULES_KEY-${{ hashFiles('src/**') }}"
-              echo "source_key=$SOURCE_KEY" >> $GITHUB_ENV
-
         - name: Setup node
           uses: actions/setup-node@v4
           with:

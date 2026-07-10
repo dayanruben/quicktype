@@ -1,3 +1,16 @@
+// URL inputs must work with the native (WHATWG) fetch. Its `response.body`
+// is a WHATWG ReadableStream, not a Node Readable, and NodeIO's
+// readableFromFileOrURL used to cast that body straight to a Node Readable,
+// so *every* URL-based input failed: JSON URLs with "readStream.setEncoding
+// is not a function" (surfaced as "Syntax error in input JSON"), and schema
+// URLs / remote $refs with "inputStream.once is not a function" (surfaced as
+// "Could not fetch schema"). See issues #2613, #2678, and #2821, and the
+// stream wrapping in packages/quicktype-core/src/input/io/NodeIO.ts.
+//
+// The fixture harness only feeds quicktype local files, so it cannot catch
+// this. These tests serve a JSON sample and a JSON Schema with a relative
+// $ref from a local HTTP server and run quicktype against the URLs.
+
 import * as fs from "node:fs";
 import * as http from "node:http";
 import type { AddressInfo } from "node:net";
