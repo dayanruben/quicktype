@@ -1,5 +1,4 @@
 import type { EnumOption, Option } from "./index.js";
-import type { OptionDefinition as CommandLineArgsOptionDefinition } from "command-line-args";
 
 /**
  * Primary options show up in the web UI in the "Language" settings tab,
@@ -9,10 +8,22 @@ import type { OptionDefinition as CommandLineArgsOptionDefinition } from "comman
 export type OptionKind = "primary" | "secondary" | "cli";
 export type OptionType = "string" | "boolean" | "enum";
 
-export interface OptionDefinition<Name extends string = string, T = unknown>
-    extends CommandLineArgsOptionDefinition {
+// This interface used to extend command-line-args' `OptionDefinition`, but
+// that package is a dependency of the quicktype CLI, not of quicktype-core,
+// so the type-only import leaked into the published declarations and broke
+// consumers that compile with `skipLibCheck: false` (issue #2904).  The
+// `alias` and `defaultOption` fields below mirror the previously inherited
+// command-line-args fields of the same names, so the CLI's option
+// definitions remain directly consumable by `commandLineArgs` (the CLI adds
+// `type` itself at the call site).  The other previously inherited fields
+// (`group`, `lazyMultiple`, `type`) were dropped as unused.
+export interface OptionDefinition<Name extends string = string, T = unknown> {
     /** Option Name */
     name: Name;
+    /** Single-character CLI alias, e.g. `-o` for `--out` */
+    alias?: string;
+    /** Whether the CLI treats this option as the default positional argument */
+    defaultOption?: boolean;
     /** Option Description */
     description: string;
     /** Category of Option */

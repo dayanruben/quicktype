@@ -69,35 +69,28 @@ all satisfies readonly TargetLanguage[];
 
 export function languageNamed<Name extends LanguageName>(
     name: Name,
-    targetLanguages?: readonly TargetLanguage[],
-): LanguageNameMap[Name];
-export function languageNamed(
-    name: string,
-    targetLanguages?: readonly TargetLanguage[],
-): TargetLanguage | undefined;
-export function languageNamed(
-    name: string,
     targetLanguages: readonly TargetLanguage[] = all,
-): TargetLanguage | undefined {
-    // Names take precedence over extensions, so that e.g. "js" resolves
-    // to JavaScript, not to Flow (whose extension is "js").
-    const lowerName = name.toLowerCase();
-    const foundLanguage = targetLanguages.find(
-        (language) =>
-            (language.names as readonly string[]).includes(lowerName) ||
-            language.displayName.toLowerCase() === lowerName,
+): LanguageNameMap[Name] {
+    const foundLanguage = targetLanguages.find((language) =>
+        language.names.includes(name),
     );
+    if (!foundLanguage) {
+        throw new Error(`Unknown language name: ${name}`);
+    }
 
-    return (
-        foundLanguage ??
-        targetLanguages.find(
-            (language) => language.extension.toLowerCase() === lowerName,
-        )
-    );
+    return foundLanguage as LanguageNameMap[Name];
 }
 
 export function isLanguageName(maybeName: string): maybeName is LanguageName {
-    return languageNamed(maybeName) !== undefined;
+    if (
+        all.some((lang) =>
+            (lang.names as readonly string[]).includes(maybeName),
+        )
+    ) {
+        return true;
+    }
+
+    return false;
 }
 
 export function isLanguageDisplayName(
