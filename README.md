@@ -249,13 +249,16 @@ files, URLs, or add other options.
 ### Test
 
 ```bash
-# Run full test suite
-npm run test
+# Run full test suite (unit tests plus all fixtures)
+npm test
+
+# Run only the Vitest unit tests
+npm run test:unit
 
 # Test a specific language (see test/languages.ts)
-FIXTURE=golang npm test
+FIXTURE=golang npm run test:fixtures
 
 # Test a single sample or directory
-FIXTURE=swift npm test -- pokedex.json
-FIXTURE=swift npm test -- test/inputs/json/samples
+FIXTURE=swift npm run test:fixtures -- pokedex.json
+FIXTURE=swift npm run test:fixtures -- test/inputs/json/samples
 ```
