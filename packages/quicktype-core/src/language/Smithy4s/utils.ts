@@ -1,6 +1,6 @@
 import { isDigit } from "unicode-properties";
 
-import { funPrefixNamer } from "../../Naming";
+import { funPrefixNamer } from "../../Naming.js";
 import {
     allLowerWordStyle,
     allUpperWordStyle,
@@ -10,9 +10,9 @@ import {
     isNumeric,
     legalizeCharacters,
     splitIntoWords,
-} from "../../support/Strings";
+} from "../../support/Strings.js";
 
-import { invalidSymbols, keywords } from "./constants";
+import { invalidSymbols, keywords } from "./constants.js";
 
 /**
  * Check if given parameter name should be wrapped in a backtick

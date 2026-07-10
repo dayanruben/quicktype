@@ -1,7 +1,7 @@
-import type { RenderContext } from "../../Renderer";
-import { TargetLanguage } from "../../TargetLanguage";
+import type { RenderContext } from "../../Renderer.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
 
-import { CrystalRenderer } from "./CrystalRenderer";
+import { CrystalRenderer } from "./CrystalRenderer.js";
 
 export const crystalLanguageConfig = {
     displayName: "Crystal",

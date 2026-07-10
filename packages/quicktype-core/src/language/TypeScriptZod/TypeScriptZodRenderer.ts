@@ -1,11 +1,11 @@
 import { arrayIntercalate } from "collection-utils";
 
-import { ConvenienceRenderer } from "../../ConvenienceRenderer";
-import { type Name, type Namer, funPrefixNamer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import type { Sourcelike } from "../../Source";
-import { AcronymStyleOptions, acronymStyle } from "../../support/Acronyms";
+import { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
+import { type Name, type Namer, funPrefixNamer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import type { Sourcelike } from "../../Source.js";
+import { AcronymStyleOptions, acronymStyle } from "../../support/Acronyms.js";
 import {
     allLowerWordStyle,
     capitalize,
@@ -15,9 +15,9 @@ import {
     splitIntoWords,
     stringEscape,
     utf16StringEscape,
-} from "../../support/Strings";
-import { panic } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../support/Strings.js";
+import { panic } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -26,11 +26,11 @@ import {
     ObjectType,
     SetOperationType,
     type Type,
-} from "../../Type";
-import { matchType } from "../../Type/TypeUtils";
-import { legalizeName } from "../JavaScript/utils";
+} from "../../Type/index.js";
+import { matchType } from "../../Type/TypeUtils.js";
+import { legalizeName } from "../JavaScript/utils.js";
 
-import type { typeScriptZodOptions } from "./language";
+import type { typeScriptZodOptions } from "./language.js";
 
 export class TypeScriptZodRenderer extends ConvenienceRenderer {
     /** TypeRefs of object types that participate in a reference cycle.

@@ -12,7 +12,7 @@ import {
     legalizeCharacters,
     splitIntoWords,
     utf32ConcatMap,
-} from "../../support/Strings";
+} from "../../support/Strings.js";
 
 function isPartCharacter(codePoint: number): boolean {
     return isLetterOrUnderscore(codePoint) || isNumeric(codePoint);

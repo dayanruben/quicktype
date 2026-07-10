@@ -1,4 +1,4 @@
-import type { EnumOption, Option } from "./index";
+import type { EnumOption, Option } from "./index.js";
 import type { OptionDefinition as CommandLineArgsOptionDefinition } from "command-line-args";
 
 /**

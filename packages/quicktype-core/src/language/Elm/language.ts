@@ -1,14 +1,14 @@
-import type { RenderContext } from "../../Renderer";
+import type { RenderContext } from "../../Renderer.js";
 import {
     BooleanOption,
     EnumOption,
     StringOption,
     getOptionValues,
-} from "../../RendererOptions";
-import { TargetLanguage } from "../../TargetLanguage";
-import type { LanguageName, RendererOptions } from "../../types";
+} from "../../RendererOptions/index.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { ElmRenderer } from "./ElmRenderer";
+import { ElmRenderer } from "./ElmRenderer.js";
 
 export const elmOptions = {
     justTypes: new BooleanOption("just-types", "Plain types only", false),

@@ -1,4 +1,4 @@
-import { type StringMap, assert } from "../support/Support";
+import { type StringMap, assert } from "../support/Support.js";
 
 export type JSONSchema = StringMap | boolean;
 

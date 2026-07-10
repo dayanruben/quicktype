@@ -1,15 +1,15 @@
 import { arrayIntercalate } from "collection-utils";
 
-import { topLevelNameOrder } from "../../ConvenienceRenderer";
-import { DependencyName, type Name, funPrefixNamer } from "../../Naming";
+import { topLevelNameOrder } from "../../ConvenienceRenderer.js";
+import { DependencyName, type Name, funPrefixNamer } from "../../Naming.js";
 import {
     type MultiWord,
     type Sourcelike,
     multiWord,
     parenIfNeeded,
     singleWord,
-} from "../../Source";
-import { assertNever, defined, panic } from "../../support/Support";
+} from "../../Source.js";
+import { assertNever, defined, panic } from "../../support/Support.js";
 import {
     ChoiceTransformer,
     DecodingChoiceTransformer,
@@ -21,12 +21,12 @@ import {
     UnionInstantiationTransformer,
     UnionMemberMatchTransformer,
     transformationForType,
-} from "../../Transformers";
-import type { ClassType, Type } from "../../Type";
-import { matchType } from "../../Type/TypeUtils";
+} from "../../Transformers.js";
+import type { ClassType, Type } from "../../Type/index.js";
+import { matchType } from "../../Type/TypeUtils.js";
 
-import { PythonRenderer } from "./PythonRenderer";
-import { snakeNameStyle } from "./utils";
+import { PythonRenderer } from "./PythonRenderer.js";
+import { snakeNameStyle } from "./utils.js";
 
 export type ConverterFunction =
     | "none"

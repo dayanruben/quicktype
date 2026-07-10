@@ -9,31 +9,31 @@ import {
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import { type Name, type Namer, funPrefixNamer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import type { Sourcelike } from "../../Source";
-import { stringEscape } from "../../support/Strings";
-import { defined, panic } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
-import { followTargetType } from "../../Transformers";
+} from "../../ConvenienceRenderer.js";
+import { type Name, type Namer, funPrefixNamer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import type { Sourcelike } from "../../Source.js";
+import { stringEscape } from "../../support/Strings.js";
+import { defined, panic } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
+import { followTargetType } from "../../Transformers.js";
 import {
     type ClassProperty,
     ClassType,
     EnumType,
     type Type,
     UnionType,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     matchType,
     nullableFromUnion,
     removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import { forbiddenPropertyNames, forbiddenTypeNames } from "./constants";
-import type { pythonOptions } from "./language";
-import { classNameStyle, snakeNameStyle } from "./utils";
+import { forbiddenPropertyNames, forbiddenTypeNames } from "./constants.js";
+import type { pythonOptions } from "./language.js";
+import { classNameStyle, snakeNameStyle } from "./utils.js";
 
 export class PythonRenderer extends ConvenienceRenderer {
     private readonly imports: Map<string, Set<string>> = new Map();

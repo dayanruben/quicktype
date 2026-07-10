@@ -1,13 +1,13 @@
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import { type Name, Namer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, modifySource } from "../../Source";
-import { snakeCase } from "../../support/Strings";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../ConvenienceRenderer.js";
+import { type Name, Namer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, modifySource } from "../../Source.js";
+import { snakeCase } from "../../support/Strings.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -16,22 +16,22 @@ import {
     MapType,
     type Type,
     type UnionType,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     matchType,
     nullableFromUnion,
     removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import { globals } from "./constants";
-import type { rubyOptions } from "./language";
+import { globals } from "./constants.js";
+import type { rubyOptions } from "./language.js";
 import {
     Strictness,
     forbiddenForObjectProperties,
     memberNameStyle,
     simpleNameStyle,
     stringEscape,
-} from "./utils";
+} from "./utils.js";
 
 export class RubyRenderer extends ConvenienceRenderer {
     public constructor(

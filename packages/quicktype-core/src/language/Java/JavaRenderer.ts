@@ -1,24 +1,24 @@
 import {
     anyTypeIssueAnnotation,
     nullTypeIssueAnnotation,
-} from "../../Annotation";
+} from "../../Annotation.js";
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
+} from "../../ConvenienceRenderer.js";
 import {
     DependencyName,
     type Name,
     type Namer,
     funPrefixNamer,
-} from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, maybeAnnotated } from "../../Source";
-import { acronymStyle } from "../../support/Acronyms";
-import { capitalize } from "../../support/Strings";
-import { assert, assertNever, defined } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, maybeAnnotated } from "../../Source.js";
+import { acronymStyle } from "../../support/Acronyms.js";
+import { capitalize } from "../../support/Strings.js";
+import { assert, assertNever, defined } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -27,22 +27,22 @@ import {
     MapType,
     type Type,
     UnionType,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     directlyReachableSingleNamedType,
     matchType,
     nullableFromUnion,
     removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import { javaKeywords } from "./constants";
+import { javaKeywords } from "./constants.js";
 import {
     Java8DateTimeProvider,
     type JavaDateTimeProvider,
     JavaLegacyDateTimeProvider,
-} from "./DateTimeProvider";
-import type { javaOptions } from "./language";
-import { javaNameStyle, stringEscape } from "./utils";
+} from "./DateTimeProvider.js";
+import type { javaOptions } from "./language.js";
+import { javaNameStyle, stringEscape } from "./utils.js";
 
 export class JavaRenderer extends ConvenienceRenderer {
     private _currentFilename: string | undefined;

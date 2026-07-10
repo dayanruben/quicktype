@@ -9,16 +9,16 @@ import {
 import {
     type StringTypes,
     stringTypesTypeAttributeKind,
-} from "../attributes/StringTypes";
+} from "../attributes/StringTypes.js";
 import {
     type CombinationKind,
     type TypeAttributes,
     combineTypeAttributes,
     emptyTypeAttributes,
-} from "../attributes/TypeAttributes";
-import { assert, assertNever, defined, panic } from "../support/Support";
+} from "../attributes/TypeAttributes.js";
+import { assert, assertNever, defined, panic } from "../support/Support.js";
 
-import { isPrimitiveStringTypeKind } from "./TransformedStringType";
+import { isPrimitiveStringTypeKind } from "./TransformedStringType.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -30,7 +30,7 @@ import {
     type SetOperationType,
     type Type,
     UnionType,
-} from "./Type";
+} from "./Type.js";
 
 export function assertIsObject(t: Type): ObjectType {
     if (t instanceof ObjectType) {

@@ -6,11 +6,11 @@ import { isNode } from "browser-or-node";
 import isURL from "is-url";
 import { Readable } from "readable-stream";
 
-import { messageError } from "../../Messages";
-import { panic } from "../../support/Support";
-import { filePathFromFileURI } from "../../support/WindowsPaths";
+import { messageError } from "../../Messages.js";
+import { panic } from "../../support/Support.js";
+import { filePathFromFileURI } from "../../support/WindowsPaths.js";
 
-import { getStream } from "./get-stream";
+import { getStream } from "./get-stream/index.js";
 
 interface HttpHeaders {
     [key: string]: string;

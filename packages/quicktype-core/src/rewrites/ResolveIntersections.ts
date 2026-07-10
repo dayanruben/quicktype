@@ -18,9 +18,9 @@ import {
     combineTypeAttributes,
     emptyTypeAttributes,
     makeTypeAttributesInferred,
-} from "../attributes/TypeAttributes";
-import type { GraphRewriteBuilder, TypeLookerUp } from "../GraphRewriting";
-import { assert, defined, mustNotHappen, panic } from "../support/Support";
+} from "../attributes/TypeAttributes.js";
+import type { GraphRewriteBuilder, TypeLookerUp } from "../GraphRewriting.js";
+import { assert, defined, mustNotHappen, panic } from "../support/Support.js";
 import {
     ArrayType,
     GenericClassProperty,
@@ -32,21 +32,21 @@ import {
     UnionType,
     isNumberTypeKind,
     isPrimitiveTypeKind,
-} from "../Type";
-import type { TypeBuilder } from "../Type/TypeBuilder";
-import type { StringTypeMapping } from "../Type/TypeBuilderUtils";
-import type { TypeGraph } from "../Type/TypeGraph";
-import type { TypeRef } from "../Type/TypeRef";
+} from "../Type/index.js";
+import type { TypeBuilder } from "../Type/TypeBuilder.js";
+import type { StringTypeMapping } from "../Type/TypeBuilderUtils.js";
+import type { TypeGraph } from "../Type/TypeGraph.js";
+import type { TypeRef } from "../Type/TypeRef.js";
 import {
     makeGroupsToFlatten,
     matchTypeExhaustive,
     setOperationMembersRecursively,
-} from "../Type/TypeUtils";
+} from "../Type/TypeUtils.js";
 import {
     type TypeAttributeMap,
     UnionBuilder,
     type UnionTypeProvider,
-} from "../UnionBuilder";
+} from "../UnionBuilder.js";
 
 function canResolve(t: IntersectionType): boolean {
     const members = setOperationMembersRecursively(t, undefined)[0];

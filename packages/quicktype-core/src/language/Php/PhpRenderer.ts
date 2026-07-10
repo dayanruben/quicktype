@@ -1,40 +1,40 @@
-import * as _ from "lodash";
+import _ from "lodash";
 
 import {
     anyTypeIssueAnnotation,
     nullTypeIssueAnnotation,
-} from "../../Annotation";
+} from "../../Annotation.js";
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
+} from "../../ConvenienceRenderer.js";
 import {
     DependencyName,
     type Name,
     type Namer,
     funPrefixNamer,
-} from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, maybeAnnotated } from "../../Source";
-import { acronymStyle } from "../../support/Acronyms";
-import { defined } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, maybeAnnotated } from "../../Source.js";
+import { acronymStyle } from "../../support/Acronyms.js";
+import { defined } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import type {
     ClassProperty,
     ClassType,
     EnumType,
     Type,
     UnionType,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     directlyReachableSingleNamedType,
     matchType,
     nullableFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import type { phpOptions } from "./language";
-import { phpNameStyle, stringEscape } from "./utils";
+import type { phpOptions } from "./language.js";
+import { phpNameStyle, stringEscape } from "./utils.js";
 
 export interface FunctionNames {
     readonly from: Name;
