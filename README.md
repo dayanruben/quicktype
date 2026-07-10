@@ -37,7 +37,8 @@ _Missing your favorite language? Please implement it!_
 
 There are many ways to use `quicktype`. [app.quicktype.io](https://app.quicktype.io) is the most powerful and complete UI. The web app also works offline and doesn't send your sample data over the Internet, so paste away!
 
-The quicktype CLI and Node.js packages require Node.js 20 or newer.
+The quicktype CLI and Node.js packages require Node.js 20 or newer. See
+[Migrating to quicktype 24](MIGRATING.md) for upgrade details.
 
 For the best CLI, we recommend installing `quicktype` globally via `npm`:
 
