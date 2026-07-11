@@ -189,6 +189,23 @@ main();
 
 The argument to `quicktype` is a complex object with many optional properties. [Explore its definition](https://github.com/quicktype/quicktype/blob/master/packages/quicktype-core/src/Run.ts#L637) to understand what options are allowed.
 
+#### Bundling `quicktype-core` as ESM
+
+`quicktype-core` ships both CommonJS and ESM builds. If you bundle it into an ESM output for Node with esbuild (`--format=esm --platform=node`), the bundle may throw at runtime:
+
+```
+Error: Dynamic require of "process" is not supported
+```
+
+This is not specific to quicktype: some of its dependencies (e.g. `yaml`) expose an ESM entry that wraps a CommonJS core, and esbuild replaces `require` calls inside inlined CommonJS with a shim that throws in ESM output. The standard workaround is to inject a `createRequire` banner:
+
+```bash
+esbuild main.js --bundle --format=esm --platform=node \
+    --banner:js="import { createRequire } from 'module'; const require = createRequire(import.meta.url);"
+```
+
+Bundling to CommonJS output (`--format=cjs`) works without any workaround.
+
 ### Adding Custom logic or Rendering:
 
 Quicktype supports creating your own custom languages and rendering output, you can extend existing classes or create your own to be using by the `quicktype function`.<br/>
