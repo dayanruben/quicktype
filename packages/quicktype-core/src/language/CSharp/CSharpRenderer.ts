@@ -3,34 +3,34 @@ import { arrayIntercalate } from "collection-utils";
 import {
     anyTypeIssueAnnotation,
     nullTypeIssueAnnotation,
-} from "../../Annotation";
+} from "../../Annotation.js";
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import type { Name, Namer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, maybeAnnotated } from "../../Source";
-import { assert } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
-import { followTargetType } from "../../Transformers";
+} from "../../ConvenienceRenderer.js";
+import type { Name, Namer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, maybeAnnotated } from "../../Source.js";
+import { assert } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
+import { followTargetType } from "../../Transformers.js";
 import type {
     ClassProperty,
     ClassType,
     EnumType,
     Type,
     UnionType,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     directlyReachableSingleNamedType,
     matchCompoundType,
     matchType,
     nullableFromUnion,
     removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import type { cSharpOptions } from "./language";
+import type { cSharpOptions } from "./language.js";
 import {
     AccessModifier,
     csTypeForTransformedStringType,
@@ -38,7 +38,7 @@ import {
     namingFunction,
     namingFunctionKeep,
     noFollow,
-} from "./utils";
+} from "./utils.js";
 
 export class CSharpRenderer extends ConvenienceRenderer {
     public constructor(

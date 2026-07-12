@@ -1,11 +1,11 @@
 import { arrayIntercalate } from "collection-utils";
 
-import { ConvenienceRenderer } from "../../ConvenienceRenderer";
-import { type Name, type Namer, funPrefixNamer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import type { Sourcelike } from "../../Source";
-import { acronymStyle } from "../../support/Acronyms";
+import { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
+import { type Name, type Namer, funPrefixNamer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import type { Sourcelike } from "../../Source.js";
+import { acronymStyle } from "../../support/Acronyms.js";
 import {
     allLowerWordStyle,
     capitalize,
@@ -13,9 +13,9 @@ import {
     firstUpperWordStyle,
     splitIntoWords,
     utf16StringEscape,
-} from "../../support/Strings";
-import { panic } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../support/Strings.js";
+import { panic } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     type ArrayType,
     type ClassProperty,
@@ -23,15 +23,15 @@ import {
     type ObjectType,
     PrimitiveType,
     type Type,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     directlyReachableSingleNamedType,
     matchType,
-} from "../../Type/TypeUtils";
-import { isES3IdentifierStart } from "../JavaScript/unicodeMaps";
-import { legalizeName } from "../JavaScript/utils";
+} from "../../Type/TypeUtils.js";
+import { isES3IdentifierStart } from "../JavaScript/unicodeMaps.js";
+import { legalizeName } from "../JavaScript/utils.js";
 
-import type { javaScriptPropTypesOptions } from "./language";
+import type { javaScriptPropTypesOptions } from "./language.js";
 
 const identityNamingFunction = funPrefixNamer("properties", (s) => s);
 

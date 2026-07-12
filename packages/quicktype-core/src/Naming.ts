@@ -13,7 +13,7 @@ import {
     setUnionInto,
 } from "collection-utils";
 
-import { assert, defined, panic } from "./support/Support";
+import { assert, defined, panic } from "./support/Support.js";
 
 export class Namespace {
     public readonly forbiddenNamespaces: ReadonlySet<Namespace>;

@@ -1,4 +1,4 @@
-import { assert, panic } from "./support/Support";
+import { assert, panic } from "./support/Support.js";
 
 export function breakCycles<T>(
     outEdges: number[][],

@@ -12,9 +12,9 @@ import {
     legalizeCharacters,
     splitIntoWords,
     utf32ConcatMap,
-} from "../../support/Strings";
+} from "../../support/Strings.js";
 
-import * as keywords from "./constants";
+import * as keywords from "./constants.js";
 
 export enum Strictness {
     Strict = "Strict::",

@@ -1,9 +1,9 @@
 import { arrayIntercalate, iterableMax, withDefault } from "collection-utils";
 
-import type { AnnotationData } from "./Annotation";
-import { Name } from "./Naming";
-import { repeatString } from "./support/Strings";
-import { assert, assertNever, defined, panic } from "./support/Support";
+import type { AnnotationData } from "./Annotation.js";
+import { Name } from "./Naming.js";
+import { repeatString } from "./support/Strings.js";
+import { assert, assertNever, defined, panic } from "./support/Support.js";
 
 export type Source =
     | TextSource

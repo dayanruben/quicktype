@@ -7,22 +7,22 @@ import {
     withDefault,
 } from "collection-utils";
 
-import { descriptionTypeAttributeKind } from "../attributes/Description";
-import { makeNamesTypeAttributes } from "../attributes/TypeNames";
-import { languageNamed } from "../language/All";
-import { messageError } from "../Messages";
-import type { RunContext } from "../Run";
-import { defined, errorMessage, panic } from "../support/Support";
-import type { TargetLanguage } from "../TargetLanguage";
-import type { TypeBuilder } from "../Type/TypeBuilder";
-import type { LanguageName } from "../types";
+import { descriptionTypeAttributeKind } from "../attributes/Description.js";
+import { makeNamesTypeAttributes } from "../attributes/TypeNames.js";
+import { languageNamed } from "../language/All.js";
+import { messageError } from "../Messages.js";
+import type { RunContext } from "../Run.js";
+import { defined, errorMessage, panic } from "../support/Support.js";
+import type { TargetLanguage } from "../TargetLanguage.js";
+import type { TypeBuilder } from "../Type/TypeBuilder.js";
+import type { LanguageName } from "../types.js";
 
 import {
     type CompressedJSON,
     CompressedJSONFromString,
     type Value,
-} from "./CompressedJSON";
-import { TypeInference } from "./Inference";
+} from "./CompressedJSON.js";
+import { TypeInference } from "./Inference.js";
 
 export interface Input<T> {
     addSource: (source: T) => Promise<void>;

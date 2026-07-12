@@ -1,7 +1,7 @@
-import type { RenderContext } from "../../Renderer";
-import { TargetLanguage } from "../../TargetLanguage";
+import type { RenderContext } from "../../Renderer.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
 
-import { PikeRenderer } from "./PikeRenderer";
+import { PikeRenderer } from "./PikeRenderer.js";
 
 export const pikeOptions = {};
 

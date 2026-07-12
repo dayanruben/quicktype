@@ -37,6 +37,9 @@ _Missing your favorite language? Please implement it!_
 
 There are many ways to use `quicktype`. [app.quicktype.io](https://app.quicktype.io) is the most powerful and complete UI. The web app also works offline and doesn't send your sample data over the Internet, so paste away!
 
+The quicktype CLI and Node.js packages require Node.js 20 or newer. See
+[Migrating to quicktype 24](MIGRATING.md) for upgrade details.
+
 For the best CLI, we recommend installing `quicktype` globally via `npm`:
 
 ```bash
@@ -186,6 +189,23 @@ main();
 
 The argument to `quicktype` is a complex object with many optional properties. [Explore its definition](https://github.com/quicktype/quicktype/blob/master/packages/quicktype-core/src/Run.ts#L637) to understand what options are allowed.
 
+#### Bundling `quicktype-core` as ESM
+
+`quicktype-core` ships both CommonJS and ESM builds. If you bundle it into an ESM output for Node with esbuild (`--format=esm --platform=node`), the bundle may throw at runtime:
+
+```
+Error: Dynamic require of "process" is not supported
+```
+
+This is not specific to quicktype: some of its dependencies (e.g. `yaml`) expose an ESM entry that wraps a CommonJS core, and esbuild replaces `require` calls inside inlined CommonJS with a shim that throws in ESM output. The standard workaround is to inject a `createRequire` banner:
+
+```bash
+esbuild main.js --bundle --format=esm --platform=node \
+    --banner:js="import { createRequire } from 'module'; const require = createRequire(import.meta.url);"
+```
+
+Bundling to CommonJS output (`--format=cjs`) works without any workaround.
+
 ### Adding Custom logic or Rendering:
 
 Quicktype supports creating your own custom languages and rendering output, you can extend existing classes or create your own to be using by the `quicktype function`.<br/>
@@ -247,13 +267,16 @@ files, URLs, or add other options.
 ### Test
 
 ```bash
-# Run full test suite
-npm run test
+# Run full test suite (unit tests plus all fixtures)
+npm test
+
+# Run only the Vitest unit tests
+npm run test:unit
 
 # Test a specific language (see test/languages.ts)
-FIXTURE=golang npm test
+FIXTURE=golang npm run test:fixtures
 
 # Test a single sample or directory
-FIXTURE=swift npm test -- pokedex.json
-FIXTURE=swift npm test -- test/inputs/json/samples
+FIXTURE=swift npm run test:fixtures -- pokedex.json
+FIXTURE=swift npm run test:fixtures -- test/inputs/json/samples
 ```

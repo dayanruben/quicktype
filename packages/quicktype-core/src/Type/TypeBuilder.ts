@@ -13,19 +13,19 @@ import {
 import {
     StringTypes,
     stringTypesTypeAttributeKind,
-} from "../attributes/StringTypes";
+} from "../attributes/StringTypes.js";
 import {
     type TypeAttributes,
     combineTypeAttributes,
     emptyTypeAttributes,
-} from "../attributes/TypeAttributes";
-import { assert, defined, panic } from "../support/Support";
+} from "../attributes/TypeAttributes.js";
+import { assert, defined, panic } from "../support/Support.js";
 
-import { provenanceTypeAttributeKind } from "./ProvenanceTypeAttributeKind";
+import { provenanceTypeAttributeKind } from "./ProvenanceTypeAttributeKind.js";
 import {
     type PrimitiveTypeKind,
     isPrimitiveStringTypeKind,
-} from "./TransformedStringType";
+} from "./TransformedStringType.js";
 import {
     ArrayType,
     ClassProperty,
@@ -46,19 +46,19 @@ import {
     mapTypeIdentify,
     primitiveTypeIdentity,
     unionTypeIdentity,
-} from "./Type";
+} from "./Type.js";
 import {
     type StringTypeMapping,
     stringTypeMappingGet,
-} from "./TypeBuilderUtils";
-import type { TypeGraph } from "./TypeGraph";
+} from "./TypeBuilderUtils.js";
+import type { TypeGraph } from "./TypeGraph.js";
 import {
     type TypeRef,
     assertTypeRefGraph,
     derefTypeRef,
     makeTypeRef,
     typeRefIndex,
-} from "./TypeRef";
+} from "./TypeRef.js";
 
 export class TypeBuilder {
     // @ts-expect-error must manually set TypeGraph

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Readable } from "readable-stream";
 
-import bufferStream, { type BufferedPassThrough } from "./buffer-stream";
+import bufferStream, { type BufferedPassThrough } from "./buffer-stream.js";
 
 export interface Options {
     array?: boolean;

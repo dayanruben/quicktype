@@ -1,12 +1,12 @@
-import type { Name } from "../../Naming";
-import { type Sourcelike, modifySource } from "../../Source";
-import { camelCase, utf16StringEscape } from "../../support/Strings";
-import type { ClassType, EnumType, Type } from "../../Type";
-import { isNamedType } from "../../Type/TypeUtils";
-import type { JavaScriptTypeAnnotations } from "../JavaScript";
+import type { Name } from "../../Naming.js";
+import { type Sourcelike, modifySource } from "../../Source.js";
+import { camelCase, utf16StringEscape } from "../../support/Strings.js";
+import type { ClassType, EnumType, Type } from "../../Type/index.js";
+import { isNamedType } from "../../Type/TypeUtils.js";
+import type { JavaScriptTypeAnnotations } from "../JavaScript/index.js";
 
-import { TypeScriptFlowBaseRenderer } from "./TypeScriptFlowBaseRenderer";
-import { tsFlowTypeAnnotations } from "./utils";
+import { TypeScriptFlowBaseRenderer } from "./TypeScriptFlowBaseRenderer.js";
+import { tsFlowTypeAnnotations } from "./utils.js";
 
 export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
     protected forbiddenNamesForGlobalNamespace(): string[] {
