@@ -45,8 +45,7 @@
         "quicktype-typescript-input": "24.0.0",
         "readable-stream": "^4.5.2",
         "stream-json": "1.8.0",
-        "string-to-stream": "^3.0.1",
-        "typescript": "~7.0.2"
+        "string-to-stream": "^3.0.1"
     },
     "devDependencies": {
         "@biomejs/biome": "^1.9.4",
@@ -82,6 +81,7 @@
         "tree-sitter-scala": "^0.24.0",
         "tree-sitter-typescript": "^0.23.2",
         "ts-node": "^10.9.2",
+        "typescript": "~7.0.2",
         "vitest": "^4.1.10",
         "watch": "^1.0.2",
         "web-tree-sitter": "^0.26.9"
