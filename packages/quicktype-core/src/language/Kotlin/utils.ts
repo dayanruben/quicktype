@@ -1,3 +1,5 @@
+import type { Type } from "../../Type/index.js";
+
 import {
     allLowerWordStyle,
     allUpperWordStyle,
@@ -54,4 +56,24 @@ const _stringEscape = utf32ConcatMap(
 export function stringEscape(s: string): string {
     // "$this" is a template string in Kotlin so we have to escape $
     return _stringEscape(s).replace(/\$/g, "\\$");
+}
+
+// When several union members are guarded by the same JSON node/value type
+// (e.g. date, time and enum values are all strings), parse attempts must be
+// ordered strictest first: transformed string types (strict ISO parsers),
+// then enums (known values only), then plain strings (accept anything).
+export function unionMemberMatchPriority(t: Type): number {
+    if (t.kind === "date-time" || t.kind === "date" || t.kind === "time") {
+        return 0;
+    }
+
+    if (t.kind === "enum") {
+        return 1;
+    }
+
+    if (t.kind === "string") {
+        return 2;
+    }
+
+    return 3;
 }
