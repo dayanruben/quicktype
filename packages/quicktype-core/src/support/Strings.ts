@@ -11,7 +11,8 @@ export type NamingStyle =
     | "underscore"
     | "upper-underscore"
     | "pascal-upper-acronyms"
-    | "camel-upper-acronyms";
+    | "camel-upper-acronyms"
+    | "original";
 
 function computeAsciiMap(mapper: (codePoint: number) => string): {
     charNoEscapeMap: number[];
@@ -598,7 +599,8 @@ export function makeNameStyle(
         namingStyle === "pascal" ||
         namingStyle === "camel" ||
         namingStyle === "pascal-upper-acronyms" ||
-        namingStyle === "camel-upper-acronyms"
+        namingStyle === "camel-upper-acronyms" ||
+        namingStyle === "original"
     ) {
         separator = "";
         if (
@@ -637,12 +639,21 @@ export function makeNameStyle(
                 restAcronymStyle =
                     allUpperWordStyle;
             break;
+        case "original":
+            firstWordStyle = restWordStyle = firstWordAcronymStyle = restAcronymStyle = originalWord;
+            break;
         default:
             return assertNever(namingStyle);
     }
 
     return (original: string) => {
-        const words = splitIntoWords(original);
+        // "original" must not split or restyle the name, but it still has
+        // to go through combineWords so that illegal characters, empty
+        // names, and invalid start characters are fixed up.
+        const words: WordInName[] =
+            namingStyle === "original"
+                ? [{ word: original, isAcronym: false }]
+                : splitIntoWords(original);
 
         const styledName = combineWords(
             words,

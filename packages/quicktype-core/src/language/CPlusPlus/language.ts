@@ -13,6 +13,7 @@ import { CPlusPlusRenderer } from "./CPlusPlusRenderer.js";
 // FIXME: share with CJSON
 const namingStyles = {
     "pascal-case": "pascal",
+    "original-case": "original",
     "underscore-case": "underscore",
     "camel-case": "camel",
     "upper-underscore-case": "upper-underscore",
