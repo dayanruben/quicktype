@@ -10,7 +10,7 @@
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
         "outDir": "dist",
-        "baseUrl": "src",
+        "rootDir": "src",
         "resolveJsonModule": true
     },
     "include": ["src"]
