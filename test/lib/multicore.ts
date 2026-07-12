@@ -2,7 +2,6 @@ import cluster from "cluster";
 import process from "process";
 import * as _ from "lodash";
 
-const exit = require("exit");
 
 const WORKERS = ["👷🏻", "👷🏼", "👷🏽", "👷🏾", "👷🏿"];
 
@@ -52,7 +51,7 @@ export async function inParallel<Item, Result, Acc>(
                         w.kill();
                     }
                 }
-                exit(code);
+                process.exit(code);
             }
         });
 
@@ -66,8 +65,6 @@ export async function inParallel<Item, Result, Acc>(
             _.range(workers).forEach((i) =>
                 cluster.fork({
                     worker: i,
-                    // https://github.com/TypeStrong/ts-node/issues/367
-                    TS_NODE_PROJECT: "test/tsconfig.json",
                 }),
             );
         }
