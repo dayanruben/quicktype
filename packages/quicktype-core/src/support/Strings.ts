@@ -1,9 +1,9 @@
 import unicode from "unicode-properties";
 
-import { messageAssert } from "../Messages";
+import { messageAssert } from "../Messages.js";
 
-import { acronyms } from "./Acronyms.const";
-import { assert, assertNever, defined, panic } from "./Support";
+import { acronyms } from "./Acronyms.const.js";
+import { assert, assertNever, defined, panic } from "./Support.js";
 
 export type NamingStyle =
     | "pascal"

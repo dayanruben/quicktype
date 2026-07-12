@@ -1,6 +1,6 @@
-import { DefaultDateTimeRecognizer } from "../../DateTime";
-import type { Name } from "../../Naming";
-import type { ForEachPosition } from "../../Renderer";
+import { DefaultDateTimeRecognizer } from "../../DateTime.js";
+import type { Name } from "../../Naming.js";
+import type { ForEachPosition } from "../../Renderer.js";
 import {
     addPrefixIfNecessary,
     allLowerWordStyle,
@@ -16,8 +16,8 @@ import {
     legalizeCharacters,
     splitIntoWords,
     utf32ConcatMap,
-} from "../../support/Strings";
-import type { ClassProperty } from "../../Type";
+} from "../../support/Strings.js";
+import type { ClassProperty } from "../../Type/index.js";
 
 export const MAX_SAMELINE_PROPERTIES = 4;
 

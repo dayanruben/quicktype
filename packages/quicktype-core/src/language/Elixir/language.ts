@@ -1,13 +1,13 @@
-import type { RenderContext } from "../../Renderer";
+import type { RenderContext } from "../../Renderer.js";
 import {
     BooleanOption,
     StringOption,
     getOptionValues,
-} from "../../RendererOptions";
-import { TargetLanguage } from "../../TargetLanguage";
-import type { LanguageName, RendererOptions } from "../../types";
+} from "../../RendererOptions/index.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { ElixirRenderer } from "./ElixirRenderer";
+import { ElixirRenderer } from "./ElixirRenderer.js";
 
 export const elixirOptions = {
     justTypes: new BooleanOption("just-types", "Plain types only", false),

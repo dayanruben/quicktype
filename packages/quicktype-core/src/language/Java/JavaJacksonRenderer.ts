@@ -1,9 +1,9 @@
-import type { Name } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import type { Sourcelike } from "../../Source";
-import { assertNever, panic } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+import type { Name } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import type { Sourcelike } from "../../Source.js";
+import { assertNever, panic } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -12,12 +12,12 @@ import {
     type Type,
     type TypeKind,
     UnionType,
-} from "../../Type";
-import { removeNullFromUnion } from "../../Type/TypeUtils";
+} from "../../Type/index.js";
+import { removeNullFromUnion } from "../../Type/TypeUtils.js";
 
-import { JavaRenderer } from "./JavaRenderer";
-import type { javaOptions } from "./language";
-import { stringEscape } from "./utils";
+import { JavaRenderer } from "./JavaRenderer.js";
+import type { javaOptions } from "./language.js";
+import { stringEscape } from "./utils.js";
 
 export class JacksonRenderer extends JavaRenderer {
     public constructor(

@@ -1,9 +1,9 @@
 import { Base64 } from "js-base64";
-import * as pako from "pako";
+import pako from "pako";
 import * as YAML from "yaml";
 
-import type { JSONSchema } from "../input/JSONSchemaStore";
-import { messageError } from "../Messages";
+import type { JSONSchema } from "../input/JSONSchemaStore.js";
+import { messageError } from "../Messages.js";
 
 export interface StringMap {
     [name: string]: any;

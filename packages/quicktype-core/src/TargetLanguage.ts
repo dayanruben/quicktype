@@ -1,16 +1,22 @@
 import { mapMap } from "collection-utils";
 
-import { ConvenienceRenderer } from "./ConvenienceRenderer";
-import { type DateTimeRecognizer, DefaultDateTimeRecognizer } from "./DateTime";
-import type { RenderContext, Renderer } from "./Renderer";
-import type { Option, OptionDefinition } from "./RendererOptions";
-import { type SerializedRenderResult, serializeRenderResult } from "./Source";
-import type { Comment } from "./support/Comments";
-import { defined } from "./support/Support";
-import type { Type } from "./Type/Type";
-import type { StringTypeMapping } from "./Type/TypeBuilderUtils";
-import type { TypeGraph } from "./Type/TypeGraph";
-import type { LanguageName, RendererOptions } from "./types";
+import { ConvenienceRenderer } from "./ConvenienceRenderer.js";
+import {
+    type DateTimeRecognizer,
+    DefaultDateTimeRecognizer,
+} from "./DateTime.js";
+import type { RenderContext, Renderer } from "./Renderer.js";
+import type { Option, OptionDefinition } from "./RendererOptions/index.js";
+import {
+    type SerializedRenderResult,
+    serializeRenderResult,
+} from "./Source.js";
+import type { Type } from "./Type/Type.js";
+import type { StringTypeMapping } from "./Type/TypeBuilderUtils.js";
+import type { TypeGraph } from "./Type/TypeGraph.js";
+import type { Comment } from "./support/Comments.js";
+import { defined } from "./support/Support.js";
+import type { LanguageName, RendererOptions } from "./types.js";
 
 export type MultiFileRenderResult = ReadonlyMap<string, SerializedRenderResult>;
 

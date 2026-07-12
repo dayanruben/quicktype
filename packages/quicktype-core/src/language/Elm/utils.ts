@@ -1,4 +1,4 @@
-import { funPrefixNamer } from "../../Naming";
+import { funPrefixNamer } from "../../Naming.js";
 import {
     allLowerWordStyle,
     allUpperWordStyle,
@@ -9,9 +9,9 @@ import {
     isLetterOrUnderscoreOrDigit,
     legalizeCharacters,
     splitIntoWords,
-} from "../../support/Strings";
-import { type ClassProperty, UnionType } from "../../Type";
-import { nullableFromUnion } from "../../Type/TypeUtils";
+} from "../../support/Strings.js";
+import { type ClassProperty, UnionType } from "../../Type/index.js";
+import { nullableFromUnion } from "../../Type/TypeUtils.js";
 
 const legalizeName = legalizeCharacters(
     (cp) => isAscii(cp) && isLetterOrUnderscoreOrDigit(cp),

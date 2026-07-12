@@ -1,12 +1,12 @@
 import { arrayIntercalate } from "collection-utils";
 
-import { ConvenienceRenderer } from "../../ConvenienceRenderer";
-import { type Name, type Namer, funPrefixNamer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, modifySource } from "../../Source";
-import { acronymStyle } from "../../support/Acronyms";
-import { ConvertersOptions } from "../../support/Converters";
+import { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
+import { type Name, type Namer, funPrefixNamer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, modifySource } from "../../Source.js";
+import { acronymStyle } from "../../support/Acronyms.js";
+import { ConvertersOptions } from "../../support/Converters.js";
 import {
     allLowerWordStyle,
     camelCase,
@@ -15,23 +15,23 @@ import {
     firstUpperWordStyle,
     splitIntoWords,
     utf16StringEscape,
-} from "../../support/Strings";
-import { panic } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../support/Strings.js";
+import { panic } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import type {
     ClassProperty,
     ClassType,
     ObjectType,
     Type,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     directlyReachableSingleNamedType,
     matchType,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import type { javaScriptOptions } from "./language";
-import { isES3IdentifierStart } from "./unicodeMaps";
-import { legalizeName } from "./utils";
+import type { javaScriptOptions } from "./language.js";
+import { isES3IdentifierStart } from "./unicodeMaps.js";
+import { legalizeName } from "./utils.js";
 
 export interface JavaScriptTypeAnnotations {
     any: string;

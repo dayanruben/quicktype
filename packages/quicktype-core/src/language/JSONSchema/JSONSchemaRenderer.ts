@@ -1,19 +1,19 @@
 import { iterableFirst, mapFirst } from "collection-utils";
 
-import { addDescriptionToSchema } from "../../attributes/Description";
-import { ConvenienceRenderer } from "../../ConvenienceRenderer";
-import type { Name, Namer } from "../../Naming";
-import { defined, panic } from "../../support/Support";
+import { addDescriptionToSchema } from "../../attributes/Description.js";
+import { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
+import type { Name, Namer } from "../../Naming.js";
+import { defined, panic } from "../../support/Support.js";
 import {
     type EnumType,
     type ObjectType,
     type Type,
     type UnionType,
     transformedStringTypeTargetTypeKindsMap,
-} from "../../Type";
-import { matchTypeExhaustive } from "../../Type/TypeUtils";
+} from "../../Type/index.js";
+import { matchTypeExhaustive } from "../../Type/TypeUtils.js";
 
-import { namingFunction } from "./utils";
+import { namingFunction } from "./utils.js";
 
 interface Schema {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

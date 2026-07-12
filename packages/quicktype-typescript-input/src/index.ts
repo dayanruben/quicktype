@@ -1,13 +1,16 @@
 import {
-    type PartialArgs,
-    generateSchema,
-} from "@mark.probst/typescript-json-schema";
-import {
     type JSONSchemaSourceData,
     defined,
     messageError,
 } from "quicktype-core";
-import * as ts from "typescript";
+import {
+    type PartialArgs,
+    generateSchema,
+    // Use the TypeScript instance that typescript-json-schema is compiled
+    // against, so the program we create is guaranteed to be compatible with
+    // `generateSchema`.
+    ts,
+} from "typescript-json-schema";
 
 const settings: PartialArgs = {
     required: true,
@@ -43,7 +46,6 @@ export function schemaForTypeScriptSources(
         });
     }
 
-    // this breaks after upgrading to TS 5+
     const schema = generateSchema(program, "*", settings);
     const uris: string[] = [];
     let topLevelName = "";

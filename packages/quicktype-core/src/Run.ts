@@ -1,44 +1,47 @@
 import { mapFirst } from "collection-utils";
 
-import { initTypeNames } from "./attributes/TypeNames";
-import { InputData } from "./input/Inputs";
-import * as targetLanguages from "./language/All";
-import type { RendererOptions } from "./language/options.types";
-import type { LanguageName } from "./language/types";
-import { combineClasses } from "./rewrites/CombineClasses";
-import { expandStrings } from "./rewrites/ExpandStrings";
-import { flattenStrings } from "./rewrites/FlattenStrings";
-import { flattenUnions } from "./rewrites/FlattenUnions";
-import { inferMaps } from "./rewrites/InferMaps";
-import { replaceObjectType } from "./rewrites/ReplaceObjectType";
-import { resolveIntersections } from "./rewrites/ResolveIntersections";
-import type { Comment } from "./support/Comments";
-import { assert } from "./support/Support";
+import { initTypeNames } from "./attributes/TypeNames.js";
+import { InputData } from "./input/Inputs.js";
+import * as targetLanguages from "./language/All.js";
+import type { RendererOptions } from "./language/options.types.js";
+import type { LanguageName } from "./language/types.js";
+import { combineClasses } from "./rewrites/CombineClasses.js";
+import { expandStrings } from "./rewrites/ExpandStrings.js";
+import { flattenStrings } from "./rewrites/FlattenStrings.js";
+import { flattenUnions } from "./rewrites/FlattenUnions.js";
+import { inferMaps } from "./rewrites/InferMaps.js";
+import { replaceObjectType } from "./rewrites/ReplaceObjectType.js";
+import { resolveIntersections } from "./rewrites/ResolveIntersections.js";
+import type { Comment } from "./support/Comments.js";
+import { assert } from "./support/Support.js";
 
-import { gatherNames } from "./GatherNames";
+import { gatherNames } from "./GatherNames.js";
 import {
     type InferenceFlags,
     defaultInferenceFlags,
     inferenceFlagNames,
     inferenceFlags,
-} from "./Inference";
-import { makeTransformations } from "./MakeTransformations";
-import { messageError } from "./Messages";
+} from "./Inference.js";
+import { makeTransformations } from "./MakeTransformations.js";
+import { messageError } from "./Messages.js";
 import type {
     Annotation,
     Location,
     SerializedRenderResult,
     Span,
-} from "./Source";
-import type { MultiFileRenderResult, TargetLanguage } from "./TargetLanguage";
-import { TypeBuilder } from "./Type/TypeBuilder";
-import type { StringTypeMapping } from "./Type/TypeBuilderUtils";
-import { TypeGraph } from "./Type/TypeGraph";
+} from "./Source.js";
+import type {
+    MultiFileRenderResult,
+    TargetLanguage,
+} from "./TargetLanguage.js";
+import { TypeBuilder } from "./Type/TypeBuilder.js";
+import type { StringTypeMapping } from "./Type/TypeBuilderUtils.js";
+import { TypeGraph } from "./Type/TypeGraph.js";
 import {
     noneToAny,
     optionalToNullable,
     removeIndirectionIntersections,
-} from "./Type/TypeGraphUtils";
+} from "./Type/TypeGraphUtils.js";
 
 export function getTargetLanguage(
     nameOrInstance: LanguageName | TargetLanguage,

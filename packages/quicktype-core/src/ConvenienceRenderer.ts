@@ -15,18 +15,18 @@ import {
     getAccessorName,
     objectPropertyNames,
     unionMemberName,
-} from "./attributes/AccessorNames";
+} from "./attributes/AccessorNames.js";
 import {
     descriptionTypeAttributeKind,
     propertyDescriptionsTypeAttributeKind,
-} from "./attributes/Description";
-import { TypeAttributeKind } from "./attributes/TypeAttributes";
+} from "./attributes/Description.js";
+import { TypeAttributeKind } from "./attributes/TypeAttributes.js";
 import {
     type Declaration,
     type DeclarationIR,
     cycleBreakerTypesForGraph,
     declarationsForGraph,
-} from "./DeclarationIR";
+} from "./DeclarationIR.js";
 import {
     DependencyName,
     FixedName,
@@ -35,31 +35,31 @@ import {
     Namespace,
     SimpleName,
     keywordNamespace,
-} from "./Naming";
+} from "./Naming.js";
 import {
     type BlankLineConfig,
     type ForEachPosition,
     type RenderContext,
     Renderer,
-} from "./Renderer";
+} from "./Renderer.js";
 import {
     type Sourcelike,
     serializeRenderResult,
     sourcelikeToSource,
-} from "./Source";
+} from "./Source.js";
 import {
     type Comment,
     type CommentOptions,
     isStringComment,
-} from "./support/Comments";
-import { trimEnd } from "./support/Strings";
-import { assert, defined, nonNull, panic } from "./support/Support";
-import type { TargetLanguage } from "./TargetLanguage";
+} from "./support/Comments.js";
+import { trimEnd } from "./support/Strings.js";
+import { assert, defined, nonNull, panic } from "./support/Support.js";
+import type { TargetLanguage } from "./TargetLanguage.js";
 import {
     type Transformation,
     followTargetType,
     transformationForType,
-} from "./Transformers";
+} from "./Transformers.js";
 import {
     type ClassProperty,
     ClassType,
@@ -69,14 +69,14 @@ import {
     type Type,
     type TypeKind,
     UnionType,
-} from "./Type";
-import { TypeAttributeStoreView } from "./Type/TypeGraph";
+} from "./Type/index.js";
+import { TypeAttributeStoreView } from "./Type/TypeGraph.js";
 import {
     isNamedType,
     matchTypeExhaustive,
     nullableFromUnion,
     separateNamedTypes,
-} from "./Type/TypeUtils";
+} from "./Type/TypeUtils.js";
 
 const wordWrap: (s: string) => string = _wordwrap(90);
 

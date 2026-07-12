@@ -8,15 +8,15 @@ import {
 import {
     StringTypes,
     stringTypesTypeAttributeKind,
-} from "./attributes/StringTypes";
+} from "./attributes/StringTypes.js";
 import {
     type TypeAttributes,
     combineTypeAttributes,
     emptyTypeAttributes,
     increaseTypeAttributesDistance,
     makeTypeAttributesInferred,
-} from "./attributes/TypeAttributes";
-import { assert, assertNever, defined, panic } from "./support/Support";
+} from "./attributes/TypeAttributes.js";
+import { assert, assertNever, defined, panic } from "./support/Support.js";
 import {
     type PrimitiveStringTypeKind,
     type PrimitiveTypeKind,
@@ -24,10 +24,10 @@ import {
     type TypeKind,
     UnionType,
     isPrimitiveTypeKind,
-} from "./Type";
-import type { TypeBuilder } from "./Type/TypeBuilder";
-import type { TypeRef } from "./Type/TypeRef";
-import { matchTypeExhaustive } from "./Type/TypeUtils";
+} from "./Type/index.js";
+import type { TypeBuilder } from "./Type/TypeBuilder.js";
+import type { TypeRef } from "./Type/TypeRef.js";
+import { matchTypeExhaustive } from "./Type/TypeUtils.js";
 
 // FIXME: This interface is badly designed.  All the properties
 // should use immutable types, and getMemberKinds should be

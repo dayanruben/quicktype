@@ -1,13 +1,13 @@
 import {
     StringTypes,
     inferTransformedStringTypeKindForString,
-} from "../attributes/StringTypes";
+} from "../attributes/StringTypes.js";
 import {
     type TypeAttributes,
     emptyTypeAttributes,
-} from "../attributes/TypeAttributes";
-import { messageError } from "../Messages";
-import { assert, assertNever, defined, panic } from "../support/Support";
+} from "../attributes/TypeAttributes.js";
+import { messageError } from "../Messages.js";
+import { assert, assertNever, defined, panic } from "../support/Support.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -15,18 +15,18 @@ import {
     MapType,
     UnionType,
     transformedStringTypeTargetTypeKindsMap,
-} from "../Type";
-import type { TypeBuilder } from "../Type/TypeBuilder";
-import { type TypeRef, derefTypeRef } from "../Type/TypeRef";
-import { nullableFromUnion } from "../Type/TypeUtils";
-import { UnionAccumulator, UnionBuilder } from "../UnionBuilder";
+} from "../Type/index.js";
+import type { TypeBuilder } from "../Type/TypeBuilder.js";
+import { type TypeRef, derefTypeRef } from "../Type/TypeRef.js";
+import { nullableFromUnion } from "../Type/TypeUtils.js";
+import { UnionAccumulator, UnionBuilder } from "../UnionBuilder.js";
 
 import {
     type CompressedJSON,
     Tag,
     type Value,
     valueTag,
-} from "./CompressedJSON";
+} from "./CompressedJSON.js";
 
 // This should be the recursive type
 //   Value[] | NestedValueArray[]

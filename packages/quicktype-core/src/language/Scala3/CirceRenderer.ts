@@ -1,5 +1,10 @@
-import type { Name } from "../../Naming";
-import type { Sourcelike } from "../../Source";
+import type { Name } from "../../Naming.js";
+import type { Sourcelike } from "../../Source.js";
+import {
+    matchType,
+    nullableFromUnion,
+    removeNullFromUnion,
+} from "../../Type/TypeUtils.js";
 import type {
     ArrayType,
     ClassType,
@@ -7,15 +12,10 @@ import type {
     MapType,
     Type,
     UnionType,
-} from "../../Type";
-import {
-    matchType,
-    nullableFromUnion,
-    removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/index.js";
 
-import { Scala3Renderer } from "./Scala3Renderer";
-import { wrapOption } from "./utils";
+import { Scala3Renderer } from "./Scala3Renderer.js";
+import { wrapOption } from "./utils.js";
 
 export class CirceRenderer extends Scala3Renderer {
     private seenUnionTypes: string[] = [];

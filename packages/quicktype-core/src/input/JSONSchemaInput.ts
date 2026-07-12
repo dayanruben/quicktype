@@ -22,30 +22,30 @@ import {
 } from "collection-utils";
 import URI from "urijs";
 
-import { accessorNamesAttributeProducer } from "../attributes/AccessorNames";
+import { accessorNamesAttributeProducer } from "../attributes/AccessorNames.js";
 import {
     minMaxAttributeProducer,
     minMaxLengthAttributeProducer,
     patternAttributeProducer,
-} from "../attributes/Constraints";
-import { descriptionAttributeProducer } from "../attributes/Description";
-import { enumValuesAttributeProducer } from "../attributes/EnumValues";
-import { StringTypes } from "../attributes/StringTypes";
+} from "../attributes/Constraints.js";
+import { descriptionAttributeProducer } from "../attributes/Description.js";
+import { enumValuesAttributeProducer } from "../attributes/EnumValues.js";
+import { StringTypes } from "../attributes/StringTypes.js";
 import {
     type TypeAttributes,
     combineTypeAttributes,
     emptyTypeAttributes,
     makeTypeAttributesInferred,
-} from "../attributes/TypeAttributes";
+} from "../attributes/TypeAttributes.js";
 import {
     TypeNames,
     makeNamesTypeAttributes,
     modifyTypeNames,
     singularizeTypeNames,
-} from "../attributes/TypeNames";
-import { uriSchemaAttributesProducer } from "../attributes/URIAttributes";
-import { messageAssert, messageError } from "../Messages";
-import type { RunContext } from "../Run";
+} from "../attributes/TypeNames.js";
+import { uriSchemaAttributesProducer } from "../attributes/URIAttributes.js";
+import { messageAssert, messageError } from "../Messages.js";
+import type { RunContext } from "../Run.js";
 import {
     type StringMap,
     assert,
@@ -53,19 +53,20 @@ import {
     defined,
     panic,
     parseJSON,
-} from "../support/Support";
+} from "../support/Support.js";
+import { fixWindowsPath } from "../support/WindowsPaths.js";
 import {
     type PrimitiveTypeKind,
     type TransformedStringTypeKind,
     isNumberTypeKind,
     transformedStringTypeTargetTypeKindsMap,
-} from "../Type";
-import type { TypeBuilder } from "../Type/TypeBuilder";
-import type { TypeRef } from "../Type/TypeRef";
+} from "../Type/index.js";
+import type { TypeBuilder } from "../Type/TypeBuilder.js";
+import type { TypeRef } from "../Type/TypeRef.js";
 
-import type { Input } from "./Inputs";
-import { type JSONSchema, JSONSchemaStore } from "./JSONSchemaStore";
-import { type PathElement, PathElementKind } from "./PathElement";
+import type { Input } from "./Inputs.js";
+import { type JSONSchema, JSONSchemaStore } from "./JSONSchemaStore.js";
+import { type PathElement, PathElementKind } from "./PathElement.js";
 
 function keyOrIndex(pe: PathElement): string | undefined {
     if (pe.kind !== PathElementKind.KeyOrIndex) return undefined;
@@ -143,7 +144,7 @@ function normalizeURI(uri: string | URI): URI {
     // JSONSchemaStore should take a URI, not a string, and if it reads from
     // a file it can decode by itself.
     if (typeof uri === "string") {
-        uri = new URI(uri);
+        uri = new URI(fixWindowsPath(uri));
     }
 
     return new URI(URI.decode(uri.clone().normalize().toString()));
@@ -151,7 +152,7 @@ function normalizeURI(uri: string | URI): URI {
 
 export class Ref {
     public static root(address: string | undefined): Ref {
-        const uri = definedMap(address, (a) => new URI(a));
+        const uri = definedMap(address, (a) => new URI(fixWindowsPath(a)));
         return new Ref(uri, []);
     }
 
@@ -189,7 +190,7 @@ export class Ref {
     }
 
     public static parse(ref: string): Ref {
-        return Ref.parseURI(new URI(ref), true);
+        return Ref.parseURI(new URI(fixWindowsPath(ref)), true);
     }
 
     public addressURI: URI | undefined;

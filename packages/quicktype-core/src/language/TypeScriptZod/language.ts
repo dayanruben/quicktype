@@ -1,14 +1,14 @@
-import type { RenderContext } from "../../Renderer";
-import { BooleanOption, getOptionValues } from "../../RendererOptions";
-import { TargetLanguage } from "../../TargetLanguage";
+import type { RenderContext } from "../../Renderer.js";
+import { BooleanOption, getOptionValues } from "../../RendererOptions/index.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
+import type { StringTypeMapping } from "../../Type/TypeBuilderUtils.js";
 import type {
     PrimitiveStringTypeKind,
     TransformedStringTypeKind,
-} from "../../Type";
-import type { StringTypeMapping } from "../../Type/TypeBuilderUtils";
-import type { LanguageName, RendererOptions } from "../../types";
+} from "../../Type/index.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { TypeScriptZodRenderer } from "./TypeScriptZodRenderer";
+import { TypeScriptZodRenderer } from "./TypeScriptZodRenderer.js";
 
 export const typeScriptZodOptions = {
     justSchema: new BooleanOption("just-schema", "Schema only", false),

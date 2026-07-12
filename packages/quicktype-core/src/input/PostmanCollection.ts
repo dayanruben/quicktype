@@ -1,7 +1,7 @@
-import { parseJSON } from "../support/Support";
+import { parseJSON } from "../support/Support.js";
 
-import type { JSONSourceData } from "./Inputs";
-import type { JSONSchema } from "./JSONSchemaStore";
+import type { JSONSourceData } from "./Inputs.js";
+import type { JSONSchema } from "./JSONSchemaStore.js";
 
 function isValidJSON(s: string): boolean {
     try {
