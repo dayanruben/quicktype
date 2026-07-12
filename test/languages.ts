@@ -845,10 +845,11 @@ export const ObjectiveCLanguage: Language = {
 export const TypeScriptLanguage: Language = {
     name: "typescript",
     base: "test/fixtures/typescript",
+    // tsx doesn't type-check, so compile explicitly to catch type errors
+    // in the generated code
+    compileCommand: "tsc -p .",
     runCommand(sample: string) {
-        // We have to unset TS_NODE_PROJECT because it gets set on the workers
-        // to the root test/tsconfig.json
-        return `TS_NODE_PROJECT= ts-node main.ts \"${sample}\"`;
+        return `tsx main.ts \"${sample}\"`;
     },
     diffViaSchema: true,
     skipDiffViaSchema: [
