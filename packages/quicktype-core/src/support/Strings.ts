@@ -647,10 +647,13 @@ export function makeNameStyle(
     }
 
     return (original: string) => {
-        if (namingStyle === "original")
-            return original;
-
-        const words = splitIntoWords(original);
+        // "original" must not split or restyle the name, but it still has
+        // to go through combineWords so that illegal characters, empty
+        // names, and invalid start characters are fixed up.
+        const words: WordInName[] =
+            namingStyle === "original"
+                ? [{ word: original, isAcronym: false }]
+                : splitIntoWords(original);
 
         const styledName = combineWords(
             words,
