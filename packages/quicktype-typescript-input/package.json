@@ -15,6 +15,7 @@
     },
     "dependencies": {
         "quicktype-core": "file:../quicktype-core",
+        "typescript": "5.9.3",
         "typescript-json-schema": "0.67.4"
     },
     "devDependencies": {
