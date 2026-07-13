@@ -18,7 +18,48 @@
         "indentWidth": 4
     },
     "linter": {
-        "enabled": false
+        "enabled": true,
+        "rules": {
+            "preset": "recommended",
+            "complexity": {
+                "noBannedTypes": "off",
+                "noExtraBooleanCast": "off",
+                "noUselessConstructor": "off",
+                "noUselessContinue": "off",
+                "noUselessSwitchCase": "off",
+                "noUselessTernary": "off",
+                "noUselessUndefinedInitialization": "off",
+                "useDateNow": "off",
+                "useOptionalChain": "off"
+            },
+            "correctness": {
+                "noConstructorReturn": "off",
+                "noSwitchDeclarations": "off",
+                "noUnusedImports": "off",
+                "noUnusedVariables": "off",
+                "noVoidTypeReturn": "off",
+                "useParseIntRadix": "off"
+            },
+            "style": {
+                "noNonNullAssertion": "off",
+                "useConst": "off",
+                "useExponentiationOperator": "off",
+                "useNodejsImportProtocol": "off",
+                "useTemplate": "off"
+            },
+            "suspicious": {
+                "noExplicitAny": "off",
+                "noGlobalIsNan": "off",
+                "noImplicitAnyLet": "off",
+                "noPrototypeBuiltins": "off",
+                "noShadowRestrictedNames": "off",
+                "noTemplateCurlyInString": "off",
+                "noTsIgnore": "off",
+                "noUselessEscapeInString": "off",
+                "useIsArray": "off",
+                "useIterableCallbackReturn": "off"
+            }
+        }
     },
     "assist": { "actions": { "source": { "organizeImports": "off" } } },
     "overrides": [
