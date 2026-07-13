@@ -1,16 +1,36 @@
 {
     "files": {
         "ignore": [
+            "data",
             "test/runs",
             "test/inputs",
+            "test/fixtures",
             "dist",
             "node_modules",
             "packages/*/dist",
+            "packages/*/out",
             "packages/*/node_modules"
         ]
     },
     "formatter": {
         "indentStyle": "space",
         "indentWidth": 4
-    }
+    },
+    "linter": {
+        "enabled": false
+    },
+    "organizeImports": {
+        "enabled": false
+    },
+    "overrides": [
+        {
+            "include": ["**/tsconfig.json", "**/tsconfig.*.json"],
+            "json": {
+                "parser": {
+                    "allowComments": true,
+                    "allowTrailingCommas": true
+                }
+            }
+        }
+    ]
 }

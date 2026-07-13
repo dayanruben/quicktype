@@ -21,8 +21,8 @@
         "start": "script/watch",
         "clean": "rm -rf dist *~ packages/*/{dist,out}",
         "debug": "node --inspect-brk --max-old-space-size=4096 ./dist/index.js",
-        "lint": "eslint src/** packages/*/src/**",
-        "lint:fix": "eslint --fix src/** packages/*/src/**"
+        "lint": "biome check .",
+        "lint:fix": "biome check --write ."
     },
     "workspaces": [
         "./packages/quicktype-core",
