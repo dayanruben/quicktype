@@ -15,7 +15,6 @@ import {
     quicktype,
 } from "quicktype-core";
 import { schemaForTypeScriptSources } from "quicktype-typescript-input";
-// eslint-disable-next-line import/no-unresolved
 import * as vscode from "vscode";
 
 const configurationSection = "quicktype";
@@ -52,7 +51,6 @@ async function promptTopLevelName(): Promise<{
 
     return {
         cancelled: topLevelName === undefined,
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         name: topLevelName || "TopLevel",
     };
 }
