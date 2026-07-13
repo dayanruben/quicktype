@@ -102,6 +102,7 @@ export const namingStyles = {
     },
 } as const;
 
+// biome-ignore lint/suspicious/noUnusedExpressions: compile-time type check via satisfies
 namingStyles satisfies Record<string, NamingStyle>;
 
 export type NamingStyleKey = keyof typeof namingStyles;
