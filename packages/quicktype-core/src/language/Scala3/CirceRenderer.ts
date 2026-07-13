@@ -18,7 +18,7 @@ import { Scala3Renderer } from "./Scala3Renderer.js";
 import { wrapOption } from "./utils.js";
 
 export class CirceRenderer extends Scala3Renderer {
-    private seenUnionTypes: string[] = [];
+    private readonly seenUnionTypes: string[] = [];
 
     protected circeEncoderForType(
         t: Type,

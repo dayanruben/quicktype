@@ -39,7 +39,7 @@ export class TypeAttributeStore {
 
     public constructor(
         private readonly _typeGraph: TypeGraph,
-        private _values: Array<TypeAttributes | undefined>,
+        private readonly _values: Array<TypeAttributes | undefined>,
     ) {}
 
     private getTypeIndex(t: Type): number {

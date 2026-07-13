@@ -34,8 +34,8 @@ export class MinMaxConstraintTypeAttributeKind extends TypeAttributeKind<MinMaxC
     public constructor(
         name: string,
         private readonly _typeKinds: Set<TypeKind>,
-        private _minSchemaProperty: string,
-        private _maxSchemaProperty: string,
+        private readonly _minSchemaProperty: string,
+        private readonly _maxSchemaProperty: string,
     ) {
         super(name);
     }

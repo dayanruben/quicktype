@@ -45,7 +45,7 @@ class MersenneTwister {
 
     private readonly LOWER_MASK: number;
 
-    private mt: number[];
+    private readonly mt: number[];
 
     private mti: number;
 

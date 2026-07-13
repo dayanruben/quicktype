@@ -44,7 +44,8 @@
                 "useConsistentMethodSignatures": "on",
                 "useUnifiedTypeSignatures": "on",
                 "noNamespace": "on",
-                "useNodeAssertStrict": "on"
+                "useNodeAssertStrict": "on",
+                "useReadonlyClassProperties": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off"

@@ -56,15 +56,15 @@ export abstract class CompressedJSON<T> {
 
     private _ctx: Context | undefined;
 
-    private _contextStack: Context[] = [];
+    private readonly _contextStack: Context[] = [];
 
-    private _strings: string[] = [];
+    private readonly _strings: string[] = [];
 
-    private _stringIndexes: { [str: string]: number } = {};
+    private readonly _stringIndexes: { [str: string]: number } = {};
 
-    private _objects: Value[][] = [];
+    private readonly _objects: Value[][] = [];
 
-    private _arrays: Value[][] = [];
+    private readonly _arrays: Value[][] = [];
 
     public constructor(
         public readonly dateTimeRecognizer: DateTimeRecognizer,

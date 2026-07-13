@@ -73,7 +73,7 @@ export class CJSONRenderer extends ConvenienceRenderer {
 
     protected readonly enumeratorNamingStyle: NamingStyle; /* Enum naming style */
 
-    private includes: string[];
+    private readonly includes: string[];
 
     /**
      * Constructor

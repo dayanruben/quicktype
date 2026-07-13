@@ -1496,7 +1496,7 @@ export class JSONSchemaInput implements Input<JSONSchemaSourceData> {
 
     private readonly _schemaInputs: Map<string, string> = new Map();
 
-    private _schemaSources: Array<[URI, JSONSchemaSourceData]> = [];
+    private readonly _schemaSources: Array<[URI, JSONSchemaSourceData]> = [];
 
     private readonly _topLevels: Map<string, Ref> = new Map();
 
