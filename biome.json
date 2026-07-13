@@ -23,7 +23,9 @@
             "preset": "recommended",
             "correctness": {
                 "noUndeclaredDependencies": "on",
-                "noGlobalDirnameFilename": "on"
+                "noGlobalDirnameFilename": "on",
+                "noUnusedInstantiation": "on",
+                "useSingleJsDocAsterisk": "on"
             },
             "complexity": {
                 "noUselessReturn": "on"
