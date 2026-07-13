@@ -119,7 +119,7 @@ export function evaluateFull(
         p = p * cp;
     }
 
-    return [Math.pow(p, 1 / (word.length - depth + 1)), scores];
+    return [p ** (1 / (word.length - depth + 1)), scores];
 }
 
 export function evaluate(mc: MarkovChain, word: string): number {

@@ -61,7 +61,7 @@ function shouldBeMap(
         const names = Array.from(properties.keys());
         const probabilities = names.map(nameProbability);
         const product = probabilities.reduce((a, b) => a * b, 1);
-        const probability = Math.pow(product, 1 / numProperties);
+        const probability = product ** (1 / numProperties);
         // The idea behind this is to have a probability around 0.0025 for
         // n=1, up to around 1.0 for n=20.  I.e. when we only have a few
         // properties, they need to look really weird to infer a map, but
@@ -76,10 +76,10 @@ function shouldBeMap(
         // we want maybe 0.004 and 5, or maybe something even more
         // trigger-happy.
         const exponent = 5;
-        const scale = Math.pow(22, exponent);
+        const scale = 22 ** exponent;
         const limit =
-            Math.pow(numProperties + 2, exponent) / scale +
-            (0.0025 - Math.pow(3, exponent) / scale);
+            (numProperties + 2) ** exponent / scale +
+            (0.0025 - 3 ** exponent / scale);
         if (probability > limit) return undefined;
     }
 
