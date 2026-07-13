@@ -942,7 +942,7 @@ export class ElixirRenderer extends ConvenienceRenderer {
                 this.forEachClassProperty(c, "none", (_name, _jsonName, _p) => {
                     propCount++;
                 });
-                const isEmpty = propCount ? false : true;
+                const isEmpty = !propCount;
                 this.ensureBlankLine();
                 this.emitBlock(
                     [`def from_map(${isEmpty ? "_" : ""}m) do`],
