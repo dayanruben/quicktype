@@ -52,8 +52,8 @@ import {
     assertNever,
     defined,
     panic,
-    parseJSON,
 } from "../support/Support.js";
+import { parseJSON } from "../support/ParseJSON.js";
 import { fixWindowsPath } from "../support/WindowsPaths.js";
 import {
     type PrimitiveTypeKind,
