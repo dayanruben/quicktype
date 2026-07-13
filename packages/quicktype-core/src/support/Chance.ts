@@ -88,13 +88,13 @@ class MersenneTwister {
 
     /* generates a random number on [0,0xffffffff]-interval */
     private genrand_int32() {
-        let y;
+        let y: number;
         const mag01 = [0x0, this.MATRIX_A];
         /* mag01[x] = x * MATRIX_A  for x=0,1 */
 
         if (this.mti >= this.N) {
             /* generate N words at one time */
-            let kk;
+            let kk: number;
 
             if (this.mti === this.N + 1) {
                 /* if init_genrand() has not been called, */

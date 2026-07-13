@@ -18,7 +18,7 @@ export async function getStream(inputStream: Readable, opts: Options = {}) {
 
     const maxBuffer = opts.maxBuffer ?? Number.POSITIVE_INFINITY;
     let stream: BufferedPassThrough;
-    let clean;
+    let clean: (() => void) | undefined;
 
     const p = new Promise((resolve, reject) => {
         const error = (err: any) => {
