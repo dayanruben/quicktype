@@ -22,7 +22,6 @@
         "rules": {
             "preset": "recommended",
             "style": {
-                "noNonNullAssertion": "off",
                 "useTemplate": "off"
             },
             "suspicious": {

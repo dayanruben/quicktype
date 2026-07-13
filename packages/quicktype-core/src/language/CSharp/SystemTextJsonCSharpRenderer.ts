@@ -663,9 +663,10 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                 }
 
                 // Handle number (integer/double) union properly
+                const { integerTransformer, doubleTransformer } = xfer;
                 if (
-                    xfer.integerTransformer !== undefined &&
-                    xfer.doubleTransformer !== undefined
+                    integerTransformer !== undefined &&
+                    doubleTransformer !== undefined
                 ) {
                     varGen.counter++;
                     const intTryVar = `intTryValue${varGen.counter}`;
@@ -680,7 +681,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                         );
                         this.emitBlock(() => {
                             const allHandled = this.emitDecodeTransformer(
-                                xfer.integerTransformer!,
+                                integerTransformer,
                                 targetType,
                                 emitFinish,
                                 intVar,
@@ -693,7 +694,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                         this.emitLine("else");
                         this.emitBlock(() => {
                             const allHandled = this.emitDecodeTransformer(
-                                xfer.doubleTransformer!,
+                                doubleTransformer,
                                 targetType,
                                 emitFinish,
                                 doubleVar,
