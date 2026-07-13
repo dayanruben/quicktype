@@ -45,12 +45,10 @@ export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
     }
 
     protected get typeAnnotations(): JavaScriptTypeAnnotations {
-        return Object.assign({ never: ": never" }, tsFlowTypeAnnotations);
+        return { never: ": never", ...tsFlowTypeAnnotations };
     }
 
-    protected emitModuleExports(): void {
-        return;
-    }
+    protected emitModuleExports(): void {}
 
     protected emitUsageImportComment(): void {
         const topLevelNames: Sourcelike[] = [];

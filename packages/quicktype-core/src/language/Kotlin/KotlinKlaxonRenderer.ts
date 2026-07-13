@@ -1,12 +1,9 @@
 import { arrayIntercalate, iterableSome } from "collection-utils";
 
 import type { Name } from "../../Naming.js";
-import type { RenderContext } from "../../Renderer.js";
-import type { OptionValues } from "../../RendererOptions/index.js";
 import { type Sourcelike, modifySource } from "../../Source.js";
 import { camelCase } from "../../support/Strings.js";
 import { mustNotHappen } from "../../support/Support.js";
-import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     type ArrayType,
     ClassType,
@@ -19,18 +16,9 @@ import {
 import { matchType, nullableFromUnion } from "../../Type/TypeUtils.js";
 
 import { KotlinRenderer } from "./KotlinRenderer.js";
-import type { kotlinOptions } from "./language.js";
 import { stringEscape } from "./utils.js";
 
 export class KotlinKlaxonRenderer extends KotlinRenderer {
-    public constructor(
-        targetLanguage: TargetLanguage,
-        renderContext: RenderContext,
-        _kotlinOptions: OptionValues<typeof kotlinOptions>,
-    ) {
-        super(targetLanguage, renderContext, _kotlinOptions);
-    }
-
     private unionMemberFromJsonValue(t: Type, e: Sourcelike): Sourcelike {
         return matchType<Sourcelike>(
             t,

@@ -21,7 +21,7 @@ export class JSONSchemaTargetLanguage extends TargetLanguage<
         super(JSONSchemaLanguageConfig);
     }
 
-    public getOptions(): {} {
+    public getOptions(): Record<string, never> {
         return {};
     }
 

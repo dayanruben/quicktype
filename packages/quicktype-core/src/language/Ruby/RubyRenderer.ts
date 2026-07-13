@@ -51,7 +51,7 @@ export class RubyRenderer extends ConvenienceRenderer {
     }
 
     protected canBeForwardDeclared(t: Type): boolean {
-        return "class" === t.kind;
+        return t.kind === "class";
     }
 
     protected forbiddenNamesForGlobalNamespace(): readonly string[] {
@@ -732,13 +732,11 @@ export class RubyRenderer extends ConvenienceRenderer {
                         ["Integer"],
                         [` = ${this._options.strictness}Integer`],
                     ]);
-                if (this._options.strictness === Strictness.Strict) {
-                    if (has.nil)
-                        declarations.push([
-                            ["Nil"],
-                            [` = ${this._options.strictness}Nil`],
-                        ]);
-                }
+                if (this._options.strictness === Strictness.Strict && has.nil)
+                    declarations.push([
+                        ["Nil"],
+                        [` = ${this._options.strictness}Nil`],
+                    ]);
 
                 if (has.bool)
                     declarations.push([
@@ -863,7 +861,7 @@ export class RubyRenderer extends ConvenienceRenderer {
 
                         // The json gem defines to_json on maps and primitives, so we only need to supply
                         // it for arrays.
-                        const needsToJsonDefined = "array" === topLevel.kind;
+                        const needsToJsonDefined = topLevel.kind === "array";
 
                         const classDeclaration = (): void => {
                             this.emitBlock(["class ", name], () => {

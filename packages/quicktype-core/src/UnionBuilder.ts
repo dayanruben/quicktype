@@ -153,7 +153,7 @@ export class UnionAccumulator<TArray, TObject>
         attributes: TypeAttributes,
         stringTypes: StringTypes | undefined,
     ): void {
-        let stringTypesAttributes: TypeAttributes | undefined = undefined;
+        let stringTypesAttributes: TypeAttributes | undefined;
         if (stringTypes === undefined) {
             stringTypes =
                 stringTypesTypeAttributeKind.tryGetInAttributes(attributes);

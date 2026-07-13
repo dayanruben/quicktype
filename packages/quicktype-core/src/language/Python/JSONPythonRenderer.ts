@@ -68,13 +68,6 @@ export interface ValueOrLambda {
 // * If `input` is a lambda, the result is `lambda x: f(input(x))`
 function compose(
     input: ValueOrLambda,
-    f: (arg: Sourcelike) => Sourcelike,
-): ValueOrLambda;
-// FIXME: refactor this
-// eslint-disable-next-line @typescript-eslint/unified-signatures
-function compose(input: ValueOrLambda, f: ValueOrLambda): ValueOrLambda;
-function compose(
-    input: ValueOrLambda,
     f: ValueOrLambda | ((arg: Sourcelike) => Sourcelike),
 ): ValueOrLambda {
     if (typeof f === "function") {

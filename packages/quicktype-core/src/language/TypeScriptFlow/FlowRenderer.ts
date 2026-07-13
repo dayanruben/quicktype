@@ -13,7 +13,7 @@ export class FlowRenderer extends TypeScriptFlowBaseRenderer {
     }
 
     protected get typeAnnotations(): JavaScriptTypeAnnotations {
-        return Object.assign({ never: "" }, tsFlowTypeAnnotations);
+        return { never: "", ...tsFlowTypeAnnotations };
     }
 
     protected emitEnum(e: EnumType, enumName: Name): void {

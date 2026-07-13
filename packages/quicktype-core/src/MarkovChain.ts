@@ -69,7 +69,8 @@ function increment(t: Trie, seq: string, i: number): void {
 
     let st = t.arr[first];
     if (st === null) {
-        t.arr[first] = st = makeTrie();
+        st = makeTrie();
+        t.arr[first] = st;
     }
 
     if (typeof st !== "object") {
@@ -116,10 +117,10 @@ export function evaluateFull(
         }
 
         scores.push(cp);
-        p = p * cp;
+        p *= cp;
     }
 
-    return [Math.pow(p, 1 / (word.length - depth + 1)), scores];
+    return [p ** (1 / (word.length - depth + 1)), scores];
 }
 
 export function evaluate(mc: MarkovChain, word: string): number {

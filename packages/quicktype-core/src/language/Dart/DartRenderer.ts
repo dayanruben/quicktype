@@ -419,8 +419,8 @@ export class DartRenderer extends ConvenienceRenderer {
     // If the first time is the unionType type, after nullableFromUnion conversion,
     // the isNullable property will become false, which is obviously wrong,
     // so add isNullable property
-    // eslint-disable-next-line @typescript-eslint/default-param-last
     protected fromDynamicExpression(
+        // biome-ignore lint/style/useDefaultParameterLast: part of the exported DartRenderer API; removing the default would break downstream subclasses
         isNullable = false,
         t: Type,
         ...dynamic: Sourcelike[]
@@ -517,8 +517,8 @@ export class DartRenderer extends ConvenienceRenderer {
     // If the first time is the unionType type, after nullableFromUnion conversion,
     // the isNullable property will become false, which is obviously wrong,
     // so add isNullable property
-    // eslint-disable-next-line @typescript-eslint/default-param-last
     protected toDynamicExpression(
+        // biome-ignore lint/style/useDefaultParameterLast: part of the exported DartRenderer API; removing the default would break downstream subclasses
         isNullable = false,
         t: Type,
         ...dynamic: Sourcelike[]

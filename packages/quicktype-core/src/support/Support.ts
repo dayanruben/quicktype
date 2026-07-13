@@ -6,6 +6,7 @@ import type { JSONSchema } from "../input/JSONSchemaStore.js";
 import { messageError } from "../Messages.js";
 
 export interface StringMap {
+    // biome-ignore lint/suspicious/noExplicitAny: heterogeneous by design; holds arbitrary JSON values
     [name: string]: any;
 }
 

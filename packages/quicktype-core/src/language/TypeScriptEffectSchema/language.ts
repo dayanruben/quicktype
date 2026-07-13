@@ -22,7 +22,7 @@ export class TypeScriptEffectSchemaTargetLanguage extends TargetLanguage<
         super(typeScriptEffectSchemaLanguageConfig);
     }
 
-    public getOptions(): {} {
+    public getOptions(): Record<string, never> {
         return {};
     }
 

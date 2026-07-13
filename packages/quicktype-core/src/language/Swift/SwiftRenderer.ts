@@ -440,7 +440,7 @@ export class SwiftRenderer extends ConvenienceRenderer {
     private get accessLevel(): string {
         return this._options.accessLevel === "internal"
             ? "" // internal is default, so we don't have to emit it
-            : this._options.accessLevel + " ";
+            : `${this._options.accessLevel} `;
     }
 
     private get objcMembersDeclaration(): string {
@@ -515,7 +515,7 @@ export class SwiftRenderer extends ConvenienceRenderer {
             ],
             () => {
                 if (this._options.dense) {
-                    let lastProperty: ClassProperty | undefined = undefined;
+                    let lastProperty: ClassProperty | undefined;
                     let lastNames: Name[] = [];
 
                     const emitLastProperty = (): void => {
@@ -684,18 +684,16 @@ export class SwiftRenderer extends ConvenienceRenderer {
             },
         );
 
-        if (!this._options.justTypes) {
-            // FIXME: We emit only the MARK line for top-level-enum.schema
-            if (this._options.convenienceInitializers) {
-                this.ensureBlankLine();
-                this.emitMark(
-                    this.sourcelikeToString(className) +
-                        " convenience initializers and mutators",
-                );
-                this.ensureBlankLine();
-                this.emitConvenienceInitializersExtension(c, className);
-                this.ensureBlankLine();
-            }
+        // FIXME: We emit only the MARK line for top-level-enum.schema
+        if (!this._options.justTypes && this._options.convenienceInitializers) {
+            this.ensureBlankLine();
+            this.emitMark(
+                this.sourcelikeToString(className) +
+                    " convenience initializers and mutators",
+            );
+            this.ensureBlankLine();
+            this.emitConvenienceInitializersExtension(c, className);
+            this.ensureBlankLine();
         }
 
         this.endFile();

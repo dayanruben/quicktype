@@ -65,6 +65,7 @@ export const all = [
     new TypeScriptZodTargetLanguage(),
 ] as const;
 
+// biome-ignore lint/suspicious/noUnusedExpressions: compile-time type check via satisfies
 all satisfies readonly TargetLanguage[];
 
 /**

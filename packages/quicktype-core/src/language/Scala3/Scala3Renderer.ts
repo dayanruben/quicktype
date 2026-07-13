@@ -265,7 +265,7 @@ export class Scala3Renderer extends ConvenienceRenderer {
                 const nameNeedsBackticks =
                     jsonName.endsWith("_") || shouldAddBacktick(jsonName);
                 const nameWithBackticks = nameNeedsBackticks
-                    ? "`" + jsonName + "`"
+                    ? `\`${jsonName}\``
                     : jsonName;
                 this.emitLine(
                     "val ",
@@ -311,7 +311,9 @@ export class Scala3Renderer extends ConvenienceRenderer {
                         const backticks =
                             shouldAddBacktick(jsonName) ||
                             jsonName.includes(" ") ||
-                            !Number.isNaN(Number.parseInt(jsonName.charAt(0)));
+                            !Number.isNaN(
+                                Number.parseInt(jsonName.charAt(0), 10),
+                            );
                         if (backticks) {
                             this.emitItem("`");
                         }

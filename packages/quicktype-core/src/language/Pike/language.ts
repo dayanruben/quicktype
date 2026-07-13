@@ -18,7 +18,7 @@ export class PikeTargetLanguage extends TargetLanguage<
         super(pikeLanguageConfig);
     }
 
-    public getOptions(): {} {
+    public getOptions(): Record<string, never> {
         return {};
     }
 

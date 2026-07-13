@@ -105,7 +105,7 @@ function withRef<T extends object>(
             : refOrLoc instanceof Ref
               ? refOrLoc
               : refOrLoc.canonicalRef;
-    return Object.assign({ ref }, props ?? {});
+    return { ref, ...(props ?? {}) };
 }
 
 function checkJSONSchemaObject(
@@ -166,9 +166,9 @@ export class Ref {
 
         if (path !== "") {
             const parts = path.split("/");
-            parts.forEach((part) =>
-                elements.push({ kind: PathElementKind.KeyOrIndex, key: part }),
-            );
+            parts.forEach((part) => {
+                elements.push({ kind: PathElementKind.KeyOrIndex, key: part });
+            });
         }
 
         return elements;
@@ -347,7 +347,7 @@ export class Ref {
         switch (first.kind) {
             case PathElementKind.Root:
                 return this.lookup(root, rest, root);
-            case PathElementKind.KeyOrIndex:
+            case PathElementKind.KeyOrIndex: {
                 const key = first.key;
                 if (Array.isArray(local)) {
                     if (!/^\d+$/.test(key)) {
@@ -380,6 +380,7 @@ export class Ref {
                     rest,
                     root,
                 );
+            }
 
             case PathElementKind.Type:
                 return panic('Cannot look up path that indexes "type"');
@@ -398,13 +399,11 @@ export class Ref {
         if (!(other instanceof Ref)) return false;
         if (this.addressURI !== undefined && other.addressURI !== undefined) {
             if (!this.addressURI.equals(other.addressURI)) return false;
-        } else {
-            if (
-                (this.addressURI === undefined) !==
-                (other.addressURI === undefined)
-            )
-                return false;
-        }
+        } else if (
+            (this.addressURI === undefined) !==
+            (other.addressURI === undefined)
+        )
+            return false;
 
         const l = this.path.length;
         if (l !== other.path.length) return false;
@@ -925,8 +924,7 @@ async function addTypesInSchema(
         }
 
         const includedTypes = setFilter(schemaTypes, isTypeIncluded);
-        let producedAttributesForNoCases: JSONSchemaAttributes[] | undefined =
-            undefined;
+        let producedAttributesForNoCases: JSONSchemaAttributes[] | undefined;
 
         function forEachProducedAttribute(
             cases: JSONSchema[] | undefined,
@@ -1443,7 +1441,7 @@ async function refsInSchemaForURI(
             });
         }
 
-        return mapMap(mapFromObject(schema), (_, name) => ref.push(name));
+        return mapMap(mapFromObject(schema), (_, key) => ref.push(key));
     }
 
     let name: string;
@@ -1498,7 +1496,7 @@ export class JSONSchemaInput implements Input<JSONSchemaSourceData> {
 
     private readonly _schemaInputs: Map<string, string> = new Map();
 
-    private _schemaSources: Array<[URI, JSONSchemaSourceData]> = [];
+    private readonly _schemaSources: Array<[URI, JSONSchemaSourceData]> = [];
 
     private readonly _topLevels: Map<string, Ref> = new Map();
 
@@ -1540,10 +1538,11 @@ export class JSONSchemaInput implements Input<JSONSchemaSourceData> {
                 return panic("Must have a schema store to process JSON Schema");
             }
         } else {
-            maybeSchemaStore = this._schemaStore = new InputJSONSchemaStore(
+            this._schemaStore = new InputJSONSchemaStore(
                 this._schemaInputs,
                 maybeSchemaStore,
             );
+            maybeSchemaStore = this._schemaStore;
         }
 
         const schemaStore = maybeSchemaStore;

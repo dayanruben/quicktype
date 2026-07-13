@@ -56,15 +56,15 @@ export abstract class CompressedJSON<T> {
 
     private _ctx: Context | undefined;
 
-    private _contextStack: Context[] = [];
+    private readonly _contextStack: Context[] = [];
 
-    private _strings: string[] = [];
+    private readonly _strings: string[] = [];
 
-    private _stringIndexes: { [str: string]: number } = {};
+    private readonly _stringIndexes: { [str: string]: number } = {};
 
-    private _objects: Value[][] = [];
+    private readonly _objects: Value[][] = [];
 
-    private _arrays: Value[][] = [];
+    private readonly _arrays: Value[][] = [];
 
     public constructor(
         public readonly dateTimeRecognizer: DateTimeRecognizer,
@@ -105,6 +105,7 @@ export abstract class CompressedJSON<T> {
     }
 
     protected internString(s: string): number {
+        // biome-ignore lint/suspicious/noPrototypeBuiltins: Object.hasOwn is not in quicktype-core's es6 lib
         if (Object.prototype.hasOwnProperty.call(this._stringIndexes, s)) {
             return this._stringIndexes[s];
         }
@@ -184,7 +185,7 @@ export abstract class CompressedJSON<T> {
     }
 
     protected commitString(s: string): void {
-        let value: Value | undefined = undefined;
+        let value: Value | undefined;
         if (this.handleRefs && this.isExpectingRef) {
             value = this.makeString(s);
         } else {

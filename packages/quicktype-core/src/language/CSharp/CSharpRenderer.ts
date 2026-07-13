@@ -294,7 +294,7 @@ export class CSharpRenderer extends ConvenienceRenderer {
                     : "none";
                 const columns: Sourcelike[][] = [];
                 let isFirstProperty = true;
-                let previousDescription: string[] | undefined = undefined;
+                let previousDescription: string[] | undefined;
                 this.forEachClassProperty(
                     c,
                     blankLines,
@@ -484,9 +484,7 @@ export class CSharpRenderer extends ConvenienceRenderer {
         }
     }
 
-    protected emitRequiredHelpers(): void {
-        return;
-    }
+    protected emitRequiredHelpers(): void {}
 
     private emitTypesAndSupport(): void {
         this.forEachObject(
@@ -502,13 +500,9 @@ export class CSharpRenderer extends ConvenienceRenderer {
         this.emitRequiredHelpers();
     }
 
-    protected emitDefaultLeadingComments(): void {
-        return;
-    }
+    protected emitDefaultLeadingComments(): void {}
 
-    protected emitDefaultFollowingComments(): void {
-        return;
-    }
+    protected emitDefaultFollowingComments(): void {}
 
     protected needNamespace(): boolean {
         return true;
@@ -537,8 +531,8 @@ export class CSharpRenderer extends ConvenienceRenderer {
     }
 
     protected emitDependencyUsings(): void {
-        let genericEmited: boolean = false;
-        let ensureGenericOnce = () => {
+        let genericEmited = false;
+        const ensureGenericOnce = () => {
             if (!genericEmited) {
                 this.emitUsing("System.Collections.Generic");
                 genericEmited = true;

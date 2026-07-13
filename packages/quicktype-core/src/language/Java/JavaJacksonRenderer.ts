@@ -1,9 +1,6 @@
 import type { Name } from "../../Naming.js";
-import type { RenderContext } from "../../Renderer.js";
-import type { OptionValues } from "../../RendererOptions/index.js";
 import type { Sourcelike } from "../../Source.js";
 import { assertNever, panic } from "../../support/Support.js";
-import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -16,18 +13,9 @@ import {
 import { removeNullFromUnion } from "../../Type/TypeUtils.js";
 
 import { JavaRenderer } from "./JavaRenderer.js";
-import type { javaOptions } from "./language.js";
 import { stringEscape } from "./utils.js";
 
 export class JacksonRenderer extends JavaRenderer {
-    public constructor(
-        targetLanguage: TargetLanguage,
-        renderContext: RenderContext,
-        options: OptionValues<typeof javaOptions>,
-    ) {
-        super(targetLanguage, renderContext, options);
-    }
-
     protected readonly _converterKeywords: string[] = [
         "JsonProperty",
         "JsonDeserialize",
@@ -73,17 +61,23 @@ export class JacksonRenderer extends JavaRenderer {
         switch (p.type.kind) {
             case "date-time":
                 this._dateTimeProvider.dateTimeJacksonAnnotations.forEach(
-                    (annotation) => annotations.push(annotation),
+                    (annotation) => {
+                        annotations.push(annotation);
+                    },
                 );
                 break;
             case "date":
                 this._dateTimeProvider.dateJacksonAnnotations.forEach(
-                    (annotation) => annotations.push(annotation),
+                    (annotation) => {
+                        annotations.push(annotation);
+                    },
                 );
                 break;
             case "time":
                 this._dateTimeProvider.timeJacksonAnnotations.forEach(
-                    (annotation) => annotations.push(annotation),
+                    (annotation) => {
+                        annotations.push(annotation);
+                    },
                 );
                 break;
             default:

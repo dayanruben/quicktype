@@ -27,7 +27,7 @@ export class TypeScriptZodTargetLanguage extends TargetLanguage<
         super(typeScriptZodLanguageConfig);
     }
 
-    public getOptions(): {} {
+    public getOptions(): Record<string, never> {
         return {};
     }
 

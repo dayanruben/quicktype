@@ -31,7 +31,7 @@ export abstract class JSONSchemaStore {
 
         try {
             schema = await this.fetch(address);
-        } catch (e) {
+        } catch {
             // FIXME: handle or log this error
         }
 

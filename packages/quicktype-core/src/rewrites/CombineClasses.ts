@@ -45,13 +45,11 @@ function canBeCombined(
         if (p1.size !== p2.size) {
             return false;
         }
-    } else {
-        if (
-            p1.size < p2.size * REQUIRED_OVERLAP ||
-            p2.size < p1.size * REQUIRED_OVERLAP
-        ) {
-            return false;
-        }
+    } else if (
+        p1.size < p2.size * REQUIRED_OVERLAP ||
+        p2.size < p1.size * REQUIRED_OVERLAP
+    ) {
+        return false;
     }
 
     let larger: ReadonlyMap<string, ClassProperty>;
@@ -142,7 +140,7 @@ function findSimilarityCliques(
     const cliques: Clique[] = [];
 
     for (const c of classCandidates) {
-        let cliqueIndex: number | undefined = undefined;
+        let cliqueIndex: number | undefined;
         for (let i = 0; i < cliques.length; i++) {
             if (tryAddToClique(c, cliques[i], onlyWithSameProperties)) {
                 cliqueIndex = i;

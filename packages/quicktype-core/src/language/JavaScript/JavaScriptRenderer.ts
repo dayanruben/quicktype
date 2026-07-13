@@ -279,16 +279,10 @@ export class JavaScriptRenderer extends ConvenienceRenderer {
                                 "), null, 2);",
                             );
                         }
+                    } else if (!this._jsOptions.runtimeTypecheck) {
+                        this.emitLine("return value;");
                     } else {
-                        if (!this._jsOptions.runtimeTypecheck) {
-                            this.emitLine("return value;");
-                        } else {
-                            this.emitLine(
-                                "return uncast(value, ",
-                                typeMap,
-                                ");",
-                            );
-                        }
+                        this.emitLine("return uncast(value, ", typeMap, ");");
                     }
                 },
             );
@@ -497,9 +491,7 @@ function r(name${stringAnnotation}) {
         }
     }
 
-    protected emitTypes(): void {
-        return;
-    }
+    protected emitTypes(): void {}
 
     protected emitUsageImportComment(): void {
         this.emitLine('//   const Convert = require("./file");');

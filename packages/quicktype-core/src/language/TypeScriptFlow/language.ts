@@ -12,7 +12,8 @@ import { javaScriptOptions } from "../JavaScript/index.js";
 import { FlowRenderer } from "./FlowRenderer.js";
 import { TypeScriptRenderer } from "./TypeScriptRenderer.js";
 
-export const tsFlowOptions = Object.assign({}, javaScriptOptions, {
+export const tsFlowOptions = {
+    ...javaScriptOptions,
     justTypes: new BooleanOption("just-types", "Interfaces only", false),
     nicePropertyNames: new BooleanOption(
         "nice-property-names",
@@ -40,7 +41,7 @@ export const tsFlowOptions = Object.assign({}, javaScriptOptions, {
         false,
     ),
     readonly: new BooleanOption("readonly", "Use readonly type members", false),
-});
+};
 
 export const typeScriptLanguageConfig = {
     displayName: "TypeScript",

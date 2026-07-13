@@ -63,7 +63,7 @@ export function utf16ConcatMap(
             const cc = s.charCodeAt(i);
             if (charNoEscapeMap[cc] !== 1) {
                 if (cs === null) cs = [];
-                cs.push(s.substring(start, i));
+                cs.push(s.slice(start, i));
 
                 const str = charStringMap[cc];
                 if (str === undefined) {
@@ -80,7 +80,7 @@ export function utf16ConcatMap(
 
         if (cs === null) return s;
 
-        cs.push(s.substring(start, i));
+        cs.push(s.slice(start, i));
 
         return cs.join("");
     };
@@ -108,7 +108,7 @@ export function utf32ConcatMap(
             let cc = s.charCodeAt(i);
             if (charNoEscapeMap[cc] !== 1) {
                 if (cs === null) cs = [];
-                cs.push(s.substring(start, i));
+                cs.push(s.slice(start, i));
 
                 if (isHighSurrogate(cc)) {
                     const highSurrogate = cc;
@@ -139,7 +139,7 @@ export function utf32ConcatMap(
 
         if (cs === null) return s;
 
-        cs.push(s.substring(start, i));
+        cs.push(s.slice(start, i));
 
         return cs.join("");
     };
@@ -189,9 +189,9 @@ export function intToHex(i: number, width: number): string {
 
 export function standardUnicodeHexEscape(codePoint: number): string {
     if (codePoint <= 0xffff) {
-        return "\\u" + intToHex(codePoint, 4);
+        return `\\u${intToHex(codePoint, 4)}`;
     } else {
-        return "\\U" + intToHex(codePoint, 8);
+        return `\\U${intToHex(codePoint, 8)}`;
     }
 }
 
@@ -343,7 +343,7 @@ export function startWithLetter(
     const modify = upper ? capitalize : decapitalize;
     if (str === "") return modify("empty");
     if (isAllowedStart(str.charCodeAt(0))) return modify(str);
-    return modify("the" + str);
+    return modify(`the${str}`);
 }
 
 const knownAcronyms = new Set(acronyms);
@@ -371,10 +371,10 @@ const fastIsDigit = precomputedCodePointPredicate(isDigit);
 export function splitIntoWords(s: string): WordInName[] {
     // [start, end, allUpper]
     const intervals: Array<[number, number, boolean]> = [];
-    let intervalStart: number | undefined = undefined;
+    let intervalStart: number | undefined;
     const len = s.length;
     let i = 0;
-    let lastLowerCaseIndex: number | undefined = undefined;
+    let lastLowerCaseIndex: number | undefined;
 
     function atEnd(): boolean {
         return i >= len;
@@ -610,7 +610,8 @@ export function makeNameStyle(
             restWordStyle = firstUpperWordStyle;
             restAcronymStyle = allUpperWordStyle;
         } else {
-            restWordStyle = restAcronymStyle = firstUpperWordStyle;
+            restAcronymStyle = firstUpperWordStyle;
+            restWordStyle = restAcronymStyle;
         }
     } else {
         separator = "_";
@@ -619,32 +620,31 @@ export function makeNameStyle(
     switch (namingStyle) {
         case "pascal":
         case "pascal-upper-acronyms":
-            firstWordStyle = firstWordAcronymStyle = firstUpperWordStyle;
+            firstWordAcronymStyle = firstUpperWordStyle;
+            firstWordStyle = firstWordAcronymStyle;
             break;
         case "camel":
         case "camel-upper-acronyms":
-            firstWordStyle = firstWordAcronymStyle = allLowerWordStyle;
+            firstWordAcronymStyle = allLowerWordStyle;
+            firstWordStyle = firstWordAcronymStyle;
             break;
         case "underscore":
-            firstWordStyle =
-                restWordStyle =
-                firstWordAcronymStyle =
-                restAcronymStyle =
-                    allLowerWordStyle;
+            firstWordStyle = allLowerWordStyle;
+            restWordStyle = allLowerWordStyle;
+            firstWordAcronymStyle = allLowerWordStyle;
+            restAcronymStyle = allLowerWordStyle;
             break;
         case "upper-underscore":
-            firstWordStyle =
-                restWordStyle =
-                firstWordAcronymStyle =
-                restAcronymStyle =
-                    allUpperWordStyle;
+            firstWordStyle = allUpperWordStyle;
+            restWordStyle = allUpperWordStyle;
+            firstWordAcronymStyle = allUpperWordStyle;
+            restAcronymStyle = allUpperWordStyle;
             break;
         case "original":
-            firstWordStyle =
-                restWordStyle =
-                firstWordAcronymStyle =
-                restAcronymStyle =
-                    originalWord;
+            firstWordStyle = originalWord;
+            restWordStyle = originalWord;
+            firstWordAcronymStyle = originalWord;
+            restAcronymStyle = originalWord;
             break;
         default:
             return assertNever(namingStyle);

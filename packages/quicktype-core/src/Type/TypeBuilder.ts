@@ -129,7 +129,9 @@ export class TypeBuilder {
         trefs: ReadonlySet<TypeRef> | undefined,
     ): void {
         if (trefs === undefined) return;
-        trefs.forEach((tref) => this.assertTypeRefGraph(tref));
+        trefs.forEach((tref) => {
+            this.assertTypeRefGraph(tref);
+        });
     }
 
     private filterTypeAttributes(
@@ -515,7 +517,9 @@ export class TypeBuilder {
     public modifyPropertiesIfNecessary(
         properties: ReadonlyMap<string, ClassProperty>,
     ): ReadonlyMap<string, ClassProperty> {
-        properties.forEach((p) => this.assertTypeRefGraph(p.typeRef));
+        properties.forEach((p) => {
+            this.assertTypeRefGraph(p.typeRef);
+        });
 
         if (this.canonicalOrder) {
             properties = mapSortByKey(properties);
@@ -637,7 +641,5 @@ export class TypeBuilder {
         this.registerType(type);
     }
 
-    public setLostTypeAttributes(): void {
-        return;
-    }
+    public setLostTypeAttributes(): void {}
 }

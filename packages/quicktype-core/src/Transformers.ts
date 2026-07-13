@@ -78,9 +78,7 @@ export abstract class Transformer {
         return `${debugStringForType(this.sourceType)} -> ${this.kind}`;
     }
 
-    protected debugPrintContinuations(_indent: number): void {
-        return;
-    }
+    protected debugPrintContinuations(_indent: number): void {}
 
     public debugPrint(indent: number): void {
         console.log(indentationString(indent) + this.debugDescription());

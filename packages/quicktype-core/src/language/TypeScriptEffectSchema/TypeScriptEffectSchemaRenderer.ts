@@ -32,7 +32,7 @@ import { legalizeName } from "../JavaScript/utils.js";
 import type { typeScriptEffectSchemaOptions } from "./language.js";
 
 export class TypeScriptEffectSchemaRenderer extends ConvenienceRenderer {
-    private emittedObjects = new Set<Name>();
+    private readonly emittedObjects = new Set<Name>();
 
     public constructor(
         targetLanguage: TargetLanguage,
@@ -286,13 +286,13 @@ export class TypeScriptEffectSchemaRenderer extends ConvenienceRenderer {
         });
 
         // now emit ordered source
-        order.forEach((i) =>
+        order.forEach((i) => {
             this.emitGatheredSource(
-                this.gatherSource(() =>
-                    this.emitObject(mapKey[i], mapValue[i]),
-                ),
-            ),
-        );
+                this.gatherSource(() => {
+                    this.emitObject(mapKey[i], mapValue[i]);
+                }),
+            );
+        });
     }
 
     protected emitSourceStructure(): void {

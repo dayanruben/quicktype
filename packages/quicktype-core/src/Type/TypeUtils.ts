@@ -81,14 +81,12 @@ export function setOperationMembersRecursively<T extends SetOperationType>(
             }
         } else if (includeAny || t.kind !== "any") {
             members.add(t);
-        } else {
-            if (combinationKind !== undefined) {
-                attributes = combineTypeAttributes(
-                    combinationKind,
-                    attributes,
-                    t.getAttributes(),
-                );
-            }
+        } else if (combinationKind !== undefined) {
+            attributes = combineTypeAttributes(
+                combinationKind,
+                attributes,
+                t.getAttributes(),
+            );
         }
     }
 
@@ -111,9 +109,7 @@ export function makeGroupsToFlatten<T extends SetOperationType>(
             setOperationMembersRecursively(u, undefined)[0],
         );
 
-        if (include !== undefined) {
-            if (!include(members)) continue;
-        }
+        if (include !== undefined && !include(members)) continue;
 
         let maybeSet = typeGroups.get(members);
         if (maybeSet === undefined) {
@@ -375,9 +371,7 @@ export function matchCompoundType(
     objectType: (objectType: ObjectType) => void,
     unionType: (unionType: UnionType) => void,
 ): void {
-    function ignore<T extends Type>(_: T): void {
-        return;
-    }
+    function ignore<T extends Type>(_: T): void {}
 
     matchTypeExhaustive(
         t,

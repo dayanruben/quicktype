@@ -663,9 +663,10 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                 }
 
                 // Handle number (integer/double) union properly
+                const { integerTransformer, doubleTransformer } = xfer;
                 if (
-                    xfer.integerTransformer !== undefined &&
-                    xfer.doubleTransformer !== undefined
+                    integerTransformer !== undefined &&
+                    doubleTransformer !== undefined
                 ) {
                     varGen.counter++;
                     const intTryVar = `intTryValue${varGen.counter}`;
@@ -680,7 +681,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                         );
                         this.emitBlock(() => {
                             const allHandled = this.emitDecodeTransformer(
-                                xfer.integerTransformer!,
+                                integerTransformer,
                                 targetType,
                                 emitFinish,
                                 intVar,
@@ -693,7 +694,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                         this.emitLine("else");
                         this.emitBlock(() => {
                             const allHandled = this.emitDecodeTransformer(
-                                xfer.doubleTransformer!,
+                                doubleTransformer,
                                 targetType,
                                 emitFinish,
                                 doubleVar,
@@ -704,31 +705,29 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                             }
                         });
                     });
-                } else {
+                } else if (xfer.integerTransformer !== undefined) {
                     // Only one present, emit as before
-                    if (xfer.integerTransformer !== undefined) {
-                        varGen.counter++;
-                        const intVar = `intValue${varGen.counter}`;
-                        this.emitDecoderTransformerCase(
-                            ["Number"],
-                            intVar,
-                            xfer.integerTransformer,
-                            targetType,
-                            emitFinish,
-                            varGen,
-                        );
-                    } else if (xfer.doubleTransformer !== undefined) {
-                        varGen.counter++;
-                        const doubleVar = `doubleValue${varGen.counter}`;
-                        this.emitDecoderTransformerCase(
-                            ["Number"],
-                            doubleVar,
-                            xfer.doubleTransformer,
-                            targetType,
-                            emitFinish,
-                            varGen,
-                        );
-                    }
+                    varGen.counter++;
+                    const intVar = `intValue${varGen.counter}`;
+                    this.emitDecoderTransformerCase(
+                        ["Number"],
+                        intVar,
+                        xfer.integerTransformer,
+                        targetType,
+                        emitFinish,
+                        varGen,
+                    );
+                } else if (xfer.doubleTransformer !== undefined) {
+                    varGen.counter++;
+                    const doubleVar = `doubleValue${varGen.counter}`;
+                    this.emitDecoderTransformerCase(
+                        ["Number"],
+                        doubleVar,
+                        xfer.doubleTransformer,
+                        targetType,
+                        emitFinish,
+                        varGen,
+                    );
                 }
 
                 this.emitDecoderTransformerCase(
@@ -948,9 +947,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     itemVariable,
                     xfer.itemTransformer,
                     xfer.itemTargetType,
-                    () => {
-                        return;
-                    },
+                    () => {},
                 );
             });
             this.emitLine("writer.WriteEndArray();");

@@ -34,8 +34,8 @@ export class MinMaxConstraintTypeAttributeKind extends TypeAttributeKind<MinMaxC
     public constructor(
         name: string,
         private readonly _typeKinds: Set<TypeKind>,
-        private _minSchemaProperty: string,
-        private _maxSchemaProperty: string,
+        private readonly _minSchemaProperty: string,
+        private readonly _maxSchemaProperty: string,
     ) {
         super(name);
     }
@@ -137,8 +137,8 @@ function producer(
 ): MinMaxConstraint | undefined {
     if (!(typeof schema === "object")) return undefined;
 
-    let min: number | undefined = undefined;
-    let max: number | undefined = undefined;
+    let min: number | undefined;
+    let max: number | undefined;
 
     if (typeof schema[minProperty] === "number") {
         min = schema[minProperty];

@@ -280,11 +280,11 @@ export class PhpRenderer extends ConvenienceRenderer {
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "time") {
-                    throw Error('transformedStringType.kind === "time"');
+                    throw new Error('transformedStringType.kind === "time"');
                 }
 
                 if (transformedStringType.kind === "date") {
-                    throw Error('transformedStringType.kind === "date"');
+                    throw new Error('transformedStringType.kind === "date"');
                 }
 
                 if (transformedStringType.kind === "date-time") {
@@ -321,7 +321,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     ];
                 }
 
-                throw Error("union are not supported");
+                throw new Error("union are not supported");
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
@@ -332,7 +332,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return "string";
                 }
 
-                throw Error('transformedStringType.kind === "unknown"');
+                throw new Error('transformedStringType.kind === "unknown"');
             },
         );
     }
@@ -356,7 +356,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return ["?", this.phpConvertType(className, nullable)];
                 }
 
-                throw Error("union are not supported");
+                throw new Error("union are not supported");
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
@@ -367,7 +367,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return "string";
                 }
 
-                throw Error('transformedStringType.kind === "unknown"');
+                throw new Error('transformedStringType.kind === "unknown"');
             },
         );
     }
@@ -435,7 +435,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return;
                 }
 
-                throw Error("union are not supported");
+                throw new Error("union are not supported");
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
@@ -452,7 +452,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return;
                 }
 
-                throw Error('transformedStringType.kind === "unknown"');
+                throw new Error('transformedStringType.kind === "unknown"');
             },
         );
     }
@@ -546,7 +546,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return;
                 }
 
-                throw Error("union are not supported");
+                throw new Error("union are not supported");
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
@@ -566,7 +566,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return;
                 }
 
-                throw Error('transformedStringType.kind === "unknown"');
+                throw new Error('transformedStringType.kind === "unknown"');
             },
         );
     }
@@ -588,11 +588,11 @@ export class PhpRenderer extends ConvenienceRenderer {
                     className,
                     "::",
                     args,
-                    "::" + idx,
+                    `::${idx}`,
                     "'",
                     suffix,
                     "/*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -603,7 +603,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     "null",
                     suffix,
                     " /*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -614,7 +614,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     "true",
                     suffix,
                     " /*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -622,10 +622,10 @@ export class PhpRenderer extends ConvenienceRenderer {
             (_integerType) =>
                 this.emitLine(
                     ...lhs,
-                    "" + idx,
+                    `${idx}`,
                     suffix,
                     " /*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -633,10 +633,10 @@ export class PhpRenderer extends ConvenienceRenderer {
             (_doubleType) =>
                 this.emitLine(
                     ...lhs,
-                    "" + (idx + idx / 1000),
+                    `${idx + idx / 1000}`,
                     suffix,
                     " /*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -648,11 +648,11 @@ export class PhpRenderer extends ConvenienceRenderer {
                     className,
                     "::",
                     args,
-                    "::" + idx,
+                    `::${idx}`,
                     "'",
                     suffix,
                     " /*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -669,7 +669,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                         "",
                     );
                 });
-                this.emitLine("); /* ", "" + idx, ":", args, "*/");
+                this.emitLine("); /* ", `${idx}`, ":", args, "*/");
             },
             (classType) =>
                 this.emitLine(
@@ -678,7 +678,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     "::sample()",
                     suffix,
                     " /*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -717,11 +717,11 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return;
                 }
 
-                throw Error(`union are not supported:${unionType}`);
+                throw new Error(`union are not supported:${unionType}`);
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
-                    const x = _.pad("" + (1 + (idx % 31)), 2, "0");
+                    const x = _.pad(`${1 + (idx % 31)}`, 2, "0");
                     this.emitLine(
                         ...lhs,
                         "DateTime::createFromFormat(DateTimeInterface::ISO8601, '",
@@ -747,7 +747,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return;
                 }
 
-                throw Error('transformedStringType.kind === "unknown"');
+                throw new Error('transformedStringType.kind === "unknown"');
             },
         );
     }
@@ -832,7 +832,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return;
                 }
 
-                throw Error("not implemented");
+                throw new Error("not implemented");
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
@@ -862,7 +862,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return;
                 }
 
-                throw Error(
+                throw new Error(
                     `transformedStringType.kind === ${transformedStringType.kind}`,
                 );
             },
@@ -1351,7 +1351,7 @@ export class PhpRenderer extends ConvenienceRenderer {
     }
 
     protected emitUnionDefinition(_u: UnionType, _unionName: Name): void {
-        throw Error("emitUnionDefinition not implemented");
+        throw new Error("emitUnionDefinition not implemented");
     }
 
     protected emitEnumSerializationAttributes(_e: EnumType): void {

@@ -265,25 +265,25 @@ export class JavaScriptPropTypesRenderer extends ConvenienceRenderer {
         });
 
         // now emit ordered source
-        order.forEach((i) => this.emitGatheredSource(mapValue[i]));
+        order.forEach((i) => {
+            this.emitGatheredSource(mapValue[i]);
+        });
 
         // now emit top levels
         this.forEachTopLevel("none", (type, name) => {
             if (type instanceof PrimitiveType) {
                 this.ensureBlankLine();
                 this.emitExport(name, this.typeMapTypeFor(type));
+            } else if (type.kind === "array") {
+                this.ensureBlankLine();
+                this.emitExport(name, [
+                    "PropTypes.arrayOf(",
+                    this.typeMapTypeFor((type as ArrayType).items),
+                    ")",
+                ]);
             } else {
-                if (type.kind === "array") {
-                    this.ensureBlankLine();
-                    this.emitExport(name, [
-                        "PropTypes.arrayOf(",
-                        this.typeMapTypeFor((type as ArrayType).items),
-                        ")",
-                    ]);
-                } else {
-                    this.ensureBlankLine();
-                    this.emitExport(name, ["_", name]);
-                }
+                this.ensureBlankLine();
+                this.emitExport(name, ["_", name]);
             }
         });
     }

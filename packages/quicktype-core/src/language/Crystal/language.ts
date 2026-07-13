@@ -24,7 +24,7 @@ export class CrystalTargetLanguage extends TargetLanguage<
         return "  ";
     }
 
-    public getOptions(): {} {
+    public getOptions(): Record<string, never> {
         return {};
     }
 }

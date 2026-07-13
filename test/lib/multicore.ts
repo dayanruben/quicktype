@@ -1,5 +1,5 @@
-import cluster from "cluster";
-import process from "process";
+import cluster from "node:cluster";
+import process from "node:process";
 import * as _ from "lodash";
 
 const WORKERS = ["👷🏻", "👷🏼", "👷🏽", "👷🏾", "👷🏿"];
@@ -7,8 +7,8 @@ const WORKERS = ["👷🏻", "👷🏼", "👷🏽", "👷🏾", "👷🏿"];
 export interface ParallelArgs<Item, Result, Acc> {
     queue: Item[];
     workers: number;
-    setup(): Promise<Acc>;
-    map(item: Item, index: number): Promise<Result>;
+    setup: () => Promise<Acc>;
+    map: (item: Item, index: number) => Promise<Result>;
 }
 
 function randomPick<T>(arr: T[]): T {
@@ -61,11 +61,11 @@ export async function inParallel<Item, Result, Acc>(
                 await map(item, i);
             }
         } else {
-            _.range(workers).forEach((i) =>
+            _.range(workers).forEach((i) => {
                 cluster.fork({
                     worker: i,
-                }),
-            );
+                });
+            });
         }
     } else {
         // Setup a worker

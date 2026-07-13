@@ -16,7 +16,7 @@ import { matchTypeExhaustive } from "../../Type/TypeUtils.js";
 import { namingFunction } from "./utils.js";
 
 interface Schema {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: JSON Schema values are arbitrary JSON
     [name: string]: any;
 }
 
@@ -142,6 +142,7 @@ export class JSONSchemaRenderer extends ConvenienceRenderer {
             }
 
             properties = props;
+            // biome-ignore lint/suspicious/useArraySortCompare: sorting strings; default UTF-16 order is intended
             required = req.sort();
         }
 
@@ -181,10 +182,10 @@ export class JSONSchemaRenderer extends ConvenienceRenderer {
             this.topLevels.size === 1
                 ? this.schemaForType(defined(mapFirst(this.topLevels)))
                 : {};
-        const schema = Object.assign(
-            { $schema: "http://json-schema.org/draft-06/schema#" },
-            topLevelType,
-        );
+        const schema: Schema = {
+            $schema: "http://json-schema.org/draft-06/schema#",
+            ...topLevelType,
+        };
         const definitions: { [name: string]: Schema } = {};
         this.forEachObject("none", (o: ObjectType, name: Name) => {
             const title = defined(this.names.get(name));
