@@ -224,7 +224,7 @@ export function serializeRenderResult(
                 }
 
                 break;
-            case "table":
+            case "table": {
                 const t = source.table;
                 const numRows = t.length;
                 if (numRows === 0) break;
@@ -270,7 +270,8 @@ export function serializeRenderResult(
                 }
 
                 break;
-            case "annotated":
+            }
+            case "annotated": {
                 const start = currentLocation();
                 serializeToStringArray(source.source);
                 const end = currentLocation();
@@ -279,12 +280,13 @@ export function serializeRenderResult(
                     span: { start, end },
                 });
                 break;
+            }
             case "name":
                 assert(names.has(source.named), "No name for Named");
                 indentIfNeeded();
                 currentLine.push(defined(names.get(source.named)));
                 break;
-            case "modified":
+            case "modified": {
                 indentIfNeeded();
                 const serialized = serializeRenderResult(
                     source.source,
@@ -297,6 +299,7 @@ export function serializeRenderResult(
                 );
                 currentLine.push(source.modifier(serialized[0]));
                 break;
+            }
             default:
                 return assertNever(source);
         }

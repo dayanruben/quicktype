@@ -990,7 +990,7 @@ export async function makeQuicktypeOptions(
     let leadingComments: string[] | undefined = undefined;
     let fixedTopLevels = false;
     switch (options.srcLang) {
-        case "graphql":
+        case "graphql": {
             let schemaString: string | undefined = undefined;
             let wroteSchemaToFile = false;
             if (options.graphqlIntrospect !== undefined) {
@@ -1047,6 +1047,7 @@ export async function makeQuicktypeOptions(
 
             sources = gqlSources;
             break;
+        }
         case "json":
         case "schema":
             sources = await getSources(options);

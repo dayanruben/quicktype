@@ -347,7 +347,7 @@ export class Ref {
         switch (first.kind) {
             case PathElementKind.Root:
                 return this.lookup(root, rest, root);
-            case PathElementKind.KeyOrIndex:
+            case PathElementKind.KeyOrIndex: {
                 const key = first.key;
                 if (Array.isArray(local)) {
                     if (!/^\d+$/.test(key)) {
@@ -380,6 +380,7 @@ export class Ref {
                     rest,
                     root,
                 );
+            }
 
             case PathElementKind.Type:
                 return panic('Cannot look up path that indexes "type"');

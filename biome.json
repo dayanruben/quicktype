@@ -34,7 +34,6 @@
             },
             "correctness": {
                 "noConstructorReturn": "off",
-                "noSwitchDeclarations": "off",
                 "noVoidTypeReturn": "off"
             },
             "style": {
