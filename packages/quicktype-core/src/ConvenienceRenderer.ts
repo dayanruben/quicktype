@@ -1217,7 +1217,9 @@ export abstract class ConvenienceRenderer extends Renderer {
     }
 
     private commentLineEscapes(
-        options: Required<Pick<CommentOptions, "lineStart" | "firstLineStart">> &
+        options: Required<
+            Pick<CommentOptions, "lineStart" | "firstLineStart">
+        > &
             Pick<CommentOptions, "lineEnd" | "beforeComment" | "afterComment">,
     ): ReadonlyArray<readonly [string, string]> {
         const delimiters = [

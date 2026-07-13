@@ -45,7 +45,7 @@ function precomputedCodePointPredicate(
         asciiResults.push(p(cp));
     }
 
-    return (cp: number) => cp < 128 ? asciiResults[cp] : p(cp);
+    return (cp: number) => (cp < 128 ? asciiResults[cp] : p(cp));
 }
 
 // FIXME: This is a copy of code in src/Data/String/Util.js
@@ -640,7 +640,11 @@ export function makeNameStyle(
                     allUpperWordStyle;
             break;
         case "original":
-            firstWordStyle = restWordStyle = firstWordAcronymStyle = restAcronymStyle = originalWord;
+            firstWordStyle =
+                restWordStyle =
+                firstWordAcronymStyle =
+                restAcronymStyle =
+                    originalWord;
             break;
         default:
             return assertNever(namingStyle);

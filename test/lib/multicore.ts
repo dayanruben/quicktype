@@ -2,7 +2,6 @@ import cluster from "cluster";
 import process from "process";
 import * as _ from "lodash";
 
-
 const WORKERS = ["👷🏻", "👷🏼", "👷🏽", "👷🏾", "👷🏿"];
 
 export interface ParallelArgs<Item, Result, Acc> {

@@ -622,9 +622,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                 this.csType(targetType.items),
                 ">();",
             );
-            this.emitLine(
-                "while (reader.TokenType != JsonTokenType.EndArray)",
-            );
+            this.emitLine("while (reader.TokenType != JsonTokenType.EndArray)");
             this.emitBlock(() => {
                 this.emitDecodeTransformer(
                     xfer.itemTransformer,
@@ -665,7 +663,10 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                 }
 
                 // Handle number (integer/double) union properly
-                if (xfer.integerTransformer !== undefined && xfer.doubleTransformer !== undefined) {
+                if (
+                    xfer.integerTransformer !== undefined &&
+                    xfer.doubleTransformer !== undefined
+                ) {
                     varGen.counter++;
                     const intTryVar = `intTryValue${varGen.counter}`;
                     varGen.counter++;
@@ -674,7 +675,9 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     const doubleVar = `doubleValue${varGen.counter}`;
                     this.emitTokenCase("Number");
                     this.indent(() => {
-                        this.emitLine(`if (reader.TryGetInt64(out long ${intTryVar}))`);
+                        this.emitLine(
+                            `if (reader.TryGetInt64(out long ${intTryVar}))`,
+                        );
                         this.emitBlock(() => {
                             const allHandled = this.emitDecodeTransformer(
                                 xfer.integerTransformer!,

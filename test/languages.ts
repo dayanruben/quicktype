@@ -844,8 +844,7 @@ export const TypeScriptLanguage: Language = {
     features: ["enum", "union", "no-defaults", "strict-optional", "date-time"],
     output: "TopLevel.ts",
     topLevel: "TopLevel",
-    skipJSON: [
-    ],
+    skipJSON: [],
     skipMiscJSON: false,
     skipSchema: ["keyword-unions.schema"], // can't handle "constructor" property
     rendererOptions: { "explicit-unions": "yes" },
@@ -875,8 +874,7 @@ export const JavaScriptLanguage: Language = {
     features: ["enum", "union", "no-defaults", "strict-optional", "date-time"],
     output: "TopLevel.js",
     topLevel: "TopLevel",
-    skipJSON: [
-    ],
+    skipJSON: [],
     skipMiscJSON: false,
     skipSchema: ["keyword-unions.schema"], // can't handle "constructor" property
     rendererOptions: {},
@@ -932,8 +930,7 @@ export const FlowLanguage: Language = {
     features: ["enum", "union", "no-defaults", "strict-optional"],
     output: "TopLevel.js",
     topLevel: "TopLevel",
-    skipJSON: [
-    ],
+    skipJSON: [],
     skipMiscJSON: false,
     skipSchema: [
         "keyword-unions.schema", // can't handle "constructor" property

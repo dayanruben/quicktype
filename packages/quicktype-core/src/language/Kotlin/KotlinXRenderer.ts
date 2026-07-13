@@ -4,12 +4,7 @@ import type { OptionValues } from "../../RendererOptions/index.js";
 import { type Sourcelike, modifySource } from "../../Source.js";
 import { camelCase } from "../../support/Strings.js";
 import type { TargetLanguage } from "../../TargetLanguage.js";
-import type {
-    ArrayType,
-    EnumType,
-    MapType,
-    Type,
-} from "../../Type/index.js";
+import type { ArrayType, EnumType, MapType, Type } from "../../Type/index.js";
 
 import { KotlinRenderer } from "./KotlinRenderer.js";
 import type { kotlinOptions } from "./language.js";
