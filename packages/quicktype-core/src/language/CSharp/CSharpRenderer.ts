@@ -538,7 +538,7 @@ export class CSharpRenderer extends ConvenienceRenderer {
 
     protected emitDependencyUsings(): void {
         let genericEmited: boolean = false;
-        let ensureGenericOnce = () => {
+        const ensureGenericOnce = () => {
             if (!genericEmited) {
                 this.emitUsing("System.Collections.Generic");
                 genericEmited = true;

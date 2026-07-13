@@ -23,7 +23,6 @@
             "preset": "recommended",
             "style": {
                 "noNonNullAssertion": "off",
-                "useConst": "off",
                 "useExponentiationOperator": "off",
                 "useNodejsImportProtocol": "off",
                 "useTemplate": "off"
