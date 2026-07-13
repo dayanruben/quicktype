@@ -323,7 +323,7 @@ export class PythonRenderer extends ConvenienceRenderer {
         ) {
             return mapSortBy(properties, (p: ClassProperty) => {
                 return (p.type instanceof UnionType &&
-                    nullableFromUnion(p.type) != null) ||
+                    nullableFromUnion(p.type) !== null) ||
                     p.isOptional
                     ? 1
                     : 0;

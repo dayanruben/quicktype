@@ -48,7 +48,8 @@
                 "useReadonlyClassProperties": "on"
             },
             "suspicious": {
-                "noTemplateCurlyInString": "off"
+                "noTemplateCurlyInString": "off",
+                "noEqualsToNull": "on"
             }
         }
     },
