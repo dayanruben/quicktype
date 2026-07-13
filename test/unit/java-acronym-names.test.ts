@@ -54,6 +54,7 @@ async function javaEnumConstantIdentifier(
         new RegExp(`case (\\w+): return "${enumValue}";`),
     );
 
+    // biome-ignore lint/suspicious/noMisplacedAssertion: helper is only called from within tests
     expect(match, `generated Java output:\n${output}`).not.toBeNull();
     return match?.[1] ?? "";
 }

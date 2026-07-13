@@ -51,12 +51,23 @@
                 "noTemplateCurlyInString": "off",
                 "noEqualsToNull": "on",
                 "noUnusedExpressions": "on",
-                "useArraySortCompare": "on"
+                "useArraySortCompare": "on",
+                "noMisplacedAssertion": "on"
             }
         }
     },
     "assist": { "actions": { "source": { "organizeImports": "off" } } },
     "overrides": [
+        {
+            "includes": ["test/release-version.ts"],
+            "linter": {
+                "rules": {
+                    "suspicious": {
+                        "noMisplacedAssertion": "off"
+                    }
+                }
+            }
+        },
         {
             "includes": ["packages/quicktype-core/src/**"],
             "linter": {
