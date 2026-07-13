@@ -1275,7 +1275,7 @@ export abstract class ConvenienceRenderer extends Renderer {
         // A quote at the end of the line would merge with a closing
         // `"""` emitted right after it.  The quote needs escaping iff
         // it's preceded by an even number of backslashes.
-        if (lineEnd !== undefined && lineEnd.startsWith('"')) {
+        if (lineEnd?.startsWith('"')) {
             const trailing = /(\\*)"$/.exec(escaped);
             if (trailing !== null && trailing[1].length % 2 === 0) {
                 escaped = `${escaped.slice(0, -1)}\\"`;

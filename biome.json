@@ -24,8 +24,7 @@
             "complexity": {
                 "noBannedTypes": "off",
                 "noUselessConstructor": "off",
-                "noUselessUndefinedInitialization": "off",
-                "useOptionalChain": "off"
+                "noUselessUndefinedInitialization": "off"
             },
             "style": {
                 "noNonNullAssertion": "off",
