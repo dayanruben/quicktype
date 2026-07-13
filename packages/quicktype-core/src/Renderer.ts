@@ -77,7 +77,8 @@ class EmitContext {
     private _preventBlankLine: boolean;
 
     public constructor() {
-        this._currentEmitTarget = this._emitted = [];
+        this._emitted = [];
+        this._currentEmitTarget = this._emitted;
         this._numBlankLinesNeeded = 0;
         this._preventBlankLine = true; // no blank lines at start of file
     }

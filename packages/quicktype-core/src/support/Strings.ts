@@ -609,7 +609,8 @@ export function makeNameStyle(
             restWordStyle = firstUpperWordStyle;
             restAcronymStyle = allUpperWordStyle;
         } else {
-            restWordStyle = restAcronymStyle = firstUpperWordStyle;
+            restAcronymStyle = firstUpperWordStyle;
+            restWordStyle = restAcronymStyle;
         }
     } else {
         separator = "_";
@@ -618,32 +619,31 @@ export function makeNameStyle(
     switch (namingStyle) {
         case "pascal":
         case "pascal-upper-acronyms":
-            firstWordStyle = firstWordAcronymStyle = firstUpperWordStyle;
+            firstWordAcronymStyle = firstUpperWordStyle;
+            firstWordStyle = firstWordAcronymStyle;
             break;
         case "camel":
         case "camel-upper-acronyms":
-            firstWordStyle = firstWordAcronymStyle = allLowerWordStyle;
+            firstWordAcronymStyle = allLowerWordStyle;
+            firstWordStyle = firstWordAcronymStyle;
             break;
         case "underscore":
-            firstWordStyle =
-                restWordStyle =
-                firstWordAcronymStyle =
-                restAcronymStyle =
-                    allLowerWordStyle;
+            firstWordStyle = allLowerWordStyle;
+            restWordStyle = allLowerWordStyle;
+            firstWordAcronymStyle = allLowerWordStyle;
+            restAcronymStyle = allLowerWordStyle;
             break;
         case "upper-underscore":
-            firstWordStyle =
-                restWordStyle =
-                firstWordAcronymStyle =
-                restAcronymStyle =
-                    allUpperWordStyle;
+            firstWordStyle = allUpperWordStyle;
+            restWordStyle = allUpperWordStyle;
+            firstWordAcronymStyle = allUpperWordStyle;
+            restAcronymStyle = allUpperWordStyle;
             break;
         case "original":
-            firstWordStyle =
-                restWordStyle =
-                firstWordAcronymStyle =
-                restAcronymStyle =
-                    originalWord;
+            firstWordStyle = originalWord;
+            restWordStyle = originalWord;
+            firstWordAcronymStyle = originalWord;
+            restAcronymStyle = originalWord;
             break;
         default:
             return assertNever(namingStyle);

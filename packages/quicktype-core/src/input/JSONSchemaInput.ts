@@ -1538,10 +1538,11 @@ export class JSONSchemaInput implements Input<JSONSchemaSourceData> {
                 return panic("Must have a schema store to process JSON Schema");
             }
         } else {
-            maybeSchemaStore = this._schemaStore = new InputJSONSchemaStore(
+            this._schemaStore = new InputJSONSchemaStore(
                 this._schemaInputs,
                 maybeSchemaStore,
             );
+            maybeSchemaStore = this._schemaStore;
         }
 
         const schemaStore = maybeSchemaStore;

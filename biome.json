@@ -33,7 +33,8 @@
                 "useObjectSpread": "on",
                 "noYodaExpression": "on",
                 "noSubstr": "on",
-                "useExplicitLengthCheck": "on"
+                "useExplicitLengthCheck": "on",
+                "noMultiAssign": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off"

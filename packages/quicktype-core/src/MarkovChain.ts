@@ -68,7 +68,8 @@ function increment(t: Trie, seq: string, i: number): void {
 
     let st = t.arr[first];
     if (st === null) {
-        t.arr[first] = st = makeTrie();
+        st = makeTrie();
+        t.arr[first] = st;
     }
 
     if (typeof st !== "object") {
