@@ -30,7 +30,8 @@
                 "useCollapsedIf": "on",
                 "useThrowNewError": "on",
                 "useConsistentBuiltinInstantiation": "on",
-                "useObjectSpread": "on"
+                "useObjectSpread": "on",
+                "noYodaExpression": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off"

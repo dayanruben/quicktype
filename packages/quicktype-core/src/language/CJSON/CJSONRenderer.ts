@@ -203,9 +203,9 @@ export class CJSONRenderer extends ConvenienceRenderer {
             fieldType,
             lookup,
         );
-        if ("bool" === fieldName) {
+        if (fieldName === "bool") {
             fieldName = "boolean";
-        } else if ("double" === fieldName) {
+        } else if (fieldName === "double") {
             fieldName = "number";
         }
 

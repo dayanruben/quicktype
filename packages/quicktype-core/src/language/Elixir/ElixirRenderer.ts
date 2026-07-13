@@ -47,7 +47,7 @@ export class ElixirRenderer extends ConvenienceRenderer {
     }
 
     protected canBeForwardDeclared(t: Type): boolean {
-        return "class" === t.kind;
+        return t.kind === "class";
     }
 
     protected forbiddenNamesForGlobalNamespace(): string[] {
@@ -1145,7 +1145,7 @@ end`);
             this.forEachTopLevel(
                 "leading-and-interposing",
                 (topLevel, name) => {
-                    const isTopLevelArray = "array" === topLevel.kind;
+                    const isTopLevelArray = topLevel.kind === "array";
 
                     this.emitBlock(
                         ["defmodule ", this.nameWithNamespace(name), " do"],
