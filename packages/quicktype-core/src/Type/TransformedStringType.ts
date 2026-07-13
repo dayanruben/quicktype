@@ -1,5 +1,5 @@
 import {
-    // eslint-disable-next-line @typescript-eslint/no-redeclare
+    // biome-ignore lint/suspicious/noShadowRestrictedNames: collection-utils exports this name
     hasOwnProperty,
     mapFromObject,
 } from "collection-utils";
