@@ -59,12 +59,14 @@ async function javaEnumConstantIdentifier(
 }
 
 describe("Java enum acronym casing", () => {
-    test.each(["original", "pascal", "camel", "lowerCase"])(
-        "keeps acronyms uppercase with acronym-style=%s",
-        async (acronymStyle) => {
-            await expect(
-                javaEnumConstantIdentifier(acronymStyle),
-            ).resolves.toBe(enumValue);
-        },
-    );
+    test.each([
+        "original",
+        "pascal",
+        "camel",
+        "lowerCase",
+    ])("keeps acronyms uppercase with acronym-style=%s", async (acronymStyle) => {
+        await expect(javaEnumConstantIdentifier(acronymStyle)).resolves.toBe(
+            enumValue,
+        );
+    });
 });

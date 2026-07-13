@@ -56,7 +56,9 @@
         "@types/wordwrap": "^1.0.3",
         "typescript": "~7.0.2"
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "browser": {
         "fs": false,
         "path": false

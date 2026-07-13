@@ -1,15 +1,16 @@
 {
     "files": {
-        "ignore": [
-            "data",
-            "test/runs",
-            "test/inputs",
-            "test/fixtures",
-            "dist",
-            "node_modules",
-            "packages/*/dist",
-            "packages/*/out",
-            "packages/*/node_modules"
+        "includes": [
+            "**",
+            "!**/data",
+            "!**/test/runs",
+            "!**/test/inputs",
+            "!**/test/fixtures",
+            "!**/dist",
+            "!**/node_modules",
+            "!**/packages/**/*/dist",
+            "!**/packages/**/*/out",
+            "!**/packages/**/*/node_modules"
         ]
     },
     "formatter": {
@@ -19,12 +20,10 @@
     "linter": {
         "enabled": false
     },
-    "organizeImports": {
-        "enabled": false
-    },
+    "assist": { "actions": { "source": { "organizeImports": "off" } } },
     "overrides": [
         {
-            "include": ["**/tsconfig.json", "**/tsconfig.*.json"],
+            "includes": ["**/tsconfig.json", "**/tsconfig.*.json"],
             "json": {
                 "parser": {
                     "allowComments": true,
