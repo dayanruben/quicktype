@@ -23,7 +23,6 @@
             "preset": "recommended",
             "style": {
                 "noNonNullAssertion": "off",
-                "useNodejsImportProtocol": "off",
                 "useTemplate": "off"
             },
             "suspicious": {
@@ -42,6 +41,16 @@
     },
     "assist": { "actions": { "source": { "organizeImports": "off" } } },
     "overrides": [
+        {
+            "includes": ["packages/quicktype-core/src/**"],
+            "linter": {
+                "rules": {
+                    "style": {
+                        "useNodejsImportProtocol": "off"
+                    }
+                }
+            }
+        },
         {
             "includes": ["**/tsconfig.json", "**/tsconfig.*.json"],
             "json": {

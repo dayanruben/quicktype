@@ -1,6 +1,6 @@
 import type { LanguageName } from "quicktype-core";
 
-import * as process from "process";
+import * as process from "node:process";
 // @ts-ignore
 import type { RendererOptions } from "../dist/quicktype-core/Run";
 
