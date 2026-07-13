@@ -17,6 +17,9 @@ jobs:
             - uses: ./.github/workflows/setup
               with:
                   node-version: ${{ matrix.node-version }}
+            - name: Check formatting (Biome)
+              if: ${{ matrix.node-version == '20' }}
+              run: npm run lint
             - run: npm run test:unit
             - run: node dist/index.js --version
             - name: Run representative fixtures on the minimum Node version
