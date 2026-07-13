@@ -74,7 +74,6 @@ export class JavaRenderer extends ConvenienceRenderer {
                     this._converterClassname,
                 );
                 break;
-            case "java8":
             default:
                 this._dateTimeProvider = new Java8DateTimeProvider(
                     this,
