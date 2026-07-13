@@ -38,6 +38,37 @@ describe("Markov chain", () => {
         expect(evaluate(chain, "id")).toBe(1);
     });
 
+    test("scores representative property names", () => {
+        const chain = load();
+        const words = [
+            "url",
+            "json",
+            "my_property",
+            "ordinary",
+            "different",
+            "189512",
+            "2BTZIqw0ntH9MvilQ3ewNY",
+            "0uBTNdNGb2OY5lou41iYL52LcDq2",
+            "-KpqHmWuDOUnr1hmAhxp",
+            "granularity",
+            "coverage",
+            "postingFrequency",
+            "dataFrequency",
+            "units",
+            "datasetOwner",
+            "organization",
+            "timePeriod",
+            "contactInformation",
+            "\ud83d\udebe \ud83c\udd92 \ud83c\udd93 \ud83c\udd95 \ud83c\udd96 \ud83c\udd97 \ud83c\udd99 \ud83c\udfe7",
+        ];
+
+        for (const word of words) {
+            const probability = evaluate(chain, word);
+            expect(Number.isFinite(probability)).toBe(true);
+            expect(probability).toBeGreaterThan(0);
+        }
+    });
+
     test("preserves map-inference decisions near the score boundary", () => {
         const chain = load();
         const score = (names: string[]): number =>

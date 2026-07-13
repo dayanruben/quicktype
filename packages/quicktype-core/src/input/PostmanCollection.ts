@@ -1,4 +1,4 @@
-import { parseJSON } from "../support/Support.js";
+import { parseJSON } from "../support/ParseJSON.js";
 
 import type { JSONSourceData } from "./Inputs.js";
 import type { JSONSchema } from "./JSONSchemaStore.js";

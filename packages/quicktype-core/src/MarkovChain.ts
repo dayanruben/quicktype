@@ -1,4 +1,5 @@
 import { encodedMarkovChain } from "./EncodedMarkovChain.js";
+import { assert, panic } from "./support/Support.js";
 
 const alphabet =
     " -0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
@@ -6,14 +7,6 @@ const alphabetSize = alphabet.length;
 const base91Alphabet =
     "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}";
 const unseenProbability = 0.0001;
-
-function panic(message: string): never {
-    throw new Error(message);
-}
-
-function assert(condition: boolean, message: string): asserts condition {
-    if (!condition) panic(message);
-}
 
 const characterIndexes = new Int8Array(128).fill(-1);
 for (let i = 0; i < alphabetSize; i++) {
@@ -374,35 +367,4 @@ export function generate(
         if (choice < sum) return String.fromCharCode(code);
     }
     return panic("We screwed up bookkeeping, or randomInt");
-}
-
-function testWord(mc: MarkovChain, word: string): void {
-    console.log(`"${word}": ${evaluate(mc, word)}`);
-}
-
-export function test(): void {
-    const mc = load();
-    for (const word of [
-        "url",
-        "json",
-        "my_property",
-        "ordinary",
-        "different",
-        "189512",
-        "2BTZIqw0ntH9MvilQ3ewNY",
-        "0uBTNdNGb2OY5lou41iYL52LcDq2",
-        "-KpqHmWuDOUnr1hmAhxp",
-        "granularity",
-        "coverage",
-        "postingFrequency",
-        "dataFrequency",
-        "units",
-        "datasetOwner",
-        "organization",
-        "timePeriod",
-        "contactInformation",
-        "\ud83d\udebe \ud83c\udd92 \ud83c\udd93 \ud83c\udd95 \ud83c\udd96 \ud83c\udd97 \ud83c\udd99 \ud83c\udfe7",
-    ]) {
-        testWord(mc, word);
-    }
 }

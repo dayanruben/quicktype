@@ -60,10 +60,10 @@ export {
     assert,
     defined,
     assertNever,
-    parseJSON,
     checkStringMap,
     checkArray,
 } from "./support/Support.js";
+export { parseJSON } from "./support/ParseJSON.js";
 export {
     splitIntoWords,
     capitalize,
