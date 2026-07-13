@@ -1,7 +1,7 @@
 import type { LanguageName } from "quicktype-core";
 
 import * as process from "node:process";
-// @ts-ignore
+// @ts-expect-error: ../dist only exists after the root package is built
 import type { RendererOptions } from "../dist/quicktype-core/Run";
 
 const easySampleJSONs = [

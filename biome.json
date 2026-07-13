@@ -28,7 +28,6 @@
                 "noPrototypeBuiltins": "off",
                 "noShadowRestrictedNames": "off",
                 "noTemplateCurlyInString": "off",
-                "noTsIgnore": "off",
                 "noUselessEscapeInString": "off",
                 "useIterableCallbackReturn": "off"
             }
