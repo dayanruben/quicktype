@@ -22,7 +22,8 @@
         "rules": {
             "preset": "recommended",
             "correctness": {
-                "noUndeclaredDependencies": "on"
+                "noUndeclaredDependencies": "on",
+                "noGlobalDirnameFilename": "on"
             },
             "complexity": {
                 "noUselessReturn": "on"

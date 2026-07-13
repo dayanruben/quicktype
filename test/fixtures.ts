@@ -867,6 +867,7 @@ const commentInjectionNestedCommentSchema =
 const commentInjectionEnumNestedCommentSchema =
     "test/inputs/schema/comment-injection-enum-nested-comment.schema";
 const treeSitterWasm = (filename: string): string =>
+    // biome-ignore lint/correctness/noGlobalDirnameFilename: the test harness runs as CommonJS
     path.join(__dirname, "tree-sitter-wasms", filename);
 
 const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
