@@ -581,6 +581,20 @@ function makeOptionDefinitions(
     return beforeLang.concat(lang, afterLang, inference, afterInference);
 }
 
+// command-line-usage defaults to a "string" type placeholder for any option
+// definition that has neither a `type` function nor a `typeLabel`.  Map our
+// `optionType` to a `type` function (like `parseOptions` does for
+// command-line-args) so boolean flags are rendered without a bogus value
+// placeholder, while options that take values keep their explicit `typeLabel`.
+function optionDefinitionsForUsage(
+    definitions: OptionDefinition[],
+): OptionDefinition[] {
+    return definitions.map((def) => ({
+        ...def,
+        type: def.optionType === "boolean" ? Boolean : String,
+    }));
+}
+
 interface ColumnDefinition {
     name: string;
     padding?: { left: string; right: string };
@@ -638,7 +652,9 @@ function makeSectionsBeforeRenderers(
         },
         {
             header: "Options",
-            optionList: makeOptionDefinitions(targetLanguages),
+            optionList: optionDefinitionsForUsage(
+                makeOptionDefinitions(targetLanguages),
+            ),
             hide: ["no-render", "build-markov-chain"],
             tableOptions: tableOptionsForOptions,
         },
@@ -786,7 +802,7 @@ function usage(targetLanguages: readonly TargetLanguage[]): void {
 
         rendererSections.push({
             header: `Options for ${language.displayName}`,
-            optionList: definitions,
+            optionList: optionDefinitionsForUsage(definitions),
             tableOptions: tableOptionsForOptions,
         });
     }
