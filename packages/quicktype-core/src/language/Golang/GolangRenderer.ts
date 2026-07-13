@@ -256,7 +256,9 @@ export class GoRenderer extends ConvenienceRenderer {
                 ? ",omitempty"
                 : [];
 
-            docStrings.forEach((doc) => columns.push([doc]));
+            docStrings.forEach((doc) => {
+                columns.push([doc]);
+            });
             const tags = this._options.fieldTags
                 .split(",")
                 .map((tag) => `${tag}:"${stringEscape(jsonName)}${omitEmpty}"`)

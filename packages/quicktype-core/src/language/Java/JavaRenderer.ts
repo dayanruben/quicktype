@@ -390,9 +390,11 @@ export class JavaRenderer extends ConvenienceRenderer {
             (_enumType) => [],
             (unionType) => {
                 const imports: string[] = [];
-                unionType.members.forEach((type) =>
-                    this.javaImport(type).forEach((imp) => imports.push(imp)),
-                );
+                unionType.members.forEach((type) => {
+                    this.javaImport(type).forEach((imp) => {
+                        imports.push(imp);
+                    });
+                });
                 return imports;
             },
             (transformedStringType) => {
@@ -474,7 +476,9 @@ export class JavaRenderer extends ConvenienceRenderer {
     protected importsForClass(c: ClassType): string[] {
         const imports: string[] = [];
         this.forEachClassProperty(c, "none", (_name, _jsonName, p) => {
-            this.javaImport(p.type).forEach((imp) => imports.push(imp));
+            this.javaImport(p.type).forEach((imp) => {
+                imports.push(imp);
+            });
         });
         imports.sort();
         return [...new Set(imports)];
@@ -484,7 +488,9 @@ export class JavaRenderer extends ConvenienceRenderer {
         const imports: string[] = [];
         const [, nonNulls] = removeNullFromUnion(u);
         this.forEachUnionMember(u, nonNulls, "none", null, (_fieldName, t) => {
-            this.javaImport(t).forEach((imp) => imports.push(imp));
+            this.javaImport(t).forEach((imp) => {
+                imports.push(imp);
+            });
         });
         imports.sort();
         return [...new Set(imports)];
@@ -558,7 +564,9 @@ export class JavaRenderer extends ConvenienceRenderer {
                             jsonName,
                             p,
                             false,
-                        ).forEach((annotation) => this.emitLine(annotation));
+                        ).forEach((annotation) => {
+                            this.emitLine(annotation);
+                        });
                         this.emitLine(
                             "public ",
                             rendered,
@@ -575,7 +583,9 @@ export class JavaRenderer extends ConvenienceRenderer {
                             jsonName,
                             p,
                             true,
-                        ).forEach((annotation) => this.emitLine(annotation));
+                        ).forEach((annotation) => {
+                            this.emitLine(annotation);
+                        });
                         this.emitLine(
                             "public void ",
                             setterName,

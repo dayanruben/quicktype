@@ -61,11 +61,11 @@ export async function inParallel<Item, Result, Acc>(
                 await map(item, i);
             }
         } else {
-            _.range(workers).forEach((i) =>
+            _.range(workers).forEach((i) => {
                 cluster.fork({
                     worker: i,
-                }),
-            );
+                });
+            });
         }
     } else {
         // Setup a worker

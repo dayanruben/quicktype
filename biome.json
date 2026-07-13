@@ -23,8 +23,7 @@
             "preset": "recommended",
             "suspicious": {
                 "noExplicitAny": "off",
-                "noTemplateCurlyInString": "off",
-                "useIterableCallbackReturn": "off"
+                "noTemplateCurlyInString": "off"
             }
         }
     },

@@ -413,9 +413,9 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
         // which we can get back to the same type by following child type
         // references. Those can never be topologically ordered.
         const indexForTypeRef = new Map<number, number>();
-        mapTypeRef.forEach((typeRef, index) =>
-            indexForTypeRef.set(typeRef, index),
-        );
+        mapTypeRef.forEach((typeRef, index) => {
+            indexForTypeRef.set(typeRef, index);
+        });
         this._recursiveTypeRefs = new Set();
         mapType.forEach((_, startIndex) => {
             const visited = new Set<number>();
@@ -510,13 +510,13 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
         } while (indices.length > 0 && passNum <= MAX_PASSES);
 
         // now emit ordered source
-        order.forEach((i) =>
+        order.forEach((i) => {
             this.emitGatheredSource(
-                this.gatherSource(() =>
-                    this.emitObject(mapName[i], mapType[i]),
-                ),
-            ),
-        );
+                this.gatherSource(() => {
+                    this.emitObject(mapName[i], mapType[i]);
+                }),
+            );
+        });
     }
 
     protected emitSourceStructure(): void {

@@ -265,7 +265,9 @@ export class JavaScriptPropTypesRenderer extends ConvenienceRenderer {
         });
 
         // now emit ordered source
-        order.forEach((i) => this.emitGatheredSource(mapValue[i]));
+        order.forEach((i) => {
+            this.emitGatheredSource(mapValue[i]);
+        });
 
         // now emit top levels
         this.forEachTopLevel("none", (type, name) => {

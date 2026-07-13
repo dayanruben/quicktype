@@ -286,13 +286,13 @@ export class TypeScriptEffectSchemaRenderer extends ConvenienceRenderer {
         });
 
         // now emit ordered source
-        order.forEach((i) =>
+        order.forEach((i) => {
             this.emitGatheredSource(
-                this.gatherSource(() =>
-                    this.emitObject(mapKey[i], mapValue[i]),
-                ),
-            ),
-        );
+                this.gatherSource(() => {
+                    this.emitObject(mapKey[i], mapValue[i]);
+                }),
+            );
+        });
     }
 
     protected emitSourceStructure(): void {

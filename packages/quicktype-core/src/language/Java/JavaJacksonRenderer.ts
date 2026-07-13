@@ -61,17 +61,23 @@ export class JacksonRenderer extends JavaRenderer {
         switch (p.type.kind) {
             case "date-time":
                 this._dateTimeProvider.dateTimeJacksonAnnotations.forEach(
-                    (annotation) => annotations.push(annotation),
+                    (annotation) => {
+                        annotations.push(annotation);
+                    },
                 );
                 break;
             case "date":
                 this._dateTimeProvider.dateJacksonAnnotations.forEach(
-                    (annotation) => annotations.push(annotation),
+                    (annotation) => {
+                        annotations.push(annotation);
+                    },
                 );
                 break;
             case "time":
                 this._dateTimeProvider.timeJacksonAnnotations.forEach(
-                    (annotation) => annotations.push(annotation),
+                    (annotation) => {
+                        annotations.push(annotation);
+                    },
                 );
                 break;
             default:

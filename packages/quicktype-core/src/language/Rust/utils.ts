@@ -171,7 +171,9 @@ export function getPreferredNamingStyle(
     const occurrences = Object.fromEntries(
         Object.keys(namingStyles).map((key) => [key, 0]),
     );
-    namingStyleOccurences.forEach((style) => ++occurrences[style]);
+    namingStyleOccurences.forEach((style) => {
+        ++occurrences[style];
+    });
     const max = Math.max(...Object.values(occurrences));
     const preferedStyles = Object.entries(occurrences).flatMap(
         ([style, num]) => (num === max ? [style] : []),

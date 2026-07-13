@@ -166,9 +166,9 @@ export class Ref {
 
         if (path !== "") {
             const parts = path.split("/");
-            parts.forEach((part) =>
-                elements.push({ kind: PathElementKind.KeyOrIndex, key: part }),
-            );
+            parts.forEach((part) => {
+                elements.push({ kind: PathElementKind.KeyOrIndex, key: part });
+            });
         }
 
         return elements;
