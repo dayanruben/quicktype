@@ -28,7 +28,14 @@
                 "useSingleJsDocAsterisk": "on"
             },
             "complexity": {
-                "noUselessReturn": "on"
+                "noUselessReturn": "on",
+                "noDivRegex": "on",
+                "noUselessCatchBinding": "on",
+                "noUselessStringConcat": "on",
+                "useArrayFind": "on",
+                "useWhile": "on",
+                "noRedundantDefaultExport": "on",
+                "noExcessiveNestedTestSuites": "on"
             },
             "style": {
                 "noUselessElse": "on",
