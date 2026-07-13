@@ -25,7 +25,6 @@
                 "noBannedTypes": "off",
                 "noExtraBooleanCast": "off",
                 "noUselessConstructor": "off",
-                "noUselessContinue": "off",
                 "noUselessSwitchCase": "off",
                 "noUselessTernary": "off",
                 "noUselessUndefinedInitialization": "off",

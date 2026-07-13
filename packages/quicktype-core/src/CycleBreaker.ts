@@ -107,8 +107,6 @@ export function breakCycles<T>(
             results.push([breakNode, info]);
             break;
         }
-
-        continue;
     }
 
     return results;
