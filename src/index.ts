@@ -242,7 +242,7 @@ async function samplesFromDirectory(
             schemaSources.length + graphQLSources.length > 0
         ) {
             return messageError("DriverCannotMixJSONWithOtherSamples", {
-                dir: dir,
+                dir,
             });
         }
 
@@ -253,7 +253,7 @@ async function samplesFromDirectory(
             oneUnlessEmpty(schemaSources) + oneUnlessEmpty(graphQLSources) >
             1
         ) {
-            return messageError("DriverCannotMixNonJSONInputs", { dir: dir });
+            return messageError("DriverCannotMixNonJSONInputs", { dir });
         }
 
         if (jsonSamples.length > 0) {
@@ -352,7 +352,7 @@ function inferCLIOptions(
     const options: CLIOptions = {
         src: opts.src ?? [],
         srcUrls: opts.srcUrls,
-        srcLang: srcLang,
+        srcLang,
         lang: language.name as LanguageName,
         topLevel: opts.topLevel ?? inferTopLevel(opts),
         noRender: !!opts.noRender,

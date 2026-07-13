@@ -147,7 +147,7 @@ async function runQuicktype(
     }
 
     const options: Partial<Options> = {
-        lang: lang,
+        lang,
         inputData,
         rendererOptions,
         indentation,

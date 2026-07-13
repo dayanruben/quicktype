@@ -307,7 +307,7 @@ export function serializeRenderResult(
 
     serializeToStringArray(rootSource);
     finishLine();
-    return { lines, annotations: annotations };
+    return { lines, annotations };
 }
 
 export interface MultiWord {

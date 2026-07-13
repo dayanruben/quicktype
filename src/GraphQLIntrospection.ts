@@ -40,7 +40,7 @@ export async function introspectServer(
     try {
         const response = await globalThis.fetch(url, {
             method,
-            headers: headers,
+            headers,
             body: JSON.stringify({ query: getIntrospectionQuery() }),
         });
 
