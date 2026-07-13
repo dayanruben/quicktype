@@ -52,12 +52,25 @@
                 "noEqualsToNull": "on",
                 "noUnusedExpressions": "on",
                 "useArraySortCompare": "on",
-                "noMisplacedAssertion": "on"
+                "noMisplacedAssertion": "on",
+                "noShadow": "on"
             }
         }
     },
     "assist": { "actions": { "source": { "organizeImports": "off" } } },
     "overrides": [
+        {
+            "includes": [
+                "packages/quicktype-core/src/language/CJSON/CJSONRenderer.ts"
+            ],
+            "linter": {
+                "rules": {
+                    "suspicious": {
+                        "noShadow": "off"
+                    }
+                }
+            }
+        },
         {
             "includes": ["test/release-version.ts"],
             "linter": {

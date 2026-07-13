@@ -1441,7 +1441,7 @@ async function refsInSchemaForURI(
             });
         }
 
-        return mapMap(mapFromObject(schema), (_, name) => ref.push(name));
+        return mapMap(mapFromObject(schema), (_, key) => ref.push(key));
     }
 
     let name: string;
