@@ -35,8 +35,7 @@
             "correctness": {
                 "noConstructorReturn": "off",
                 "noSwitchDeclarations": "off",
-                "noVoidTypeReturn": "off",
-                "useParseIntRadix": "off"
+                "noVoidTypeReturn": "off"
             },
             "style": {
                 "noNonNullAssertion": "off",
