@@ -21,9 +21,6 @@
         "enabled": true,
         "rules": {
             "preset": "recommended",
-            "complexity": {
-                "noBannedTypes": "off"
-            },
             "style": {
                 "noNonNullAssertion": "off",
                 "useConst": "off",

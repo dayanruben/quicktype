@@ -14,7 +14,10 @@ export type ErrorProperties =
           kind: "MiscReadError";
           properties: { fileOrURL: string; message: string };
       }
-    | { kind: "MiscUnicodeHighSurrogateWithoutLowSurrogate"; properties: {} }
+    | {
+          kind: "MiscUnicodeHighSurrogateWithoutLowSurrogate";
+          properties: Record<string, never>;
+      }
     | {
           kind: "MiscInvalidMinMaxConstraint";
           properties: { max: number; min: number };
@@ -98,21 +101,24 @@ export type ErrorProperties =
     | { kind: "SchemaFetchErrorAdditional"; properties: { address: string } }
 
     // GraphQL input
-    | { kind: "GraphQLNoQueriesDefined"; properties: {} }
+    | { kind: "GraphQLNoQueriesDefined"; properties: Record<string, never> }
 
     // Driver
     | { kind: "DriverUnknownSourceLanguage"; properties: { lang: string } }
     | { kind: "DriverUnknownOutputLanguage"; properties: { lang: string } }
     | { kind: "DriverMoreThanOneInputGiven"; properties: { topLevel: string } }
     | { kind: "DriverCannotInferNameForSchema"; properties: { uri: string } }
-    | { kind: "DriverNoGraphQLQueryGiven"; properties: {} }
+    | { kind: "DriverNoGraphQLQueryGiven"; properties: Record<string, never> }
     | { kind: "DriverNoGraphQLSchemaInDir"; properties: { dir: string } }
     | {
           kind: "DriverMoreThanOneGraphQLSchemaInDir";
           properties: { dir: string };
       }
-    | { kind: "DriverSourceLangMustBeGraphQL"; properties: {} }
-    | { kind: "DriverGraphQLSchemaNeeded"; properties: {} }
+    | {
+          kind: "DriverSourceLangMustBeGraphQL";
+          properties: Record<string, never>;
+      }
+    | { kind: "DriverGraphQLSchemaNeeded"; properties: Record<string, never> }
     | { kind: "DriverInputFileDoesNotExist"; properties: { filename: string } }
     | {
           kind: "DriverCannotMixJSONWithOtherSamples";
@@ -120,16 +126,19 @@ export type ErrorProperties =
       }
     | { kind: "DriverCannotMixNonJSONInputs"; properties: { dir: string } }
     | { kind: "DriverUnknownDebugOption"; properties: { option: string } }
-    | { kind: "DriverNoLanguageOrExtension"; properties: {} }
+    | { kind: "DriverNoLanguageOrExtension"; properties: Record<string, never> }
     | { kind: "DriverCLIOptionParsingFailed"; properties: { message: string } }
 
     // IR
-    | { kind: "IRNoForwardDeclarableTypeInCycle"; properties: {} }
+    | {
+          kind: "IRNoForwardDeclarableTypeInCycle";
+          properties: Record<string, never>;
+      }
     | {
           kind: "IRTypeAttributesNotPropagated";
           properties: { count: number; indexes: number[] };
       }
-    | { kind: "IRNoEmptyUnions"; properties: {} }
+    | { kind: "IRNoEmptyUnions"; properties: Record<string, never> }
 
     // Rendering
     | {
