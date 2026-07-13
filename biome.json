@@ -27,7 +27,8 @@
             "style": {
                 "noUselessElse": "on",
                 "useCollapsedElseIf": "on",
-                "useCollapsedIf": "on"
+                "useCollapsedIf": "on",
+                "useThrowNewError": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off"
