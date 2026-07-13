@@ -181,13 +181,11 @@ function expandSelectionSet(
     inType: GQLType,
     optional: boolean,
 ): Selection[] {
-    return [...selectionSet.selections]
-        .reverse()
-        .map((s) => ({
-            selection: s,
-            inType,
-            optional: optional || hasOptionalDirectives(s.directives),
-        }));
+    return [...selectionSet.selections].reverse().map((s) => ({
+        selection: s,
+        inType,
+        optional: optional || hasOptionalDirectives(s.directives),
+    }));
 }
 
 interface GQLSchema {

@@ -21,8 +21,8 @@
         "start": "script/watch",
         "clean": "rm -rf dist *~ packages/*/{dist,out}",
         "debug": "node --inspect-brk --max-old-space-size=4096 ./dist/index.js",
-        "lint": "eslint src/** packages/*/src/**",
-        "lint:fix": "eslint --fix src/** packages/*/src/**"
+        "lint": "biome check .",
+        "lint:fix": "biome check --write ."
     },
     "workspaces": [
         "./packages/quicktype-core",
@@ -48,7 +48,7 @@
         "string-to-stream": "^3.0.1"
     },
     "devDependencies": {
-        "@biomejs/biome": "^1.9.4",
+        "@biomejs/biome": "^2.5.3",
         "@tsconfig/node20": "^20.1.6",
         "@types/command-line-args": "^5.2.0",
         "@types/command-line-usage": "^5.0.4",
@@ -59,8 +59,6 @@
         "@types/stream-json": "^1.7.3",
         "@types/urijs": "^1.19.25",
         "@types/wordwrap": "^1.0.3",
-        "@typescript-eslint/eslint-plugin": "^6.3.0",
-        "@typescript-eslint/parser": "^6.3.0",
         "ajv": "^5.5.2",
         "deep-equal": "^2.2.3",
         "esbuild": "^0.28.1",
@@ -85,6 +83,8 @@
         "watch": "^1.0.2",
         "web-tree-sitter": "^0.26.9"
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "bin": "dist/index.js"
 }

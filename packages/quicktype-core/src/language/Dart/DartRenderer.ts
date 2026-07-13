@@ -840,64 +840,72 @@ export class DartRenderer extends ConvenienceRenderer {
         this.emitDescription(this.descriptionForType(c));
 
         this.emitLine("@freezed");
-        this.emitBlock(["abstract class ", className, " with _$", className], () => {
-            if (c.getProperties().size === 0) {
-                this.emitLine(
-                    "const factory ",
-                    className,
-                    "() = _",
-                    className,
-                    ";",
-                );
-            } else {
-                this.emitLine("const factory ", className, "({");
-                this.indent(() => {
-                    this.forEachClassProperty(
-                        c,
-                        "none",
-                        (name, jsonName, prop) => {
-                            const description =
-                                this.descriptionForClassProperty(c, jsonName);
-                            if (description !== undefined) {
-                                this.emitDescription(description);
-                            }
-
-                            const required =
-                                this._options.requiredProperties ||
-                                (this._options.nullSafety &&
-                                    (!prop.type.isNullable ||
-                                        !prop.isOptional));
-                            if (this._options.useJsonAnnotation) {
-                                this.classPropertyCounter++;
-                                this.emitLine(`@JsonKey(name: "${jsonName}")`);
-                            }
-
-                            this.emitLine(
-                                required ? "required " : "",
-                                this.dartType(prop.type, true),
-                                " ",
-                                name,
-                                ",",
-                            );
-                        },
+        this.emitBlock(
+            ["abstract class ", className, " with _$", className],
+            () => {
+                if (c.getProperties().size === 0) {
+                    this.emitLine(
+                        "const factory ",
+                        className,
+                        "() = _",
+                        className,
+                        ";",
                     );
-                });
-                this.emitLine("}) = _", className, ";");
-            }
+                } else {
+                    this.emitLine("const factory ", className, "({");
+                    this.indent(() => {
+                        this.forEachClassProperty(
+                            c,
+                            "none",
+                            (name, jsonName, prop) => {
+                                const description =
+                                    this.descriptionForClassProperty(
+                                        c,
+                                        jsonName,
+                                    );
+                                if (description !== undefined) {
+                                    this.emitDescription(description);
+                                }
 
-            if (this._options.justTypes) return;
+                                const required =
+                                    this._options.requiredProperties ||
+                                    (this._options.nullSafety &&
+                                        (!prop.type.isNullable ||
+                                            !prop.isOptional));
+                                if (this._options.useJsonAnnotation) {
+                                    this.classPropertyCounter++;
+                                    this.emitLine(
+                                        `@JsonKey(name: "${jsonName}")`,
+                                    );
+                                }
 
-            this.ensureBlankLine();
-            this.emitLine(
-                // factory PublicAnswer.fromJson(Map<String, dynamic> json) => _$PublicAnswerFromJson(json);
-                "factory ",
-                className,
-                ".fromJson(Map<String, dynamic> json) => ",
-                "_$",
-                className,
-                "FromJson(json);",
-            );
-        });
+                                this.emitLine(
+                                    required ? "required " : "",
+                                    this.dartType(prop.type, true),
+                                    " ",
+                                    name,
+                                    ",",
+                                );
+                            },
+                        );
+                    });
+                    this.emitLine("}) = _", className, ";");
+                }
+
+                if (this._options.justTypes) return;
+
+                this.ensureBlankLine();
+                this.emitLine(
+                    // factory PublicAnswer.fromJson(Map<String, dynamic> json) => _$PublicAnswerFromJson(json);
+                    "factory ",
+                    className,
+                    ".fromJson(Map<String, dynamic> json) => ",
+                    "_$",
+                    className,
+                    "FromJson(json);",
+                );
+            },
+        );
     }
 
     protected emitEnumDefinition(e: EnumType, enumName: Name): void {

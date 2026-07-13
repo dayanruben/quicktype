@@ -14,7 +14,10 @@ import { describe, expect, test } from "vitest";
 describe("fixWindowsPath", () => {
     test.each([
         // Drive-letter paths become "file:///<drive>:/..." URIs.
-        ["C:\\Users\\me\\top.schema.json", "file:///C:/Users/me/top.schema.json"],
+        [
+            "C:\\Users\\me\\top.schema.json",
+            "file:///C:/Users/me/top.schema.json",
+        ],
         ["C:/Users/me/top.schema.json", "file:///C:/Users/me/top.schema.json"],
         ["c:\\dir\\x.json", "file:///c:/dir/x.json"],
         ["Z:/x.json", "file:///Z:/x.json"],

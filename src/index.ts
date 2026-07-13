@@ -6,7 +6,7 @@ import { exceptionToString } from "@glideapps/ts-necessities";
 import chalk from "chalk";
 import {
     definedMap,
-    // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
+    // biome-ignore lint/suspicious/noShadowRestrictedNames: collection-utils exports this name
     hasOwnProperty,
     mapFromObject,
     mapMap,
@@ -74,7 +74,7 @@ const wordWrap: (s: string) => string = _wordwrap(90);
 
 export interface CLIOptions<Lang extends LanguageName = LanguageName> {
     // We use this to access the inference flags
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: heterogeneous by design
     [option: string]: any;
     additionalSchema: string[];
     allPropertiesOptional: boolean;

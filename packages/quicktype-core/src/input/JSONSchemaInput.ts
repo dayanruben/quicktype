@@ -5,7 +5,7 @@ import {
     arrayLast,
     arrayMapSync,
     definedMap,
-    // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
+    // biome-ignore lint/suspicious/noShadowRestrictedNames: collection-utils exports this name
     hasOwnProperty,
     hashCodeOf,
     hashString,

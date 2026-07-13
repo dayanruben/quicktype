@@ -20,12 +20,7 @@ import {
     defined,
     isStringMap,
 } from "../support/Support.js";
-import type {
-    EnumType,
-    ObjectType,
-    Type,
-    UnionType,
-} from "../Type/Type.js";
+import type { EnumType, ObjectType, Type, UnionType } from "../Type/Type.js";
 
 import { TypeAttributeKind, type TypeAttributes } from "./TypeAttributes.js";
 

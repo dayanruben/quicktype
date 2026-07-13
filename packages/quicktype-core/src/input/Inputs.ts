@@ -212,7 +212,7 @@ export function jsonInputForTargetLanguage(
 
 export class InputData {
     // FIXME: Make into a Map, indexed by kind.
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: heterogeneous by design
     private _inputs: Set<Input<any>> = new Set();
 
     public addInput<T>(input: Input<T>): void {

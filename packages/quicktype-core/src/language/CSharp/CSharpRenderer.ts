@@ -543,17 +543,17 @@ export class CSharpRenderer extends ConvenienceRenderer {
                 this.emitUsing("System.Collections.Generic");
                 genericEmited = true;
             }
-        }
-        this.typeGraph.allTypesUnordered().forEach(_ => {
+        };
+        this.typeGraph.allTypesUnordered().forEach((_) => {
             matchCompoundType(
                 _,
-                _arrayType => this._csOptions.useList ? ensureGenericOnce() : undefined,
-                _classType => { },
-                _mapType => ensureGenericOnce(),
-                _objectType => { },
-                _unionType => { }
-            )
+                (_arrayType) =>
+                    this._csOptions.useList ? ensureGenericOnce() : undefined,
+                (_classType) => {},
+                (_mapType) => ensureGenericOnce(),
+                (_objectType) => {},
+                (_unionType) => {},
+            );
         });
     }
-
 }
