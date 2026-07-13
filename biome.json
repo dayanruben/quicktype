@@ -33,7 +33,6 @@
                 "useOptionalChain": "off"
             },
             "correctness": {
-                "noConstructorReturn": "off",
                 "noVoidTypeReturn": "off"
             },
             "style": {
