@@ -51,7 +51,7 @@ function lineIndentation(line: string): {
         } else if (c === "\t") {
             indent = (indent / 4 + 1) * 4;
         } else {
-            return { indent, text: line.substring(i) };
+            return { indent, text: line.slice(i) };
         }
     }
 

@@ -120,7 +120,8 @@ async function sourceFromFileOrUrlArray(
 
 function typeNameFromFilename(filename: string): string {
     const name = path.basename(filename);
-    return name.substring(0, name.lastIndexOf("."));
+    const extIndex = name.lastIndexOf(".");
+    return extIndex === -1 ? "" : name.slice(0, extIndex);
 }
 
 async function samplesFromDirectory(

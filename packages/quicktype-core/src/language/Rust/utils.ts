@@ -57,8 +57,8 @@ export const namingStyles = {
                 .map((p, i) =>
                     i === 0
                         ? p.toLowerCase()
-                        : p.substring(0, 1).toUpperCase() +
-                          p.substring(1).toLowerCase(),
+                        : p.slice(0, 1).toUpperCase() +
+                          p.slice(1).toLowerCase(),
                 )
                 .join(""),
     },
@@ -72,8 +72,7 @@ export const namingStyles = {
             parts
                 .map(
                     (p) =>
-                        p.substring(0, 1).toUpperCase() +
-                        p.substring(1).toLowerCase(),
+                        p.slice(0, 1).toUpperCase() + p.slice(1).toLowerCase(),
                 )
                 .join(""),
     },

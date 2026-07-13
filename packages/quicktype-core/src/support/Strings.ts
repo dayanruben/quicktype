@@ -63,7 +63,7 @@ export function utf16ConcatMap(
             const cc = s.charCodeAt(i);
             if (charNoEscapeMap[cc] !== 1) {
                 if (cs === null) cs = [];
-                cs.push(s.substring(start, i));
+                cs.push(s.slice(start, i));
 
                 const str = charStringMap[cc];
                 if (str === undefined) {
@@ -80,7 +80,7 @@ export function utf16ConcatMap(
 
         if (cs === null) return s;
 
-        cs.push(s.substring(start, i));
+        cs.push(s.slice(start, i));
 
         return cs.join("");
     };
@@ -108,7 +108,7 @@ export function utf32ConcatMap(
             let cc = s.charCodeAt(i);
             if (charNoEscapeMap[cc] !== 1) {
                 if (cs === null) cs = [];
-                cs.push(s.substring(start, i));
+                cs.push(s.slice(start, i));
 
                 if (isHighSurrogate(cc)) {
                     const highSurrogate = cc;
@@ -139,7 +139,7 @@ export function utf32ConcatMap(
 
         if (cs === null) return s;
 
-        cs.push(s.substring(start, i));
+        cs.push(s.slice(start, i));
 
         return cs.join("");
     };
