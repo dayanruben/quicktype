@@ -162,9 +162,9 @@ class Run implements RunContext {
         // We must not overwrite defaults with undefined values, which
         // we sometimes get.
         this._options = Object.fromEntries(
-            Object.entries(
-                Object.assign({}, defaultOptions, defaultInferenceFlags),
-            ).map(([k, v]) => [k, options[k as keyof typeof options] ?? v]),
+            Object.entries({ ...defaultOptions, ...defaultInferenceFlags }).map(
+                ([k, v]) => [k, options[k as keyof typeof options] ?? v],
+            ),
         ) as Required<typeof options>;
     }
 

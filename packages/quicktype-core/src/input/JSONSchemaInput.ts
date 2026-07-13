@@ -105,7 +105,7 @@ function withRef<T extends object>(
             : refOrLoc instanceof Ref
               ? refOrLoc
               : refOrLoc.canonicalRef;
-    return Object.assign({ ref }, props ?? {});
+    return { ref, ...(props ?? {}) };
 }
 
 function checkJSONSchemaObject(

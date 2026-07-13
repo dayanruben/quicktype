@@ -139,9 +139,9 @@ export const cSharpOptions = {
     ),
 } as const;
 
-export const newtonsoftCSharpOptions = Object.assign({}, cSharpOptions, {});
+export const newtonsoftCSharpOptions = { ...cSharpOptions };
 
-export const systemTextJsonCSharpOptions = Object.assign({}, cSharpOptions, {});
+export const systemTextJsonCSharpOptions = { ...cSharpOptions };
 
 export const cSharpLanguageConfig = {
     displayName: "C#",

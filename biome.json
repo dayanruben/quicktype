@@ -29,7 +29,8 @@
                 "useCollapsedElseIf": "on",
                 "useCollapsedIf": "on",
                 "useThrowNewError": "on",
-                "useConsistentBuiltinInstantiation": "on"
+                "useConsistentBuiltinInstantiation": "on",
+                "useObjectSpread": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off"

@@ -181,10 +181,10 @@ export class JSONSchemaRenderer extends ConvenienceRenderer {
             this.topLevels.size === 1
                 ? this.schemaForType(defined(mapFirst(this.topLevels)))
                 : {};
-        const schema = Object.assign(
-            { $schema: "http://json-schema.org/draft-06/schema#" },
-            topLevelType,
-        );
+        const schema: Schema = {
+            $schema: "http://json-schema.org/draft-06/schema#",
+            ...topLevelType,
+        };
         const definitions: { [name: string]: Schema } = {};
         this.forEachObject("none", (o: ObjectType, name: Name) => {
             const title = defined(this.names.get(name));

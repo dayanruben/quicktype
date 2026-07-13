@@ -13,7 +13,7 @@ export interface BufferedPassThrough extends PassThrough {
 }
 
 export default function bufferStream(opts: Options) {
-    opts = Object.assign({}, opts);
+    opts = { ...opts };
 
     const array = opts.array;
     let encoding: string | undefined = opts.encoding;

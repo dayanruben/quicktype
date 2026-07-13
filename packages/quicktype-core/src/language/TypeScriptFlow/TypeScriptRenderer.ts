@@ -45,7 +45,7 @@ export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
     }
 
     protected get typeAnnotations(): JavaScriptTypeAnnotations {
-        return Object.assign({ never: ": never" }, tsFlowTypeAnnotations);
+        return { never: ": never", ...tsFlowTypeAnnotations };
     }
 
     protected emitModuleExports(): void {}

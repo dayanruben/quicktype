@@ -100,7 +100,7 @@ function additionalTestFiles(
 function runEnvForLanguage(
     additionalRendererOptions: RendererOptions,
 ): NodeJS.ProcessEnv {
-    const newEnv = Object.assign({}, process.env);
+    const newEnv = { ...process.env };
 
     for (const option of Object.keys(additionalRendererOptions)) {
         newEnv[`QUICKTYPE_${option.toUpperCase().replace("-", "_")}`] = (

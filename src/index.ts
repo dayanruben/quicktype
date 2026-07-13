@@ -879,10 +879,10 @@ async function getSources(options: CLIOptions): Promise<TypeSource[]> {
 }
 
 function makeTypeScriptSource(fileNames: string[]): SchemaTypeSource {
-    return Object.assign(
-        { kind: "schema" },
-        schemaForTypeScriptSources(fileNames),
-    ) as SchemaTypeSource;
+    return {
+        kind: "schema",
+        ...schemaForTypeScriptSources(fileNames),
+    } as SchemaTypeSource;
 }
 
 export function jsonInputForTargetLanguage(
@@ -1064,12 +1064,10 @@ export async function makeQuicktypeOptions(
                         collectionFile,
                     );
                 for (const src of postmanSources) {
-                    sources.push(
-                        Object.assign(
-                            { kind: "json" },
-                            stringSourceDataToStreamSourceData(src),
-                        ) as JSONTypeSource,
-                    );
+                    sources.push({
+                        kind: "json",
+                        ...stringSourceDataToStreamSourceData(src),
+                    } as JSONTypeSource);
                 }
 
                 if (postmanSources.length > 1) {
