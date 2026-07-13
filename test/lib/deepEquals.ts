@@ -6,11 +6,6 @@ function pathToString(path: string[]): string {
     return `.${path.join(".")}`;
 }
 
-declare namespace Math {
-    // TypeScript cannot find this function
-    function fround(n: number): number;
-}
-
 function tryParseMoment(s: string): [Moment | undefined, boolean] {
     let m = moment(s);
     if (m.isValid()) return [m, false];
