@@ -41,7 +41,10 @@
                 "useShorthandAssign": "on",
                 "noInferrableTypes": "on",
                 "useDefaultParameterLast": "on",
-                "useConsistentMethodSignatures": "on"
+                "useConsistentMethodSignatures": "on",
+                "useUnifiedTypeSignatures": "on",
+                "noNamespace": "on",
+                "useNodeAssertStrict": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off"
