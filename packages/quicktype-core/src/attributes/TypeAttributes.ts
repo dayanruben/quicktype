@@ -158,8 +158,9 @@ export function combineTypeAttributes(
         if (attrs.length === 1) return attrs[0];
         if (union) {
             return kind.combine(attrs);
+        } else {
+            return kind.intersect(attrs);
         }
-        return kind.intersect(attrs);
     }
 
     return mapFilterMap(attributesByKind, combine);

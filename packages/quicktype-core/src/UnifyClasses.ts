@@ -191,36 +191,38 @@ export class UnifyUnionBuilder extends UnionBuilder<
                 this._unifyTypes(Array.from(propertyTypes)),
                 forwardingRef,
             );
-        }
-        const [properties, additionalProperties, lostTypeAttributes] =
-            getCliqueProperties(objectTypes, this.typeBuilder, (types) => {
-                assert(types.size > 0, "Property has no type");
-                return this._unifyTypes(
-                    Array.from(types).map((t) => t.typeRef),
-                );
-            });
-        if (lostTypeAttributes) {
-            this.typeBuilder.setLostTypeAttributes();
-        }
+        } else {
+            const [properties, additionalProperties, lostTypeAttributes] =
+                getCliqueProperties(objectTypes, this.typeBuilder, (types) => {
+                    assert(types.size > 0, "Property has no type");
+                    return this._unifyTypes(
+                        Array.from(types).map((t) => t.typeRef),
+                    );
+                });
+            if (lostTypeAttributes) {
+                this.typeBuilder.setLostTypeAttributes();
+            }
 
-        if (this._makeObjectTypes) {
-            return this.typeBuilder.getUniqueObjectType(
-                typeAttributes,
-                properties,
-                additionalProperties,
-                forwardingRef,
-            );
+            if (this._makeObjectTypes) {
+                return this.typeBuilder.getUniqueObjectType(
+                    typeAttributes,
+                    properties,
+                    additionalProperties,
+                    forwardingRef,
+                );
+            } else {
+                assert(
+                    additionalProperties === undefined,
+                    "We have additional properties but want to make a class",
+                );
+                return this.typeBuilder.getUniqueClassType(
+                    typeAttributes,
+                    this._makeClassesFixed,
+                    properties,
+                    forwardingRef,
+                );
+            }
         }
-        assert(
-            additionalProperties === undefined,
-            "We have additional properties but want to make a class",
-        );
-        return this.typeBuilder.getUniqueClassType(
-            typeAttributes,
-            this._makeClassesFixed,
-            properties,
-            forwardingRef,
-        );
     }
 
     protected makeArray(
@@ -280,8 +282,7 @@ export function unifyTypes<T extends Type>(
     typeAttributes = typeBuilder.reconstituteTypeAttributes(typeAttributes);
     if (types.size === 0) {
         return panic("Cannot unify empty set of types");
-    }
-    if (types.size === 1) {
+    } else if (types.size === 1) {
         const first = defined(iterableFirst(types));
         if (!(first instanceof UnionType)) {
             return typeBuilder.reconstituteTypeRef(

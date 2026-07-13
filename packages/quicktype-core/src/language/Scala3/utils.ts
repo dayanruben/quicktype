@@ -29,8 +29,9 @@ export const shouldAddBacktick = (paramName: string): boolean => {
 export const wrapOption = (s: string, optional: boolean): string => {
     if (optional) {
         return `Option[${s}]`;
+    } else {
+        return s;
     }
-    return s;
 };
 
 function isPartCharacter(codePoint: number): boolean {

@@ -91,12 +91,13 @@ export function optionalToNullable(
                 properties,
                 forwardingRef,
             );
+        } else {
+            return builder.getClassType(
+                c.getAttributes(),
+                properties,
+                forwardingRef,
+            );
         }
-        return builder.getClassType(
-            c.getAttributes(),
-            properties,
-            forwardingRef,
-        );
     }
 
     const classesWithOptional = setFilter(

@@ -583,11 +583,12 @@ export abstract class UnionBuilder<
         if (union !== undefined) {
             this.typeBuilder.setSetOperationMembers(union, typesSet);
             return union;
+        } else {
+            return this.typeBuilder.getUnionType(
+                typeAttributes,
+                typesSet,
+                forwardingRef,
+            );
         }
-        return this.typeBuilder.getUnionType(
-            typeAttributes,
-            typesSet,
-            forwardingRef,
-        );
     }
 }

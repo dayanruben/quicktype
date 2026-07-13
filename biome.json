@@ -41,7 +41,7 @@
                 "noDelete": "on"
             },
             "style": {
-                "noUselessElse": "on",
+                "noUselessElse": "off",
                 "useCollapsedElseIf": "on",
                 "useCollapsedIf": "on",
                 "useThrowNewError": "on",

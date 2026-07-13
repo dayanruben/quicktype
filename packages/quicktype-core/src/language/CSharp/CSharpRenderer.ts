@@ -159,8 +159,9 @@ export class CSharpRenderer extends ConvenienceRenderer {
                 );
                 if (this._csOptions.useList) {
                     return ["List<", itemsType, ">"];
+                } else {
+                    return [itemsType, "[]"];
                 }
-                return [itemsType, "[]"];
             },
             (classType) => this.nameForNamedType(classType),
             (mapType) => [
@@ -189,8 +190,9 @@ export class CSharpRenderer extends ConvenienceRenderer {
         const csType = this.csType(t, follow, withIssues);
         if (isValueType(t)) {
             return [csType, "?"];
+        } else {
+            return csType;
         }
-        return csType;
     }
 
     protected baseclassForType(_t: Type): Sourcelike | undefined {
