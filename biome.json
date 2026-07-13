@@ -25,7 +25,8 @@
                 "noUselessReturn": "on"
             },
             "style": {
-                "noUselessElse": "on"
+                "noUselessElse": "on",
+                "useCollapsedElseIf": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off"

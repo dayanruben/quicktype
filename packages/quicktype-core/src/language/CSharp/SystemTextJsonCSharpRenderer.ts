@@ -705,31 +705,29 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                             }
                         });
                     });
-                } else {
+                } else if (xfer.integerTransformer !== undefined) {
                     // Only one present, emit as before
-                    if (xfer.integerTransformer !== undefined) {
-                        varGen.counter++;
-                        const intVar = `intValue${varGen.counter}`;
-                        this.emitDecoderTransformerCase(
-                            ["Number"],
-                            intVar,
-                            xfer.integerTransformer,
-                            targetType,
-                            emitFinish,
-                            varGen,
-                        );
-                    } else if (xfer.doubleTransformer !== undefined) {
-                        varGen.counter++;
-                        const doubleVar = `doubleValue${varGen.counter}`;
-                        this.emitDecoderTransformerCase(
-                            ["Number"],
-                            doubleVar,
-                            xfer.doubleTransformer,
-                            targetType,
-                            emitFinish,
-                            varGen,
-                        );
-                    }
+                    varGen.counter++;
+                    const intVar = `intValue${varGen.counter}`;
+                    this.emitDecoderTransformerCase(
+                        ["Number"],
+                        intVar,
+                        xfer.integerTransformer,
+                        targetType,
+                        emitFinish,
+                        varGen,
+                    );
+                } else if (xfer.doubleTransformer !== undefined) {
+                    varGen.counter++;
+                    const doubleVar = `doubleValue${varGen.counter}`;
+                    this.emitDecoderTransformerCase(
+                        ["Number"],
+                        doubleVar,
+                        xfer.doubleTransformer,
+                        targetType,
+                        emitFinish,
+                        varGen,
+                    );
                 }
 
                 this.emitDecoderTransformerCase(

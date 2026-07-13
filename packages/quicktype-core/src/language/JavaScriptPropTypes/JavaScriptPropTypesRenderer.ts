@@ -274,18 +274,16 @@ export class JavaScriptPropTypesRenderer extends ConvenienceRenderer {
             if (type instanceof PrimitiveType) {
                 this.ensureBlankLine();
                 this.emitExport(name, this.typeMapTypeFor(type));
+            } else if (type.kind === "array") {
+                this.ensureBlankLine();
+                this.emitExport(name, [
+                    "PropTypes.arrayOf(",
+                    this.typeMapTypeFor((type as ArrayType).items),
+                    ")",
+                ]);
             } else {
-                if (type.kind === "array") {
-                    this.ensureBlankLine();
-                    this.emitExport(name, [
-                        "PropTypes.arrayOf(",
-                        this.typeMapTypeFor((type as ArrayType).items),
-                        ")",
-                    ]);
-                } else {
-                    this.ensureBlankLine();
-                    this.emitExport(name, ["_", name]);
-                }
+                this.ensureBlankLine();
+                this.emitExport(name, ["_", name]);
             }
         });
     }

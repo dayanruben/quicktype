@@ -81,14 +81,12 @@ export function setOperationMembersRecursively<T extends SetOperationType>(
             }
         } else if (includeAny || t.kind !== "any") {
             members.add(t);
-        } else {
-            if (combinationKind !== undefined) {
-                attributes = combineTypeAttributes(
-                    combinationKind,
-                    attributes,
-                    t.getAttributes(),
-                );
-            }
+        } else if (combinationKind !== undefined) {
+            attributes = combineTypeAttributes(
+                combinationKind,
+                attributes,
+                t.getAttributes(),
+            );
         }
     }
 

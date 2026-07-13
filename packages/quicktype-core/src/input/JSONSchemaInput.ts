@@ -399,13 +399,11 @@ export class Ref {
         if (!(other instanceof Ref)) return false;
         if (this.addressURI !== undefined && other.addressURI !== undefined) {
             if (!this.addressURI.equals(other.addressURI)) return false;
-        } else {
-            if (
-                (this.addressURI === undefined) !==
-                (other.addressURI === undefined)
-            )
-                return false;
-        }
+        } else if (
+            (this.addressURI === undefined) !==
+            (other.addressURI === undefined)
+        )
+            return false;
 
         const l = this.path.length;
         if (l !== other.path.length) return false;

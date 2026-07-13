@@ -45,13 +45,11 @@ function canBeCombined(
         if (p1.size !== p2.size) {
             return false;
         }
-    } else {
-        if (
-            p1.size < p2.size * REQUIRED_OVERLAP ||
-            p2.size < p1.size * REQUIRED_OVERLAP
-        ) {
-            return false;
-        }
+    } else if (
+        p1.size < p2.size * REQUIRED_OVERLAP ||
+        p2.size < p1.size * REQUIRED_OVERLAP
+    ) {
+        return false;
     }
 
     let larger: ReadonlyMap<string, ClassProperty>;
