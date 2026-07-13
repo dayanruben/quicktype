@@ -23,7 +23,6 @@
             "preset": "recommended",
             "complexity": {
                 "noBannedTypes": "off",
-                "noExtraBooleanCast": "off",
                 "noUselessConstructor": "off",
                 "noUselessUndefinedInitialization": "off",
                 "useDateNow": "off",

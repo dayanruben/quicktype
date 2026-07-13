@@ -77,7 +77,7 @@ export default function deepEquals(
         return false;
     }
     if (
-        !!relax.allowStringifiedIntegers &&
+        relax.allowStringifiedIntegers &&
         typeof x === "string" &&
         typeof y === "number"
     ) {
@@ -155,7 +155,7 @@ export default function deepEquals(
 
     for (const p of xKeys) {
         if (yKeys.indexOf(p) < 0) {
-            if (!!relax.allowMissingNull && x[p] === null) {
+            if (relax.allowMissingNull && x[p] === null) {
                 continue;
             }
             console.error(
