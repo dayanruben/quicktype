@@ -21,6 +21,9 @@
         "enabled": true,
         "rules": {
             "preset": "recommended",
+            "correctness": {
+                "noUndeclaredDependencies": "on"
+            },
             "complexity": {
                 "noUselessReturn": "on"
             },

@@ -15,6 +15,7 @@ import {
     quicktype,
 } from "quicktype-core";
 import { schemaForTypeScriptSources } from "quicktype-typescript-input";
+// biome-ignore lint/correctness/noUndeclaredDependencies: the vscode module is provided by the VS Code host at runtime
 import * as vscode from "vscode";
 
 const configurationSection = "quicktype";
