@@ -26,6 +26,7 @@
                 "noGlobalDirnameFilename": "on",
                 "noUnusedInstantiation": "on",
                 "useSingleJsDocAsterisk": "on",
+                "noConstructorReturn": "off",
                 "noVoidTypeReturn": "off"
             },
             "complexity": {

@@ -466,6 +466,7 @@ class GQLQuery {
 class GQLSchemaFromJSON implements GQLSchema {
     public readonly types: { [name: string]: GQLType } = {};
 
+    // @ts-expect-error: The constructor can return early, but only by throwing.
     public readonly queryType: GQLType;
 
     public readonly mutationType?: GQLType;
@@ -474,11 +475,11 @@ class GQLSchemaFromJSON implements GQLSchema {
         const schema: GraphQLSchema = json.data;
 
         if (schema.__schema.queryType.name === null) {
-            panic("Query type doesn't have a name.");
+            return panic("Query type doesn't have a name.");
         }
 
         for (const t of schema.__schema.types as GQLType[]) {
-            if (!t.name) panic("No top-level type name given");
+            if (!t.name) return panic("No top-level type name given");
             this.types[t.name] = {
                 kind: t.kind,
                 name: t.name,
@@ -487,7 +488,7 @@ class GQLSchemaFromJSON implements GQLSchema {
         }
 
         for (const t of schema.__schema.types) {
-            if (!t.name) panic("This cannot happen");
+            if (!t.name) return panic("This cannot happen");
             const type = this.types[t.name];
             this.addTypeFields(type, t as GQLType);
             // console.log(`type ${type.name} is ${type.kind}`);
@@ -495,7 +496,7 @@ class GQLSchemaFromJSON implements GQLSchema {
 
         const queryType = this.types[schema.__schema.queryType.name];
         if (queryType === undefined) {
-            panic("Query type not found.");
+            return panic("Query type not found.");
         }
 
         // console.log(`query type ${queryType.name} is ${queryType.kind}`);
@@ -506,12 +507,12 @@ class GQLSchemaFromJSON implements GQLSchema {
         }
 
         if (schema.__schema.mutationType.name === null) {
-            panic("Mutation type doesn't have a name.");
+            return panic("Mutation type doesn't have a name.");
         }
 
         const mutationType = this.types[schema.__schema.mutationType.name];
         if (mutationType === undefined) {
-            panic("Mutation type not found.");
+            return panic("Mutation type not found.");
         }
 
         this.mutationType = mutationType;
