@@ -154,9 +154,9 @@ export const camelNamingFunction = funPrefixNamer("camel", (original: string) =>
 
 const standardUnicodeRustEscape = (codePoint: number): string => {
     if (codePoint <= 0xffff) {
-        return "\\u{" + intToHex(codePoint, 4) + "}";
+        return `\\u{${intToHex(codePoint, 4)}}`;
     } else {
-        return "\\u{" + intToHex(codePoint, 6) + "}";
+        return `\\u{${intToHex(codePoint, 6)}}`;
     }
 };
 

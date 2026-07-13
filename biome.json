@@ -21,9 +21,6 @@
         "enabled": true,
         "rules": {
             "preset": "recommended",
-            "style": {
-                "useTemplate": "off"
-            },
             "suspicious": {
                 "noExplicitAny": "off",
                 "noGlobalIsNan": "off",

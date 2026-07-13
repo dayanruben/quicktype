@@ -249,7 +249,7 @@ export class GoRenderer extends ConvenienceRenderer {
             const description = this.descriptionForClassProperty(c, jsonName);
             const docStrings =
                 description !== undefined && description.length > 0
-                    ? description.map((d) => "// " + d)
+                    ? description.map((d) => `// ${d}`)
                     : [];
             const goType = this.propertyGoType(p);
             const omitEmpty = canOmitEmpty(p, this._options.omitEmpty)

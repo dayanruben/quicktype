@@ -128,7 +128,7 @@ export class Smithy4sRenderer extends ConvenienceRenderer {
     // because some renderers, such as kotlinx, can cope with `any`, while some get mad.
     protected arrayType(arrayType: ArrayType, _ = false): Sourcelike {
         // this.emitTopLevelArray(arrayType, new Name(arrayType.getCombinedName().toString() + "List"))
-        return arrayType.getCombinedName().toString() + "List";
+        return `${arrayType.getCombinedName().toString()}List`;
     }
 
     protected emitArrayType(_: ArrayType, smithyType: Sourcelike): void {
@@ -136,7 +136,7 @@ export class Smithy4sRenderer extends ConvenienceRenderer {
     }
 
     protected mapType(mapType: MapType, _ = false): Sourcelike {
-        return mapType.getCombinedName().toString() + "Map";
+        return `${mapType.getCombinedName().toString()}Map`;
         // return [this.scalaType(mapType.values, withIssues), "Map"];
     }
 
@@ -278,7 +278,7 @@ export class Smithy4sRenderer extends ConvenienceRenderer {
                 const nameNeedsBackticks =
                     jsonName.endsWith("_") || shouldAddBacktick(jsonName);
                 const nameWithBackticks = nameNeedsBackticks
-                    ? "`" + jsonName + "`"
+                    ? `\`${jsonName}\``
                     : jsonName;
                 this.emitLine(
                     p.isOptional ? "" : nullableOrOptional ? "" : "@required ",

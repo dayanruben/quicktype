@@ -395,7 +395,7 @@ function negatedInferenceFlagName(name: string): string {
         name = name.slice(prefix.length);
     }
 
-    return "no" + capitalize(name);
+    return `no${capitalize(name)}`;
 }
 
 function dashedFromCamelCase(name: string): string {
@@ -470,7 +470,7 @@ function makeOptionDefinitions(
             return {
                 name: dashedFromCamelCase(negatedInferenceFlagName(name)),
                 optionType: "boolean" as const,
-                description: flag.negationDescription + ".",
+                description: `${flag.negationDescription}.`,
                 kind: "cli" as const,
             };
         }).values(),

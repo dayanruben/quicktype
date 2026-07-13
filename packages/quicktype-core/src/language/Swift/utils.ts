@@ -78,7 +78,7 @@ export function swiftNameStyle(
 }
 
 function unicodeEscape(codePoint: number): string {
-    return "\\u{" + intToHex(codePoint, 0) + "}";
+    return `\\u{${intToHex(codePoint, 0)}}`;
 }
 
 export const stringEscape = utf32ConcatMap(

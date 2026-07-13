@@ -440,7 +440,7 @@ export class SwiftRenderer extends ConvenienceRenderer {
     private get accessLevel(): string {
         return this._options.accessLevel === "internal"
             ? "" // internal is default, so we don't have to emit it
-            : this._options.accessLevel + " ";
+            : `${this._options.accessLevel} `;
     }
 
     private get objcMembersDeclaration(): string {

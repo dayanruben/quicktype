@@ -180,7 +180,7 @@ export class CirceRenderer extends Scala3Renderer {
         function sortBy(t: Type): string {
             const kind = t.kind;
             if (kind === "class") return kind;
-            return "_" + kind;
+            return `_${kind}`;
         }
 
         this.emitDescription(this.descriptionForType(u));

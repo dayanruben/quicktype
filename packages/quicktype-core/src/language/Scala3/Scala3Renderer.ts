@@ -265,7 +265,7 @@ export class Scala3Renderer extends ConvenienceRenderer {
                 const nameNeedsBackticks =
                     jsonName.endsWith("_") || shouldAddBacktick(jsonName);
                 const nameWithBackticks = nameNeedsBackticks
-                    ? "`" + jsonName + "`"
+                    ? `\`${jsonName}\``
                     : jsonName;
                 this.emitLine(
                     "val ",

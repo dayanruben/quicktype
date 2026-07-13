@@ -588,11 +588,11 @@ export class PhpRenderer extends ConvenienceRenderer {
                     className,
                     "::",
                     args,
-                    "::" + idx,
+                    `::${idx}`,
                     "'",
                     suffix,
                     "/*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -603,7 +603,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     "null",
                     suffix,
                     " /*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -614,7 +614,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     "true",
                     suffix,
                     " /*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -622,10 +622,10 @@ export class PhpRenderer extends ConvenienceRenderer {
             (_integerType) =>
                 this.emitLine(
                     ...lhs,
-                    "" + idx,
+                    `${idx}`,
                     suffix,
                     " /*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -633,10 +633,10 @@ export class PhpRenderer extends ConvenienceRenderer {
             (_doubleType) =>
                 this.emitLine(
                     ...lhs,
-                    "" + (idx + idx / 1000),
+                    `${idx + idx / 1000}`,
                     suffix,
                     " /*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -648,11 +648,11 @@ export class PhpRenderer extends ConvenienceRenderer {
                     className,
                     "::",
                     args,
-                    "::" + idx,
+                    `::${idx}`,
                     "'",
                     suffix,
                     " /*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -669,7 +669,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                         "",
                     );
                 });
-                this.emitLine("); /* ", "" + idx, ":", args, "*/");
+                this.emitLine("); /* ", `${idx}`, ":", args, "*/");
             },
             (classType) =>
                 this.emitLine(
@@ -678,7 +678,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     "::sample()",
                     suffix,
                     " /*",
-                    "" + idx,
+                    `${idx}`,
                     ":",
                     args,
                     "*/",
@@ -721,7 +721,7 @@ export class PhpRenderer extends ConvenienceRenderer {
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
-                    const x = _.pad("" + (1 + (idx % 31)), 2, "0");
+                    const x = _.pad(`${1 + (idx % 31)}`, 2, "0");
                     this.emitLine(
                         ...lhs,
                         "DateTime::createFromFormat(DateTimeInterface::ISO8601, '",

@@ -189,9 +189,9 @@ export function intToHex(i: number, width: number): string {
 
 export function standardUnicodeHexEscape(codePoint: number): string {
     if (codePoint <= 0xffff) {
-        return "\\u" + intToHex(codePoint, 4);
+        return `\\u${intToHex(codePoint, 4)}`;
     } else {
-        return "\\U" + intToHex(codePoint, 8);
+        return `\\U${intToHex(codePoint, 8)}`;
     }
 }
 
@@ -343,7 +343,7 @@ export function startWithLetter(
     const modify = upper ? capitalize : decapitalize;
     if (str === "") return modify("empty");
     if (isAllowedStart(str.charCodeAt(0))) return modify(str);
-    return modify("the" + str);
+    return modify(`the${str}`);
 }
 
 const knownAcronyms = new Set(acronyms);

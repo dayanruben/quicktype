@@ -3,7 +3,7 @@ import type { Moment } from "moment";
 import type { ComparisonRelaxations } from "../utils";
 
 function pathToString(path: string[]): string {
-    return "." + path.join(".");
+    return `.${path.join(".")}`;
 }
 
 declare namespace Math {

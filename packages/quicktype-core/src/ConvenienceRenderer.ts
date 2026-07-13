@@ -825,9 +825,9 @@ export abstract class ConvenienceRenderer extends Renderer {
                 (_doubleType) => "double",
                 (_stringType) => "string",
                 (arrayType) =>
-                    typeNameForUnionMember(arrayType.items) + "_array",
+                    `${typeNameForUnionMember(arrayType.items)}_array`,
                 (classType) => lookup(this.nameForNamedType(classType)),
-                (mapType) => typeNameForUnionMember(mapType.values) + "_map",
+                (mapType) => `${typeNameForUnionMember(mapType.values)}_map`,
                 (objectType) => {
                     assert(
                         this.targetLanguage.supportsFullObjectType,

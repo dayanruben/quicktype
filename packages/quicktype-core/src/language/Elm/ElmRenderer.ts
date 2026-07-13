@@ -564,7 +564,7 @@ export class ElmRenderer extends ConvenienceRenderer {
                 return " xdouble";
             }
             if (t.isPrimitive()) {
-                return " " + t.kind;
+                return ` ${t.kind}`;
             }
 
             return t.kind;

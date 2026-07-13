@@ -103,7 +103,7 @@ function runEnvForLanguage(
     const newEnv = Object.assign({}, process.env);
 
     for (const option of Object.keys(additionalRendererOptions)) {
-        newEnv["QUICKTYPE_" + option.toUpperCase().replace("-", "_")] = (
+        newEnv[`QUICKTYPE_${option.toUpperCase().replace("-", "_")}`] = (
             additionalRendererOptions[
                 option as keyof typeof additionalRendererOptions
             ] as Option<string, unknown>

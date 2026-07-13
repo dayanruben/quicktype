@@ -297,7 +297,7 @@ export function messageError<Kind extends ErrorKinds>(
             valueString = value;
         }
 
-        userMessage = userMessage.replace("${" + name + "}", valueString);
+        userMessage = userMessage.replace(`\${${name}}`, valueString);
     }
 
     throw new QuickTypeError(
