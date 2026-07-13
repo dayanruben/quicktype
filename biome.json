@@ -37,6 +37,9 @@
                 "noRedundantDefaultExport": "on",
                 "noExcessiveNestedTestSuites": "on"
             },
+            "performance": {
+                "noDelete": "on"
+            },
             "style": {
                 "noUselessElse": "on",
                 "useCollapsedElseIf": "on",
