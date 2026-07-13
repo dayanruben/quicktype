@@ -153,9 +153,7 @@ export abstract class CompressedJSON<T> {
             this._rootValue = value;
         } else if (this._ctx.currentObject !== undefined) {
             if (this._ctx.currentKey === undefined) {
-                return panic(
-                    "Must have key and can't have string when committing",
-                );
+                panic("Must have key and can't have string when committing");
             }
 
             this._ctx.currentObject.push(
@@ -166,7 +164,7 @@ export abstract class CompressedJSON<T> {
         } else if (this._ctx.currentArray !== undefined) {
             this._ctx.currentArray.push(value);
         } else {
-            return panic("Committing value but nowhere to commit to");
+            panic("Committing value but nowhere to commit to");
         }
     }
 
@@ -257,7 +255,7 @@ export abstract class CompressedJSON<T> {
     protected finishObject(): void {
         const obj = this.context.currentObject;
         if (obj === undefined) {
-            return panic("Object ended but not started");
+            panic("Object ended but not started");
         }
 
         this.popContext();
@@ -272,7 +270,7 @@ export abstract class CompressedJSON<T> {
     protected finishArray(): void {
         const arr = this.context.currentArray;
         if (arr === undefined) {
-            return panic("Array ended but not started");
+            panic("Array ended but not started");
         }
 
         this.popContext();
@@ -360,7 +358,7 @@ export class CompressedJSONFromString extends CompressedJSON<string> {
 
             this.finishObject();
         } else {
-            return panic("Invalid JSON object");
+            panic("Invalid JSON object");
         }
     }
 }

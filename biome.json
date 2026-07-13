@@ -32,9 +32,6 @@
                 "useDateNow": "off",
                 "useOptionalChain": "off"
             },
-            "correctness": {
-                "noVoidTypeReturn": "off"
-            },
             "style": {
                 "noNonNullAssertion": "off",
                 "useConst": "off",

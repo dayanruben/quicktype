@@ -305,5 +305,5 @@ export function messageAssert<Kind extends ErrorKinds>(
     properties: ErrorPropertiesForKind<Kind>,
 ): void {
     if (assertion) return;
-    return messageError(kind, properties);
+    messageError(kind, properties);
 }

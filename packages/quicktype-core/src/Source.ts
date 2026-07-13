@@ -301,7 +301,7 @@ export function serializeRenderResult(
                 break;
             }
             default:
-                return assertNever(source);
+                assertNever(source);
         }
     }
 

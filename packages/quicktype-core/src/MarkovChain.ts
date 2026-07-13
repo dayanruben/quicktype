@@ -52,14 +52,14 @@ function increment(t: Trie, seq: string, i: number): void {
 
     if (i >= seq.length - 1) {
         if (typeof t !== "object") {
-            return panic("Malformed trie");
+            panic("Malformed trie");
         }
 
         let n = t.arr[first];
         if (n === null) {
             n = 0;
         } else if (typeof n === "object") {
-            return panic("Malformed trie");
+            panic("Malformed trie");
         }
 
         t.arr[first] = n + 1;
@@ -73,7 +73,7 @@ function increment(t: Trie, seq: string, i: number): void {
     }
 
     if (typeof st !== "object") {
-        return panic("Malformed trie");
+        panic("Malformed trie");
     }
 
     increment(st, seq, i + 1);
