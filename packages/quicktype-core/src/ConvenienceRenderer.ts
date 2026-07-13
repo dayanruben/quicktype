@@ -39,7 +39,6 @@ import {
 import {
     type BlankLineConfig,
     type ForEachPosition,
-    type RenderContext,
     Renderer,
 } from "./Renderer.js";
 import {
@@ -54,7 +53,6 @@ import {
 } from "./support/Comments.js";
 import { trimEnd } from "./support/Strings.js";
 import { assert, defined, nonNull, panic } from "./support/Support.js";
-import type { TargetLanguage } from "./TargetLanguage.js";
 import {
     type Transformation,
     followTargetType,
@@ -176,13 +174,6 @@ export abstract class ConvenienceRenderer extends Renderer {
     private _cycleBreakerTypes?: Set<Type> | undefined;
 
     private _alphabetizeProperties = false;
-
-    public constructor(
-        targetLanguage: TargetLanguage,
-        renderContext: RenderContext,
-    ) {
-        super(targetLanguage, renderContext);
-    }
 
     public get topLevels(): ReadonlyMap<string, Type> {
         return this.typeGraph.topLevels;

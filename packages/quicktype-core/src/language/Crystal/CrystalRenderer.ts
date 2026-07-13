@@ -7,9 +7,7 @@ import {
     type ForbiddenWordsInfo,
 } from "../../ConvenienceRenderer.js";
 import type { Name, Namer } from "../../Naming.js";
-import type { RenderContext } from "../../Renderer.js";
 import { type Sourcelike, maybeAnnotated } from "../../Source.js";
-import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     matchType,
     nullableFromUnion,
@@ -25,13 +23,6 @@ import {
 } from "./utils.js";
 
 export class CrystalRenderer extends ConvenienceRenderer {
-    public constructor(
-        targetLanguage: TargetLanguage,
-        renderContext: RenderContext,
-    ) {
-        super(targetLanguage, renderContext);
-    }
-
     protected makeNamedTypeNamer(): Namer {
         return camelNamingFunction;
     }

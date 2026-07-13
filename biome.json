@@ -23,7 +23,6 @@
             "preset": "recommended",
             "complexity": {
                 "noBannedTypes": "off",
-                "noUselessConstructor": "off",
                 "noUselessUndefinedInitialization": "off"
             },
             "style": {
