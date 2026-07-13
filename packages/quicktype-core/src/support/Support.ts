@@ -1,5 +1,3 @@
-import { Base64 } from "js-base64";
-import { inflate } from "pako";
 import * as YAML from "yaml";
 
 import type { JSONSchema } from "../input/JSONSchemaStore.js";
@@ -135,11 +133,6 @@ export function errorMessage(e: unknown): string {
     }
 
     return (e as { toString: () => string }).toString();
-}
-
-export function inflateBase64(encoded: string): string {
-    const bytes = Base64.toUint8Array(encoded);
-    return inflate(bytes, { toText: true });
 }
 
 export function parseJSON(

@@ -63,7 +63,6 @@ export {
     parseJSON,
     checkStringMap,
     checkArray,
-    inflateBase64,
 } from "./support/Support.js";
 export {
     splitIntoWords,
