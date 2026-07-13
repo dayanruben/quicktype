@@ -420,7 +420,8 @@ export class DartRenderer extends ConvenienceRenderer {
     // the isNullable property will become false, which is obviously wrong,
     // so add isNullable property
     protected fromDynamicExpression(
-        isNullable: boolean,
+        // biome-ignore lint/style/useDefaultParameterLast: part of the exported DartRenderer API; removing the default would break downstream subclasses
+        isNullable = false,
         t: Type,
         ...dynamic: Sourcelike[]
     ): Sourcelike {
@@ -517,7 +518,8 @@ export class DartRenderer extends ConvenienceRenderer {
     // the isNullable property will become false, which is obviously wrong,
     // so add isNullable property
     protected toDynamicExpression(
-        isNullable: boolean,
+        // biome-ignore lint/style/useDefaultParameterLast: part of the exported DartRenderer API; removing the default would break downstream subclasses
+        isNullable = false,
         t: Type,
         ...dynamic: Sourcelike[]
     ): Sourcelike {
