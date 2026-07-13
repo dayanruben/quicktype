@@ -137,8 +137,8 @@ async function samplesFromDirectory(
         // Each file is a (Name, JSON | URL)
         const sourcesInDir: TypeSource[] = [];
         const graphQLSources: GraphQLTypeSource[] = [];
-        let graphQLSchema: Readable | undefined = undefined;
-        let graphQLSchemaFileName: string | undefined = undefined;
+        let graphQLSchema: Readable | undefined;
+        let graphQLSchemaFileName: string | undefined;
         for (let file of files) {
             const name = typeNameFromFilename(file);
 
@@ -987,11 +987,11 @@ export async function makeQuicktypeOptions(
     }
 
     let sources: TypeSource[] = [];
-    let leadingComments: string[] | undefined = undefined;
+    let leadingComments: string[] | undefined;
     let fixedTopLevels = false;
     switch (options.srcLang) {
         case "graphql": {
-            let schemaString: string | undefined = undefined;
+            let schemaString: string | undefined;
             let wroteSchemaToFile = false;
             if (options.graphqlIntrospect !== undefined) {
                 schemaString = await introspectServer(
@@ -1024,7 +1024,7 @@ export async function makeQuicktypeOptions(
 
             const gqlSources: GraphQLTypeSource[] = [];
             for (const queryFile of options.src) {
-                let schemaFileName: string | undefined = undefined;
+                let schemaFileName: string | undefined;
                 if (schemaString === undefined) {
                     schemaFileName = defined(options.graphqlSchema);
                     schemaString = fs.readFileSync(schemaFileName, "utf8");

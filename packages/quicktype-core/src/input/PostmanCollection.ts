@@ -96,7 +96,7 @@ export function sourcesFromPostmanCollection(
     );
 
     const joinedDescription = descriptions.join("\n\n").trim();
-    let description: string | undefined = undefined;
+    let description: string | undefined;
     if (joinedDescription !== "") {
         description = joinedDescription;
     }

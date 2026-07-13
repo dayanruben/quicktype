@@ -371,10 +371,10 @@ const fastIsDigit = precomputedCodePointPredicate(isDigit);
 export function splitIntoWords(s: string): WordInName[] {
     // [start, end, allUpper]
     const intervals: Array<[number, number, boolean]> = [];
-    let intervalStart: number | undefined = undefined;
+    let intervalStart: number | undefined;
     const len = s.length;
     let i = 0;
-    let lastLowerCaseIndex: number | undefined = undefined;
+    let lastLowerCaseIndex: number | undefined;
 
     function atEnd(): boolean {
         return i >= len;

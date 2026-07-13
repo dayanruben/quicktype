@@ -36,7 +36,7 @@ function getCliqueProperties(
     const properties = Array.from(propertyNames).map(
         (name) => [name, new Set(), false] as [string, Set<Type>, boolean],
     );
-    let additionalProperties: Set<Type> | undefined = undefined;
+    let additionalProperties: Set<Type> | undefined;
     for (const o of clique) {
         const additional = o.getAdditionalProperties();
         if (additional !== undefined) {

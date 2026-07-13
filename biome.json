@@ -22,8 +22,7 @@
         "rules": {
             "preset": "recommended",
             "complexity": {
-                "noBannedTypes": "off",
-                "noUselessUndefinedInitialization": "off"
+                "noBannedTypes": "off"
             },
             "style": {
                 "noNonNullAssertion": "off",

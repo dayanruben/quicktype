@@ -294,7 +294,7 @@ export class CSharpRenderer extends ConvenienceRenderer {
                     : "none";
                 const columns: Sourcelike[][] = [];
                 let isFirstProperty = true;
-                let previousDescription: string[] | undefined = undefined;
+                let previousDescription: string[] | undefined;
                 this.forEachClassProperty(
                     c,
                     blankLines,

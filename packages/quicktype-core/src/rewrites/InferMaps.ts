@@ -19,7 +19,7 @@ import { unifyTypes, unionBuilderForUnification } from "../UnifyClasses.js";
 const mapSizeThreshold = 20;
 const stringMapSizeThreshold = 50;
 
-let markovChain: MarkovChain | undefined = undefined;
+let markovChain: MarkovChain | undefined;
 
 function nameProbability(name: string): number {
     if (markovChain === undefined) {
@@ -92,7 +92,7 @@ function shouldBeMap(
     // 1. All property types are null.
     // 2. Some property types are null or nullable.
     // 3. No property types are null or nullable.
-    let firstNonNullCases: ReadonlySet<Type> | undefined = undefined;
+    let firstNonNullCases: ReadonlySet<Type> | undefined;
     const allCases = new Set<Type>();
     let canBeMap = true;
     // Check that all the property types are the same, modulo nullability.

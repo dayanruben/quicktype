@@ -411,12 +411,12 @@ function deduceTargetLanguage(): TargetLanguage {
 
 const lastTargetLanguageUsedKey = "lastTargetLanguageUsed";
 
-let extensionContext: vscode.ExtensionContext | undefined = undefined;
+let extensionContext: vscode.ExtensionContext | undefined;
 
 const codeProviders: Map<string, CodeProvider> = new Map();
 
-let lastCodeProvider: CodeProvider | undefined = undefined;
-let explicitlySetTargetLanguage: TargetLanguage | undefined = undefined;
+let lastCodeProvider: CodeProvider | undefined;
+let explicitlySetTargetLanguage: TargetLanguage | undefined;
 
 async function openQuicktype(
     inputKind: InputKind,

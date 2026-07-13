@@ -515,7 +515,7 @@ export class SwiftRenderer extends ConvenienceRenderer {
             ],
             () => {
                 if (this._options.dense) {
-                    let lastProperty: ClassProperty | undefined = undefined;
+                    let lastProperty: ClassProperty | undefined;
                     let lastNames: Name[] = [];
 
                     const emitLastProperty = (): void => {

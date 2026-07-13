@@ -182,7 +182,7 @@ export abstract class CompressedJSON<T> {
     }
 
     protected commitString(s: string): void {
-        let value: Value | undefined = undefined;
+        let value: Value | undefined;
         if (this.handleRefs && this.isExpectingRef) {
             value = this.makeString(s);
         } else {

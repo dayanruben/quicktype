@@ -926,8 +926,7 @@ async function addTypesInSchema(
         }
 
         const includedTypes = setFilter(schemaTypes, isTypeIncluded);
-        let producedAttributesForNoCases: JSONSchemaAttributes[] | undefined =
-            undefined;
+        let producedAttributesForNoCases: JSONSchemaAttributes[] | undefined;
 
         function forEachProducedAttribute(
             cases: JSONSchema[] | undefined,

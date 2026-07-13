@@ -175,7 +175,7 @@ function replaceUnion(
         );
     }
 
-    let maybeStringType: TypeRef | undefined = undefined;
+    let maybeStringType: TypeRef | undefined;
     function getStringType(): TypeRef {
         if (maybeStringType === undefined) {
             maybeStringType = builder.getStringType(

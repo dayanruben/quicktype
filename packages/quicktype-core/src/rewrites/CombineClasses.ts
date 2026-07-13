@@ -142,7 +142,7 @@ function findSimilarityCliques(
     const cliques: Clique[] = [];
 
     for (const c of classCandidates) {
-        let cliqueIndex: number | undefined = undefined;
+        let cliqueIndex: number | undefined;
         for (let i = 0; i < cliques.length; i++) {
             if (tryAddToClique(c, cliques[i], onlyWithSameProperties)) {
                 cliqueIndex = i;
