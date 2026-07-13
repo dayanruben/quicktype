@@ -23,7 +23,6 @@
             "preset": "recommended",
             "suspicious": {
                 "noExplicitAny": "off",
-                "noGlobalIsNan": "off",
                 "noTemplateCurlyInString": "off",
                 "noUselessEscapeInString": "off",
                 "useIterableCallbackReturn": "off"

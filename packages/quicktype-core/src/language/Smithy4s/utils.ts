@@ -22,8 +22,8 @@ export const shouldAddBacktick = (paramName: string): boolean => {
     return (
         keywords.some((s) => paramName === s) ||
         invalidSymbols.some((s) => paramName.includes(s)) ||
-        !isNaN(Number.parseFloat(paramName)) ||
-        !isNaN(Number.parseInt(paramName.charAt(0), 10))
+        !Number.isNaN(Number.parseFloat(paramName)) ||
+        !Number.isNaN(Number.parseInt(paramName.charAt(0), 10))
     );
 };
 

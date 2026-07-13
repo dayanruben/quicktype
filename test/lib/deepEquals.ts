@@ -42,7 +42,7 @@ export default function deepEquals(
     // remember that NaN === NaN returns false
     // and isNaN(undefined) returns true
     if (typeof x === "number" && typeof y === "number") {
-        if (isNaN(x) && isNaN(y)) {
+        if (Number.isNaN(x) && Number.isNaN(y)) {
             return true;
         }
         // because sometimes Newtonsoft.JSON is not exact
