@@ -142,6 +142,7 @@ export class JSONSchemaRenderer extends ConvenienceRenderer {
             }
 
             properties = props;
+            // biome-ignore lint/suspicious/useArraySortCompare: sorting strings; default UTF-16 order is intended
             required = req.sort();
         }
 

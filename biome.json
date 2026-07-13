@@ -50,7 +50,8 @@
             "suspicious": {
                 "noTemplateCurlyInString": "off",
                 "noEqualsToNull": "on",
-                "noUnusedExpressions": "on"
+                "noUnusedExpressions": "on",
+                "useArraySortCompare": "on"
             }
         }
     },

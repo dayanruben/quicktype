@@ -480,6 +480,7 @@ export class JavaRenderer extends ConvenienceRenderer {
                 imports.push(imp);
             });
         });
+        // biome-ignore lint/suspicious/useArraySortCompare: sorting strings; default UTF-16 order is intended
         imports.sort();
         return [...new Set(imports)];
     }
@@ -492,6 +493,7 @@ export class JavaRenderer extends ConvenienceRenderer {
                 imports.push(imp);
             });
         });
+        // biome-ignore lint/suspicious/useArraySortCompare: sorting strings; default UTF-16 order is intended
         imports.sort();
         return [...new Set(imports)];
     }
