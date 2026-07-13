@@ -58,23 +58,23 @@ export type ErrorProperties =
       }
     | {
           kind: "SchemaRequiredMustBeStringOrStringArray";
-          properties: { actual: any; ref: Ref };
+          properties: { actual: unknown; ref: Ref };
       }
     | {
           kind: "SchemaRequiredElementMustBeString";
-          properties: { element: any; ref: Ref };
+          properties: { element: unknown; ref: Ref };
       }
     | {
           kind: "SchemaTypeMustBeStringOrStringArray";
-          properties: { actual: any };
+          properties: { actual: unknown };
       }
     | {
           kind: "SchemaTypeElementMustBeString";
-          properties: { element: any; ref: Ref };
+          properties: { element: unknown; ref: Ref };
       }
     | {
           kind: "SchemaArrayItemsMustBeStringOrArray";
-          properties: { actual: any; ref: Ref };
+          properties: { actual: unknown; ref: Ref };
       }
     | { kind: "SchemaIDMustHaveAddress"; properties: { id: string; ref: Ref } }
     | {
@@ -83,7 +83,7 @@ export type ErrorProperties =
       }
     | {
           kind: "SchemaSetOperationCasesIsNotArray";
-          properties: { cases: any; operation: string; ref: Ref };
+          properties: { cases: unknown; operation: string; ref: Ref };
       }
     | {
           kind: "SchemaMoreThanOneUnionMemberName";

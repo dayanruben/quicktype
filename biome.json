@@ -22,7 +22,6 @@
         "rules": {
             "preset": "recommended",
             "suspicious": {
-                "noExplicitAny": "off",
                 "noTemplateCurlyInString": "off"
             }
         }

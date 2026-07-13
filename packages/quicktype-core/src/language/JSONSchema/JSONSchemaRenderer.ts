@@ -16,7 +16,7 @@ import { matchTypeExhaustive } from "../../Type/TypeUtils.js";
 import { namingFunction } from "./utils.js";
 
 interface Schema {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: JSON Schema values are arbitrary JSON
     [name: string]: any;
 }
 

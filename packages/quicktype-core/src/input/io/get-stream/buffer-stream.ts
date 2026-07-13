@@ -4,6 +4,7 @@ import { PassThrough } from "readable-stream";
 import type { Options } from "./index.js";
 
 export interface BufferedPassThrough extends PassThrough {
+    // biome-ignore lint/suspicious/noExplicitAny: vendored from sindresorhus/get-stream
     getBufferedValue: () => any;
     getBufferedLength: () => number;
 
@@ -30,6 +31,7 @@ export default function bufferStream(opts: Options) {
     }
 
     let len = 0;
+    // biome-ignore lint/suspicious/noExplicitAny: vendored from sindresorhus/get-stream
     const ret: any[] = [];
     const stream = new PassThrough({
         objectMode,
@@ -39,6 +41,7 @@ export default function bufferStream(opts: Options) {
         stream.setEncoding(encoding as BufferEncoding);
     }
 
+    // biome-ignore lint/suspicious/noExplicitAny: vendored from sindresorhus/get-stream
     stream.on("data", (chunk: any) => {
         ret.push(chunk);
 

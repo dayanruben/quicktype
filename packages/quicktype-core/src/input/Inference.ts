@@ -32,7 +32,7 @@ import {
 //   Value[] | NestedValueArray[]
 // but TypeScript doesn't support that.
 // FIXME: reactor this
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: TypeScript cannot express this recursive type
 export type NestedValueArray = any;
 
 function forEachArrayInNestedValueArray(

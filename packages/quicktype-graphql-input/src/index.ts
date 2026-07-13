@@ -648,13 +648,13 @@ function makeGraphQLQueryTypes(
 export interface GraphQLSourceData {
     name: string;
     query: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: raw GraphQL introspection JSON
     schema: any;
 }
 
 interface GraphQLTopLevel {
     query: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: raw GraphQL introspection JSON
     schema: any;
 }
 

@@ -1147,6 +1147,7 @@ class CommentInjectionTreeSitterFixture extends Fixture {
     private readonly _treeSitterLanguages = new Map<string, unknown>();
 
     private async loadTreeSitterLanguage(
+        // biome-ignore lint/suspicious/noExplicitAny: web-tree-sitter is loaded dynamically without types
         TreeSitter: any,
         wasmModule: string,
     ): Promise<unknown> {
@@ -1161,6 +1162,7 @@ class CommentInjectionTreeSitterFixture extends Fixture {
     }
 
     private async parseGeneratedFiles(
+        // biome-ignore lint/suspicious/noExplicitAny: web-tree-sitter is loaded dynamically without types
         TreeSitter: any,
         target: TreeSitterTarget,
         generatedFiles: string[],
@@ -1183,6 +1185,7 @@ class CommentInjectionTreeSitterFixture extends Fixture {
             const tree = parser.parse(source);
             const problems: TreeSitterParseProblem[] = [];
 
+            // biome-ignore lint/suspicious/noExplicitAny: web-tree-sitter is loaded dynamically without types
             function visit(node: any): void {
                 if (
                     node.type === "ERROR" ||

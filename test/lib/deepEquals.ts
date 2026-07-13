@@ -33,7 +33,9 @@ function momentsEqual(x: Moment, y: Moment, isTime: boolean): boolean {
 
 // https://stackoverflow.com/questions/1068834/object-comparison-in-javascript
 export default function deepEquals(
+    // biome-ignore lint/suspicious/noExplicitAny: compares arbitrary parsed JSON values
     x: any,
+    // biome-ignore lint/suspicious/noExplicitAny: compares arbitrary parsed JSON values
     y: any,
     assumeStringsEqual: boolean,
     relax: ComparisonRelaxations,

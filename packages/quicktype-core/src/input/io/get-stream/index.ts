@@ -21,6 +21,7 @@ export async function getStream(inputStream: Readable, opts: Options = {}) {
     let clean: (() => void) | undefined;
 
     const p = new Promise((resolve, reject) => {
+        // biome-ignore lint/suspicious/noExplicitAny: vendored from sindresorhus/get-stream
         const error = (err: any) => {
             if (err) {
                 // null check
