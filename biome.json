@@ -58,7 +58,14 @@
                 "useUnifiedTypeSignatures": "on",
                 "noNamespace": "on",
                 "useNodeAssertStrict": "on",
-                "useReadonlyClassProperties": "on"
+                "useReadonlyClassProperties": "on",
+                "useThrowOnlyError": "on",
+                "useTrimStartEnd": "on",
+                "useSymbolDescription": "on",
+                "useSpreadOverApply": "on",
+                "useNumberNamespace": "on",
+                "useGlobalThis": "on",
+                "useErrorCause": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off",
