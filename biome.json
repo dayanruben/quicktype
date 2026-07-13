@@ -39,7 +39,8 @@
                 "useForOf": "on",
                 "noUnusedTemplateLiteral": "on",
                 "useShorthandAssign": "on",
-                "noInferrableTypes": "on"
+                "noInferrableTypes": "on",
+                "useDefaultParameterLast": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off"

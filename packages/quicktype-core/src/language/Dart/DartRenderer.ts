@@ -419,9 +419,8 @@ export class DartRenderer extends ConvenienceRenderer {
     // If the first time is the unionType type, after nullableFromUnion conversion,
     // the isNullable property will become false, which is obviously wrong,
     // so add isNullable property
-    // eslint-disable-next-line @typescript-eslint/default-param-last
     protected fromDynamicExpression(
-        isNullable = false,
+        isNullable: boolean,
         t: Type,
         ...dynamic: Sourcelike[]
     ): Sourcelike {
@@ -517,9 +516,8 @@ export class DartRenderer extends ConvenienceRenderer {
     // If the first time is the unionType type, after nullableFromUnion conversion,
     // the isNullable property will become false, which is obviously wrong,
     // so add isNullable property
-    // eslint-disable-next-line @typescript-eslint/default-param-last
     protected toDynamicExpression(
-        isNullable = false,
+        isNullable: boolean,
         t: Type,
         ...dynamic: Sourcelike[]
     ): Sourcelike {
