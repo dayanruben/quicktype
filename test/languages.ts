@@ -1152,16 +1152,6 @@ export const KotlinLanguage: Language = {
         "af2d1.json",
         "32431.json",
         "bug427.json",
-        // Contain date-time values in non-RFC3339 formats that java.time
-        // cannot parse
-        "437e7.json",
-        "127a1.json",
-        "e0ac7.json",
-        "7681c.json",
-        "26b49.json",
-        "f6a65.json",
-        "0cffa.json",
-        "c3303.json",
         // Contain date-time values with trailing zeros in the fractional
         // seconds, which java.time does not re-serialize identically
         "54d32.json",
@@ -1258,16 +1248,6 @@ export const KotlinJacksonLanguage: Language = {
         "af2d1.json",
         "32431.json",
         "bug427.json",
-        // Contain date-time values in non-RFC3339 formats that java.time
-        // cannot parse
-        "437e7.json",
-        "127a1.json",
-        "e0ac7.json",
-        "7681c.json",
-        "26b49.json",
-        "f6a65.json",
-        "0cffa.json",
-        "c3303.json",
         // Contain date-time values with trailing zeros in the fractional
         // seconds, which java.time does not re-serialize identically
         "54d32.json",
