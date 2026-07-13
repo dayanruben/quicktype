@@ -49,10 +49,8 @@ function getCliqueProperties(
             }
         }
 
-        // FIXME: refactor this
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < properties.length; i++) {
-            let [name, types, isOptional] = properties[i];
+        for (const property of properties) {
+            let [name, types, isOptional] = property;
             const maybeProperty = o.getProperties().get(name);
             if (maybeProperty === undefined) {
                 isOptional = true;
@@ -67,7 +65,7 @@ function getCliqueProperties(
                 types.add(maybeProperty.type);
             }
 
-            properties[i][2] = isOptional;
+            property[2] = isOptional;
         }
     }
 

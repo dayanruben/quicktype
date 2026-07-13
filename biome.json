@@ -35,7 +35,8 @@
                 "noSubstr": "on",
                 "useExplicitLengthCheck": "on",
                 "noMultiAssign": "on",
-                "useConsistentObjectDefinitions": "on"
+                "useConsistentObjectDefinitions": "on",
+                "useForOf": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off"
