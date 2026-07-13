@@ -7,8 +7,8 @@ const WORKERS = ["👷🏻", "👷🏼", "👷🏽", "👷🏾", "👷🏿"];
 export interface ParallelArgs<Item, Result, Acc> {
     queue: Item[];
     workers: number;
-    setup(): Promise<Acc>;
-    map(item: Item, index: number): Promise<Result>;
+    setup: () => Promise<Acc>;
+    map: (item: Item, index: number) => Promise<Result>;
 }
 
 function randomPick<T>(arr: T[]): T {

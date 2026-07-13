@@ -40,7 +40,8 @@
                 "noUnusedTemplateLiteral": "on",
                 "useShorthandAssign": "on",
                 "noInferrableTypes": "on",
-                "useDefaultParameterLast": "on"
+                "useDefaultParameterLast": "on",
+                "useConsistentMethodSignatures": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off"
