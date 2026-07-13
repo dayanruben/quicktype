@@ -6,6 +6,7 @@ import { join } from "node:path";
 import * as semver from "semver";
 
 type PublishAction = "publish" | "skip";
+type NpmDistTag = "latest" | "pre";
 
 interface PackageManifest {
     version: string;
@@ -38,9 +39,13 @@ const internalDependencies = new Set([
 ]);
 
 export function parseReleaseTag(tag: string): string {
-    if (!/^v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(tag)) {
+    if (
+        !/^v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-pre[1-9]\d*)?$/.test(
+            tag,
+        )
+    ) {
         throw new Error(
-            `Release tag ${JSON.stringify(tag)} must have the form vMAJOR.MINOR.PATCH`,
+            `Release tag ${JSON.stringify(tag)} must have the form vMAJOR.MINOR.PATCH or vMAJOR.MINOR.PATCH-preN`,
         );
     }
 
@@ -53,15 +58,74 @@ export function parseReleaseTag(tag: string): string {
     return version;
 }
 
-function requireStableVersion(version: string): void {
-    if (
-        semver.valid(version) !== version ||
-        semver.prerelease(version) !== null
-    ) {
+function requireReleaseVersion(version: string): void {
+    if (!parseReleaseVersion(version)) {
         throw new Error(
-            `${JSON.stringify(version)} is not a stable SemVer version`,
+            `${JSON.stringify(version)} is not a supported release version`,
         );
     }
+}
+
+interface ReleaseVersion {
+    major: number;
+    minor: number;
+    patch: number;
+    prereleaseNumber?: number;
+}
+
+function parseReleaseVersion(version: string): ReleaseVersion | undefined {
+    const match =
+        /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-pre([1-9]\d*))?$/.exec(
+            version,
+        );
+    if (match === null || semver.valid(version) !== version) {
+        return undefined;
+    }
+    return {
+        major: Number(match[1]),
+        minor: Number(match[2]),
+        patch: Number(match[3]),
+        prereleaseNumber: match[4] === undefined ? undefined : Number(match[4]),
+    };
+}
+
+function compareReleaseVersions(left: string, right: string): number {
+    const parsedLeft = parseReleaseVersion(left);
+    const parsedRight = parseReleaseVersion(right);
+    if (parsedLeft === undefined || parsedRight === undefined) {
+        throw new Error("Cannot compare unsupported release versions");
+    }
+
+    for (const component of ["major", "minor", "patch"] as const) {
+        const difference = parsedLeft[component] - parsedRight[component];
+        if (difference !== 0) {
+            return difference;
+        }
+    }
+
+    if (parsedLeft.prereleaseNumber === undefined) {
+        return parsedRight.prereleaseNumber === undefined ? 0 : 1;
+    }
+    if (parsedRight.prereleaseNumber === undefined) {
+        return -1;
+    }
+    return parsedLeft.prereleaseNumber - parsedRight.prereleaseNumber;
+}
+
+function newestReleaseVersion(versions: readonly string[]): string | undefined {
+    return versions.reduce<string | undefined>(
+        (newest, candidate) =>
+            newest === undefined ||
+            compareReleaseVersions(candidate, newest) > 0
+                ? candidate
+                : newest,
+        undefined,
+    );
+}
+
+export function npmDistTag(version: string): NpmDistTag {
+    requireReleaseVersion(version);
+    return semver.prerelease(version) === null ? "latest" : "pre";
 }
 
 export function publishAction(
@@ -69,15 +133,13 @@ export function publishAction(
     publishedVersions: readonly string[],
     target: string,
 ): PublishAction {
-    requireStableVersion(version);
+    requireReleaseVersion(version);
     const validVersions = publishedVersions.filter(
-        (candidate) =>
-            semver.valid(candidate) === candidate &&
-            semver.prerelease(candidate) === null,
+        (candidate) => parseReleaseVersion(candidate) !== undefined,
     );
-    const newest = semver.rsort(validVersions)[0];
+    const newest = newestReleaseVersion(validVersions);
 
-    if (newest !== undefined && semver.gt(newest, version)) {
+    if (newest !== undefined && compareReleaseVersions(newest, version) > 0) {
         throw new Error(
             `${target} already has newer version ${newest}; refusing to publish ${version}`,
         );
@@ -89,7 +151,7 @@ export function publishAction(
 }
 
 export function stampManifests(root: string, version: string): void {
-    requireStableVersion(version);
+    requireReleaseVersion(version);
 
     for (const relativePath of manifests) {
         const path = join(root, relativePath);
@@ -115,14 +177,9 @@ export function validateAgainstPreviousReleases(
     currentReleaseId: number,
     releases: readonly GitHubRelease[],
 ): string | undefined {
-    requireStableVersion(version);
+    requireReleaseVersion(version);
     const previousVersions = releases
-        .filter(
-            (release) =>
-                !release.draft &&
-                !release.prerelease &&
-                release.id !== currentReleaseId,
-        )
+        .filter((release) => !release.draft && release.id !== currentReleaseId)
         .map((release) => {
             try {
                 return parseReleaseTag(release.tag_name);
@@ -131,9 +188,9 @@ export function validateAgainstPreviousReleases(
             }
         })
         .filter((candidate): candidate is string => candidate !== undefined);
-    const newest = semver.rsort(previousVersions)[0];
+    const newest = newestReleaseVersion(previousVersions);
 
-    if (newest !== undefined && !semver.gt(version, newest)) {
+    if (newest !== undefined && compareReleaseVersions(version, newest) <= 0) {
         throw new Error(
             `Release version ${version} must be greater than previous release ${newest}`,
         );
@@ -245,6 +302,12 @@ async function main(): Promise<void> {
             }
             console.log(publishAction(second, npmVersions(first), first));
             return;
+        case "npm-tag":
+            if (first === undefined) {
+                throw new Error("npm-tag requires a version");
+            }
+            console.log(npmDistTag(first));
+            return;
         case "marketplace-action":
             if (first === undefined) {
                 throw new Error("marketplace-action requires a version");
@@ -259,7 +322,7 @@ async function main(): Promise<void> {
             return;
         default:
             throw new Error(
-                "Usage: release-version.ts <validate|stamp|npm-action|marketplace-action> ...",
+                "Usage: release-version.ts <validate|stamp|npm-action|npm-tag|marketplace-action> ...",
             );
     }
 }
