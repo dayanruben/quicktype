@@ -91,7 +91,7 @@ export const CSharpLanguage: Language = {
         return `dotnet run -p:CheckEolTargetFramework=false -- "${sample}"`;
     },
     diffViaSchema: true,
-    skipDiffViaSchema: ["34702.json", "437e7.json"],
+    skipDiffViaSchema: ["34702.json"],
     allowMissingNull: false,
     features: [
         "enum",
@@ -134,7 +134,7 @@ export const CSharpLanguageSystemTextJson: Language = {
         return `dotnet run -p:CheckEolTargetFramework=false -- "${sample}"`;
     },
     diffViaSchema: true,
-    skipDiffViaSchema: ["34702.json", "437e7.json"],
+    skipDiffViaSchema: ["34702.json"],
     allowMissingNull: false,
     features: [
         "enum",
@@ -469,15 +469,6 @@ export const GoLanguage: Language = {
         // can't differenciate empty array and nothing for optional empty array
         // (omitempty).
         "github-events.json",
-        // files contains datetime filed with contain non rfc3339 format value
-        "f6a65.json",
-        "e0ac7.json",
-        "c3303.json",
-        "7681c.json",
-        "437e7.json",
-        "127a1.json",
-        "26b49.json",
-        "0cffa.json",
     ],
     skipMiscJSON: false,
     skipSchema: [
@@ -592,15 +583,9 @@ export const CPlusPlusLanguage: Language = {
         "bug427.json",
         "keywords.json",
         "0a91a.json",
-        "0cffa.json",
-        "127a1.json",
-        "26b49.json",
         "34702.json",
-        "7681c.json",
         "7f568.json",
-        "c3303.json",
         "e8b04.json",
-        "f6a65.json",
         "fcca3.json",
     ],
     allowMissingNull: false,
@@ -663,9 +648,7 @@ export const ElmLanguage: Language = {
         "github-events.json",
         "nbl-stats.json",
         "0a91a.json",
-        "0cffa.json",
         "0e0c2.json",
-        "127a1.json",
         "29f47.json",
         "2df80.json",
         "27332.json",
@@ -676,13 +659,10 @@ export const ElmLanguage: Language = {
         "6de06.json",
         "76ae1.json",
         "7eb30.json",
-        "7681c.json",
         "ae9ca.json",
         "af2d1.json",
         "be234.json",
-        "c3303.json",
         "e8b04.json",
-        "f6a65.json",
     ],
     allowMissingNull: false,
     features: ["enum", "union", "no-defaults"],
@@ -731,17 +711,12 @@ export const SwiftLanguage: Language = {
         "keywords.json",
         "0a358.json", // date-time issues
         "0a91a.json",
-        "0cffa.json", // date-time issues
-        "127a1.json", // date-time issues
-        "26b49.json", // date-time issues
         "26c9c.json", // uri/string confusion
         "32d5c.json", // date-time issues
         "337ed.json",
         "34702.json",
-        "437e7.json", // date-time issues
         "54d32.json", // date-time issues
         "5eae5.json", // date-time issues
-        "7681c.json", // date-time issues
         "77392.json", // date-time issues
         "7f568.json",
         "734ad.json",
@@ -750,13 +725,10 @@ export const SwiftLanguage: Language = {
         "9ac3b.json", // date-time issues
         "a0496.json", // date-time issues
         "b4865.json", // date-time issues
-        "c3303.json", // date-time issues
         "c8c7e.json",
         "d23d5.json", // date-time issues
-        "e0ac7.json", // date-time issues
         "e53b5.json",
         "e8b04.json",
-        "f6a65.json", // date-time issues
         "fcca3.json",
         "f82d9.json",
         "bug863.json", // Unable to resolve reserved keyword use, "description"
@@ -845,10 +817,11 @@ export const ObjectiveCLanguage: Language = {
 export const TypeScriptLanguage: Language = {
     name: "typescript",
     base: "test/fixtures/typescript",
+    // tsx doesn't type-check, so compile explicitly to catch type errors
+    // in the generated code
+    compileCommand: "tsc -p .",
     runCommand(sample: string) {
-        // We have to unset TS_NODE_PROJECT because it gets set on the workers
-        // to the root test/tsconfig.json
-        return `TS_NODE_PROJECT= ts-node main.ts \"${sample}\"`;
+        return `tsx main.ts \"${sample}\"`;
     },
     diffViaSchema: true,
     skipDiffViaSchema: [
@@ -872,7 +845,6 @@ export const TypeScriptLanguage: Language = {
     output: "TopLevel.ts",
     topLevel: "TopLevel",
     skipJSON: [
-        "7681c.json", // year 0 is out of range
     ],
     skipMiscJSON: false,
     skipSchema: ["keyword-unions.schema"], // can't handle "constructor" property
@@ -904,7 +876,6 @@ export const JavaScriptLanguage: Language = {
     output: "TopLevel.js",
     topLevel: "TopLevel",
     skipJSON: [
-        "7681c.json", // year 0 is out of range
     ],
     skipMiscJSON: false,
     skipSchema: ["keyword-unions.schema"], // can't handle "constructor" property
@@ -962,7 +933,6 @@ export const FlowLanguage: Language = {
     output: "TopLevel.js",
     topLevel: "TopLevel",
     skipJSON: [
-        "7681c.json", // year 0 is out of range
     ],
     skipMiscJSON: false,
     skipSchema: [
@@ -1654,7 +1624,6 @@ export const TypeScriptZodLanguage: Language = {
         "nst-test-suite.json",
         "keywords.json",
         "ed095.json",
-        "7681c.json",
         "32d5c.json",
     ],
     skipMiscJSON: false,

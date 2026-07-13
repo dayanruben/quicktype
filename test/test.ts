@@ -6,7 +6,6 @@ import { type Fixture, allFixtures } from "./fixtures";
 import { inParallel } from "./lib/multicore";
 import { type Sample, execAsync } from "./utils";
 
-const exit = require("exit");
 const CPUs = Number.parseInt(process.env.CPUs || "0", 10) || os.cpus().length;
 
 //////////////////////////////////////
@@ -76,7 +75,7 @@ async function main(sources: string[]) {
                 await fixture.runWithSample(sample, index, tests.length);
             } catch (e) {
                 console.trace(e);
-                exit(1);
+                process.exit(1);
             }
         },
     });
@@ -85,5 +84,5 @@ async function main(sources: string[]) {
 // skip 2 `node` args
 main(process.argv.slice(2)).catch((reason) => {
     console.error(reason);
-    process.exit(1);
+    process.process.exit(1);
 });

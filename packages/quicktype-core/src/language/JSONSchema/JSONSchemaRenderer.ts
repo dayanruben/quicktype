@@ -68,7 +68,7 @@ export class JSONSchemaRenderer extends ConvenienceRenderer {
     }
 
     private schemaForType(t: Type): Schema {
-        const schema = matchTypeExhaustive(
+        const schema = matchTypeExhaustive<Schema>(
             t,
             (_noneType) => {
                 return panic("none type should have been replaced");
