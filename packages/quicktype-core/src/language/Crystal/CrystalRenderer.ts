@@ -202,7 +202,6 @@ export class CrystalRenderer extends ConvenienceRenderer {
     protected emitLeadingComments(): void {
         if (this.leadingComments !== undefined) {
             this.emitComments(this.leadingComments);
-            return;
         }
     }
 

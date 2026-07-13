@@ -48,9 +48,7 @@ export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
         return Object.assign({ never: ": never" }, tsFlowTypeAnnotations);
     }
 
-    protected emitModuleExports(): void {
-        return;
-    }
+    protected emitModuleExports(): void {}
 
     protected emitUsageImportComment(): void {
         const topLevelNames: Sourcelike[] = [];

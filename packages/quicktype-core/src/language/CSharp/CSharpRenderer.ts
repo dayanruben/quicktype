@@ -484,9 +484,7 @@ export class CSharpRenderer extends ConvenienceRenderer {
         }
     }
 
-    protected emitRequiredHelpers(): void {
-        return;
-    }
+    protected emitRequiredHelpers(): void {}
 
     private emitTypesAndSupport(): void {
         this.forEachObject(
@@ -502,13 +500,9 @@ export class CSharpRenderer extends ConvenienceRenderer {
         this.emitRequiredHelpers();
     }
 
-    protected emitDefaultLeadingComments(): void {
-        return;
-    }
+    protected emitDefaultLeadingComments(): void {}
 
-    protected emitDefaultFollowingComments(): void {
-        return;
-    }
+    protected emitDefaultFollowingComments(): void {}
 
     protected needNamespace(): boolean {
         return true;

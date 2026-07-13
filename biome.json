@@ -21,6 +21,9 @@
         "enabled": true,
         "rules": {
             "preset": "recommended",
+            "complexity": {
+                "noUselessReturn": "on"
+            },
             "suspicious": {
                 "noTemplateCurlyInString": "off"
             }

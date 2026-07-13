@@ -546,6 +546,4 @@ export async function activate(
     }
 }
 
-export function deactivate(): void {
-    return;
-}
+export function deactivate(): void {}

@@ -497,9 +497,7 @@ function r(name${stringAnnotation}) {
         }
     }
 
-    protected emitTypes(): void {
-        return;
-    }
+    protected emitTypes(): void {}
 
     protected emitUsageImportComment(): void {
         this.emitLine('//   const Convert = require("./file");');

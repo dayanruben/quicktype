@@ -3331,9 +3331,7 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
             return inner;
         }
 
-        public emitHelperFunctions(): void {
-            return;
-        }
+        public emitHelperFunctions(): void {}
     })();
 
     public WideString = new (class extends BaseString implements StringType {

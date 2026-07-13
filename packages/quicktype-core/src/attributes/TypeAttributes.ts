@@ -36,9 +36,7 @@ export class TypeAttributeKind<T> {
         _schema: { [name: string]: unknown },
         _t: Type,
         _attrs: T,
-    ): void {
-        return;
-    }
+    ): void {}
 
     public children(_: T): ReadonlySet<Type> {
         return new Set();

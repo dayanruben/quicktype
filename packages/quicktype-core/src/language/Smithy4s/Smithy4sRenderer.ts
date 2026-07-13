@@ -302,9 +302,7 @@ export class Smithy4sRenderer extends ConvenienceRenderer {
     protected emitClassDefinitionMethods(arrayTypes: ClassProperty[]): void {
         this.emitLine("}");
         arrayTypes.forEach((p) => {
-            function ignore<T extends Type>(_: T): void {
-                return;
-            }
+            function ignore<T extends Type>(_: T): void {}
 
             matchCompoundType(
                 p.type,
@@ -397,9 +395,7 @@ export class Smithy4sRenderer extends ConvenienceRenderer {
         this.ensureBlankLine();
 
         emitLater.forEach((p) => {
-            function ignore<T extends Type>(_: T): void {
-                return;
-            }
+            function ignore<T extends Type>(_: T): void {}
 
             matchCompoundType(
                 p,

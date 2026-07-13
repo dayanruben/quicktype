@@ -1108,9 +1108,7 @@ end`);
         );
     }
 
-    protected emitUnion(_u: UnionType, _unionName: Name): void {
-        return;
-    }
+    protected emitUnion(_u: UnionType, _unionName: Name): void {}
 
     protected emitSourceStructure(): void {
         if (this.leadingComments !== undefined) {

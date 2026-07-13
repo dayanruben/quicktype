@@ -375,9 +375,7 @@ export function matchCompoundType(
     objectType: (objectType: ObjectType) => void,
     unionType: (unionType: UnionType) => void,
 ): void {
-    function ignore<T extends Type>(_: T): void {
-        return;
-    }
+    function ignore<T extends Type>(_: T): void {}
 
     matchTypeExhaustive(
         t,

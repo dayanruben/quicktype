@@ -641,7 +641,5 @@ export class TypeBuilder {
         this.registerType(type);
     }
 
-    public setLostTypeAttributes(): void {
-        return;
-    }
+    public setLostTypeAttributes(): void {}
 }

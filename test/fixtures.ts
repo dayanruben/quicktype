@@ -159,9 +159,7 @@ export abstract class Fixture {
         return this.name === name;
     }
 
-    async setup(): Promise<void> {
-        return;
-    }
+    async setup(): Promise<void> {}
 
     abstract getSamples(sources: string[]): {
         priority: Sample[];
@@ -1110,9 +1108,7 @@ class CommentInjectionTreeSitterFixture extends Fixture {
         return this.name === name;
     }
 
-    async setup(): Promise<void> {
-        return;
-    }
+    async setup(): Promise<void> {}
 
     getSamples(sources: string[]): { priority: Sample[]; others: Sample[] } {
         const commentInjectionSamples = [
