@@ -112,6 +112,73 @@ describe("schemaForTypeScriptSources", () => {
         );
     });
 
+    // https://github.com/glideapps/quicktype/issues/2935
+    test("Date properties become date-time strings", () => {
+        const { schema } = schemaForSource(`
+            export interface User {
+                id: number;
+                createdAt: Date;
+            }
+        `);
+
+        expect(schema.definitions.User.properties.createdAt).toMatchObject({
+            type: "string",
+            format: "date-time",
+        });
+    });
+
+    // https://github.com/glideapps/quicktype/issues/1858
+    test("Map properties become map schemas", () => {
+        const { schema } = schemaForSource(`
+            export interface Env {
+                flags: Map<string, boolean>;
+                services: Map<string, Service>;
+                nested: ReadonlyMap<string, Map<string, number>>;
+            }
+
+            export interface Service {
+                url: string;
+            }
+        `);
+
+        const properties = schema.definitions.Env.properties;
+        expect(properties.flags).toMatchObject({
+            type: "object",
+            additionalProperties: { type: "boolean" },
+        });
+        expect(properties.services.additionalProperties.$ref).toBe(
+            "#/definitions/Service",
+        );
+        expect(properties.nested.additionalProperties).toMatchObject({
+            type: "object",
+            additionalProperties: { type: "number" },
+        });
+    });
+
+    test("a user-defined Map type is not treated as the built-in Map", () => {
+        const { schema } = schemaForSource(`
+            export interface Map {
+                width: number;
+            }
+
+            export interface Atlas {
+                map: Map;
+            }
+        `);
+
+        expect(schema.definitions.Map.properties.width.type).toBe("number");
+    });
+
+    test("unsupported built-in types are reported with a helpful message", () => {
+        expect(() =>
+            schemaForSource(`
+                export interface Bag {
+                    tags: Set<string>;
+                }
+            `),
+        ).toThrow(/does not support 'Set<string>'/);
+    });
+
     test("compiler errors are reported as quicktype errors", () => {
         expect(() =>
             schemaForSource(`
