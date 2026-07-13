@@ -821,7 +821,7 @@ export const TypeScriptLanguage: Language = {
     // in the generated code
     compileCommand: "tsc -p .",
     runCommand(sample: string) {
-        return `tsx main.ts \"${sample}\"`;
+        return `tsx main.ts "${sample}"`;
     },
     diffViaSchema: true,
     skipDiffViaSchema: [
@@ -865,7 +865,7 @@ export const JavaScriptLanguage: Language = {
     name: "javascript",
     base: "test/fixtures/javascript",
     runCommand(sample: string) {
-        return `node main.js \"${sample}\"`;
+        return `node main.js "${sample}"`;
     },
     // FIXME: enable once TypeScript supports unions
     diffViaSchema: false,
@@ -891,7 +891,7 @@ export const JavaScriptPropTypesLanguage: Language = {
     base: "test/fixtures/javascript-prop-types",
     setupCommand: "npm install",
     runCommand(sample: string) {
-        return `node main.js \"${sample}\"`;
+        return `node main.js "${sample}"`;
     },
     copyInput: true,
     diffViaSchema: false,
@@ -922,7 +922,7 @@ export const FlowLanguage: Language = {
     name: "flow",
     base: "test/fixtures/flow",
     runCommand(sample: string) {
-        return `flow check 1>&2 && flow-node main.js \"${sample}\"`;
+        return `flow check 1>&2 && flow-node main.js "${sample}"`;
     },
     diffViaSchema: false,
     skipDiffViaSchema: [],
@@ -1272,7 +1272,7 @@ export const DartLanguage: Language = {
     name: "dart",
     base: "test/fixtures/dart",
     runCommand(sample: string) {
-        return `dart --enable-experiment=non-nullable parser.dart \"${sample}\"`;
+        return `dart --enable-experiment=non-nullable parser.dart "${sample}"`;
     },
     diffViaSchema: false,
     skipDiffViaSchema: [],
@@ -1330,7 +1330,7 @@ export const PikeLanguage: Language = {
     name: "pike",
     base: "test/fixtures/pike",
     runCommand(sample: string) {
-        return `pike main.pike \"${sample}\"`;
+        return `pike main.pike "${sample}"`;
     },
     diffViaSchema: false,
     skipDiffViaSchema: [],
@@ -1469,7 +1469,7 @@ export const HaskellLanguage: Language = {
 export const PHPLanguage: Language = {
     name: "php",
     base: "test/fixtures/php",
-    runCommand: (sample) => `php main.php \"${sample}\"`,
+    runCommand: (sample) => `php main.php "${sample}"`,
     diffViaSchema: false,
     skipDiffViaSchema: [],
     allowMissingNull: true,
