@@ -32,7 +32,8 @@
                 "useConsistentBuiltinInstantiation": "on",
                 "useObjectSpread": "on",
                 "noYodaExpression": "on",
-                "noSubstr": "on"
+                "noSubstr": "on",
+                "useExplicitLengthCheck": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off"

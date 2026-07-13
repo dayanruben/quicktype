@@ -656,7 +656,7 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
 
         const typeList: Sourcelike = [];
         for (const t of nonNulls) {
-            if (typeList.length !== 0) {
+            if (typeList.length > 0) {
                 typeList.push(", ");
             }
 
@@ -3086,7 +3086,7 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
             );
         }
 
-        if (includes.size !== 0) {
+        if (includes.size > 0) {
             let numForwards = 0;
             let numIncludes = 0;
             includes.forEach((rec: IncludeRecord, name: string) => {

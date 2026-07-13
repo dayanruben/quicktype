@@ -798,7 +798,10 @@ export class ElixirRenderer extends ConvenienceRenderer {
                         ]);
                     }
                 });
-                if (structDescription.length || attributeDescriptions.length) {
+                if (
+                    structDescription.length > 0 ||
+                    attributeDescriptions.length > 0
+                ) {
                     this.emitDescription([
                         ...structDescription,
                         ...attributeDescriptions,
@@ -816,7 +819,7 @@ export class ElixirRenderer extends ConvenienceRenderer {
                         }
                     }
                 });
-                if (requiredAttributes.length) {
+                if (requiredAttributes.length > 0) {
                     this.emitLine(["@enforce_keys [", requiredAttributes, "]"]);
                 }
 
@@ -1152,7 +1155,7 @@ end`);
                         () => {
                             const description =
                                 this.descriptionForType(topLevel) ?? [];
-                            if (description.length) {
+                            if (description.length > 0) {
                                 this.emitDescription([...description]);
                                 this.ensureBlankLine();
                             }

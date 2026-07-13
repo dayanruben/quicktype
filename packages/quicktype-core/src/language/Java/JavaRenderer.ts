@@ -524,13 +524,13 @@ export class JavaRenderer extends ConvenienceRenderer {
                         p,
                         true,
                     );
-                    if (getter.length !== 0) {
+                    if (getter.length > 0) {
                         this.emitLine(
                             `@lombok.Getter(onMethod_ = {${getter.join(", ")}})`,
                         );
                     }
 
-                    if (setter.length !== 0) {
+                    if (setter.length > 0) {
                         this.emitLine(
                             `@lombok.Setter(onMethod_ = {${setter.join(", ")}})`,
                         );

@@ -5763,7 +5763,7 @@ export class CJSONRenderer extends ConvenienceRenderer {
         }
 
         /* Emit includes */
-        if (includes.size !== 0) {
+        if (includes.size > 0) {
             includes.forEach((_rec: IncludeRecord, name: string) => {
                 name = name.concat(".h");
                 if (name !== filename) {

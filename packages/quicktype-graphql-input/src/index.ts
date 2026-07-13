@@ -217,7 +217,7 @@ class GQLQuery {
             }
         }
 
-        messageAssert(queries.length >= 1, "GraphQLNoQueriesDefined", {});
+        messageAssert(queries.length > 0, "GraphQLNoQueriesDefined", {});
         this.queries = queries;
     }
 
