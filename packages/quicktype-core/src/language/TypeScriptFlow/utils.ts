@@ -17,13 +17,15 @@ export function quotePropertyName(original: string): string {
 
     if (original.length === 0) {
         return quoted;
-    } else if (!isES3IdentifierStart(original.codePointAt(0) as number)) {
-        return quoted;
-    } else if (escaped !== original) {
-        return quoted;
-    } else if (legalizeName(original) !== original) {
-        return quoted;
-    } else {
-        return original;
     }
+    if (!isES3IdentifierStart(original.codePointAt(0) as number)) {
+        return quoted;
+    }
+    if (escaped !== original) {
+        return quoted;
+    }
+    if (legalizeName(original) !== original) {
+        return quoted;
+    }
+    return original;
 }

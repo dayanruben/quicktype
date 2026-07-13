@@ -190,9 +190,8 @@ export function intToHex(i: number, width: number): string {
 export function standardUnicodeHexEscape(codePoint: number): string {
     if (codePoint <= 0xffff) {
         return `\\u${intToHex(codePoint, 4)}`;
-    } else {
-        return `\\U${intToHex(codePoint, 8)}`;
     }
+    return `\\U${intToHex(codePoint, 8)}`;
 }
 
 export function escapeNonPrintableMapper(
@@ -672,8 +671,7 @@ export function makeNameStyle(
 
         if (prefix !== undefined) {
             return addPrefixIfNecessary(prefix, styledName);
-        } else {
-            return styledName;
         }
+        return styledName;
     };
 }

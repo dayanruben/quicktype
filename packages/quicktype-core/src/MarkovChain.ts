@@ -39,9 +39,8 @@ function lookup(t: Trie, seq: string, i: number): Trie | number | undefined {
 
     if (typeof n === "object") {
         return lookup(n, seq, i + 1);
-    } else {
-        return n / t.count;
     }
+    return n / t.count;
 }
 
 function increment(t: Trie, seq: string, i: number): void {

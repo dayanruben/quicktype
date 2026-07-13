@@ -260,24 +260,23 @@ export function accessorNamesAttributeProducer(
                 makeAccessorNames(maybeAccessors),
             ),
         };
-    } else {
-        const identifierAttribute = makeUnionIdentifierAttribute();
-
-        const accessors = checkArray(maybeAccessors, isAccessorEntry);
-        messageAssert(
-            cases.length === accessors.length,
-            "SchemaWrongAccessorEntryArrayLength",
-            {
-                operation: "oneOf",
-                ref: canonicalRef.push("oneOf"),
-            },
-        );
-        const caseAttributes = accessors.map((accessor) =>
-            makeUnionMemberNamesAttribute(
-                identifierAttribute,
-                makeAccessorEntry(accessor),
-            ),
-        );
-        return { forUnion: identifierAttribute, forCases: caseAttributes };
     }
+    const identifierAttribute = makeUnionIdentifierAttribute();
+
+    const accessors = checkArray(maybeAccessors, isAccessorEntry);
+    messageAssert(
+        cases.length === accessors.length,
+        "SchemaWrongAccessorEntryArrayLength",
+        {
+            operation: "oneOf",
+            ref: canonicalRef.push("oneOf"),
+        },
+    );
+    const caseAttributes = accessors.map((accessor) =>
+        makeUnionMemberNamesAttribute(
+            identifierAttribute,
+            makeAccessorEntry(accessor),
+        ),
+    );
+    return { forUnion: identifierAttribute, forCases: caseAttributes };
 }

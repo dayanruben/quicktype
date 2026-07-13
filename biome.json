@@ -24,6 +24,9 @@
             "complexity": {
                 "noUselessReturn": "on"
             },
+            "style": {
+                "noUselessElse": "on"
+            },
             "suspicious": {
                 "noTemplateCurlyInString": "off"
             }
