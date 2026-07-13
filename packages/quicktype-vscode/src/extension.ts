@@ -34,7 +34,7 @@ enum Command {
 function jsonIsValid(json: string): boolean {
     try {
         JSON.parse(json);
-    } catch (e) {
+    } catch {
         return false;
     }
 
@@ -186,7 +186,7 @@ async function pasteAsTypes(
     let content: string;
     try {
         content = await vscode.env.clipboard.readText();
-    } catch (e) {
+    } catch {
         return await vscode.window.showErrorMessage(
             "Could not get clipboard contents",
         );
@@ -370,7 +370,7 @@ class CodeProvider implements vscode.TextDocumentContentProvider {
             if (!this._isOpen) return;
 
             this._onDidChange.fire(this.uri);
-        } catch (e) {
+        } catch {
             // FIXME
         }
     }
