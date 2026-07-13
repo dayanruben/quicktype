@@ -36,7 +36,10 @@
                 "useExplicitLengthCheck": "on",
                 "noMultiAssign": "on",
                 "useConsistentObjectDefinitions": "on",
-                "useForOf": "on"
+                "useForOf": "on",
+                "noUnusedTemplateLiteral": "on",
+                "useShorthandAssign": "on",
+                "noInferrableTypes": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off"

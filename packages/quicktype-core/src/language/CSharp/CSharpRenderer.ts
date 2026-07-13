@@ -529,7 +529,7 @@ export class CSharpRenderer extends ConvenienceRenderer {
     }
 
     protected emitDependencyUsings(): void {
-        let genericEmited: boolean = false;
+        let genericEmited = false;
         const ensureGenericOnce = () => {
             if (!genericEmited) {
                 this.emitUsing("System.Collections.Generic");
