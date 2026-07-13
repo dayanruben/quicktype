@@ -1185,12 +1185,10 @@ encoder.dateEncodingStrategy = .formatted(formatter)`);
 			return 0
 	}`);
 
-                if (this._options.swift5Support) {
-                    this.ensureBlankLine();
-                    this.emitMultiline(`    public func hash(into hasher: inout Hasher) {
+                this.ensureBlankLine();
+                this.emitMultiline(`    public func hash(into hasher: inout Hasher) {
 			// No-op
 	}`);
-                }
             }
 
             this.ensureBlankLine();
