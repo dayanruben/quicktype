@@ -469,7 +469,7 @@ export class TypeBuilder {
 
         const type = derefTypeRef(ref, this.typeGraph);
         if (!(type instanceof ObjectType)) {
-            panic("Tried to set properties of non-object type");
+            return panic("Tried to set properties of non-object type");
         }
 
         type.setProperties(

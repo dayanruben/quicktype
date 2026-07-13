@@ -99,7 +99,7 @@ export function assertNever(x: never): never {
 
 export function assert(condition: boolean, message = "Assertion failed"): void {
     if (!condition) {
-        messageError("InternalError", { message });
+        return messageError("InternalError", { message });
     }
 }
 

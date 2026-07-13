@@ -423,7 +423,7 @@ export function splitIntoWords(s: string): WordInName[] {
 
     function commitInterval(): void {
         if (intervalStart === undefined) {
-            panic("Tried to commit interval without starting one");
+            return panic("Tried to commit interval without starting one");
         }
 
         assert(i > intervalStart, "Interval must be non-empty");

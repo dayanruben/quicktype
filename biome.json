@@ -25,7 +25,8 @@
                 "noUndeclaredDependencies": "on",
                 "noGlobalDirnameFilename": "on",
                 "noUnusedInstantiation": "on",
-                "useSingleJsDocAsterisk": "on"
+                "useSingleJsDocAsterisk": "on",
+                "noVoidTypeReturn": "off"
             },
             "complexity": {
                 "noUselessReturn": "on",
