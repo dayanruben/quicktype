@@ -120,6 +120,10 @@ export class JSONInput<T> implements Input<JSONSourceData<T>> {
 
     public async addSource(source: JSONSourceData<T>): Promise<void> {
         const { name, samples, description } = source;
+        if (samples.length === 0) {
+            return messageError("DriverNoSamplesForTopLevel", { name });
+        }
+
         try {
             const values = await arrayMapSync(
                 samples,
@@ -133,6 +137,10 @@ export class JSONInput<T> implements Input<JSONSourceData<T>> {
 
     public addSourceSync(source: JSONSourceData<T>): void {
         const { name, samples, description } = source;
+        if (samples.length === 0) {
+            return messageError("DriverNoSamplesForTopLevel", { name });
+        }
+
         try {
             const values = samples.map((s) =>
                 this._compressedJSON.parseSync(s),
