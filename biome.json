@@ -25,7 +25,6 @@
                 "noBannedTypes": "off",
                 "noUselessConstructor": "off",
                 "noUselessUndefinedInitialization": "off",
-                "useDateNow": "off",
                 "useOptionalChain": "off"
             },
             "style": {
