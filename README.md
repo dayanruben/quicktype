@@ -189,6 +189,25 @@ main();
 
 The argument to `quicktype` is a complex object with many optional properties. [Explore its definition](https://github.com/quicktype/quicktype/blob/master/packages/quicktype-core/src/Run.ts#L637) to understand what options are allowed.
 
+#### TypeScript: the `lang` option is a `LanguageName`, not a `string`
+
+In TypeScript, the `lang` option of `quicktype` and the argument of `jsonInputForTargetLanguage` are typed as `LanguageName`, a union of all supported language names — passing a plain `string` is a compile-time error. If the language name is known statically, just pass the literal (`lang: "swift"`). For wrappers that take the language name at runtime — from CLI arguments or configuration — validate it with the `isLanguageName` type guard instead of casting:
+
+```typescript
+import { type LanguageName, isLanguageName, quicktype } from "quicktype-core";
+
+async function quicktypeJSON(targetLanguage: LanguageName, typeName: string, jsonString: string) {
+    // same body as above
+}
+
+const lang = process.argv[2]; // untrusted string
+if (!isLanguageName(lang)) {
+    throw new Error(`Unknown language: ${lang}`);
+}
+// lang now has type LanguageName
+const { lines } = await quicktypeJSON(lang, "Person", jsonString);
+```
+
 #### Bundling `quicktype-core` as ESM
 
 `quicktype-core` ships both CommonJS and ESM builds. If you bundle it into an ESM output for Node with esbuild (`--format=esm --platform=node`), the bundle may throw at runtime:
