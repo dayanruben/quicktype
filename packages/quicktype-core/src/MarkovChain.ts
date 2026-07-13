@@ -116,7 +116,7 @@ export function evaluateFull(
         }
 
         scores.push(cp);
-        p = p * cp;
+        p *= cp;
     }
 
     return [p ** (1 / (word.length - depth + 1)), scores];
