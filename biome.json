@@ -24,7 +24,6 @@
             "suspicious": {
                 "noExplicitAny": "off",
                 "noGlobalIsNan": "off",
-                "noPrototypeBuiltins": "off",
                 "noShadowRestrictedNames": "off",
                 "noTemplateCurlyInString": "off",
                 "noUselessEscapeInString": "off",

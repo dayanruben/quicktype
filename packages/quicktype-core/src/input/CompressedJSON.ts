@@ -105,6 +105,7 @@ export abstract class CompressedJSON<T> {
     }
 
     protected internString(s: string): number {
+        // biome-ignore lint/suspicious/noPrototypeBuiltins: Object.hasOwn is not in quicktype-core's es6 lib
         if (Object.prototype.hasOwnProperty.call(this._stringIndexes, s)) {
             return this._stringIndexes[s];
         }
