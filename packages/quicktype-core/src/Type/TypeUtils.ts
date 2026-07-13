@@ -109,9 +109,7 @@ export function makeGroupsToFlatten<T extends SetOperationType>(
             setOperationMembersRecursively(u, undefined)[0],
         );
 
-        if (include !== undefined) {
-            if (!include(members)) continue;
-        }
+        if (include !== undefined && !include(members)) continue;
 
         let maybeSet = typeGroups.get(members);
         if (maybeSet === undefined) {

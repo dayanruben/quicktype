@@ -145,13 +145,11 @@ export default function deepEquals(
     for (const p of yKeys) {
         // We allow properties in y that aren't present in x
         // so long as they're null.
-        if (xKeys.indexOf(p) < 0) {
-            if (y[p] !== null) {
-                console.error(
-                    `Non-null property ${p} is not expected at path ${pathToString(path)}.`,
-                );
-                return false;
-            }
+        if (xKeys.indexOf(p) < 0 && y[p] !== null) {
+            console.error(
+                `Non-null property ${p} is not expected at path ${pathToString(path)}.`,
+            );
+            return false;
         }
     }
 

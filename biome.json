@@ -26,7 +26,8 @@
             },
             "style": {
                 "noUselessElse": "on",
-                "useCollapsedElseIf": "on"
+                "useCollapsedElseIf": "on",
+                "useCollapsedIf": "on"
             },
             "suspicious": {
                 "noTemplateCurlyInString": "off"

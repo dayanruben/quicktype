@@ -732,13 +732,11 @@ export class RubyRenderer extends ConvenienceRenderer {
                         ["Integer"],
                         [` = ${this._options.strictness}Integer`],
                     ]);
-                if (this._options.strictness === Strictness.Strict) {
-                    if (has.nil)
-                        declarations.push([
-                            ["Nil"],
-                            [` = ${this._options.strictness}Nil`],
-                        ]);
-                }
+                if (this._options.strictness === Strictness.Strict && has.nil)
+                    declarations.push([
+                        ["Nil"],
+                        [` = ${this._options.strictness}Nil`],
+                    ]);
 
                 if (has.bool)
                     declarations.push([

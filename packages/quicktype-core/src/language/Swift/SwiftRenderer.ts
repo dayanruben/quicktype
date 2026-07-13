@@ -684,18 +684,16 @@ export class SwiftRenderer extends ConvenienceRenderer {
             },
         );
 
-        if (!this._options.justTypes) {
-            // FIXME: We emit only the MARK line for top-level-enum.schema
-            if (this._options.convenienceInitializers) {
-                this.ensureBlankLine();
-                this.emitMark(
-                    this.sourcelikeToString(className) +
-                        " convenience initializers and mutators",
-                );
-                this.ensureBlankLine();
-                this.emitConvenienceInitializersExtension(c, className);
-                this.ensureBlankLine();
-            }
+        // FIXME: We emit only the MARK line for top-level-enum.schema
+        if (!this._options.justTypes && this._options.convenienceInitializers) {
+            this.ensureBlankLine();
+            this.emitMark(
+                this.sourcelikeToString(className) +
+                    " convenience initializers and mutators",
+            );
+            this.ensureBlankLine();
+            this.emitConvenienceInitializersExtension(c, className);
+            this.ensureBlankLine();
         }
 
         this.endFile();
