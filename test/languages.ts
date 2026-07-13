@@ -700,7 +700,7 @@ export const ElmLanguage: Language = {
 export const SwiftLanguage: Language = {
     name: "swift",
     base: "test/fixtures/swift",
-    compileCommand: `swiftc -o quicktype main.swift quicktype.swift`,
+    compileCommand: "swiftc -o quicktype main.swift quicktype.swift",
     runCommand(sample: string) {
         return `./quicktype "${sample}"`;
     },
@@ -779,7 +779,7 @@ export const SwiftLanguage: Language = {
 export const ObjectiveCLanguage: Language = {
     name: "objective-c",
     base: "test/fixtures/objective-c",
-    compileCommand: `clang -Werror -framework Foundation *.m -o test`,
+    compileCommand: "clang -Werror -framework Foundation *.m -o test",
     runCommand(sample: string) {
         return `cp "${sample}" sample.json && ./test sample.json`;
     },
