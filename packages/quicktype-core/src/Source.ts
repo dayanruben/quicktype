@@ -66,7 +66,7 @@ export type Sourcelike = Source | string | Name | SourcelikeArray;
 export type SourcelikeArray = Sourcelike[];
 
 export function sourcelikeToSource(sl: Sourcelike): Source {
-    if (sl instanceof Array) {
+    if (Array.isArray(sl)) {
         return {
             kind: "sequence",
             sequence: sl.map(sourcelikeToSource),

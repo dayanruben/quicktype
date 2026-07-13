@@ -30,7 +30,6 @@
                 "noTemplateCurlyInString": "off",
                 "noTsIgnore": "off",
                 "noUselessEscapeInString": "off",
-                "useIsArray": "off",
                 "useIterableCallbackReturn": "off"
             }
         }
