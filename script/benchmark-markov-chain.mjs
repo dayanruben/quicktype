@@ -167,7 +167,7 @@ console.log(`  V8 heap:                 ${formatBytes(heap.heapBytes)}`);
 console.log(`  ArrayBuffer backing:     ${formatBytes(heap.arrayBufferBytes)}`);
 console.log(`  Measurement copies:      ${heapCopies}`);
 console.log("");
-console.log("Base91 + Exp-Golomb decode");
+console.log("Base91 + rANS decode");
 console.log(
     `  Median:                  ${decode.milliseconds.toFixed(3)} ms (${decodeSamples} samples)`,
 );

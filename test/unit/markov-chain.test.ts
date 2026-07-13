@@ -7,27 +7,26 @@ import {
 } from "../../packages/quicktype-core/src/MarkovChain.js";
 
 describe("Markov chain", () => {
-    test("decodes the compact count tables", () => {
+    test("decodes the compact probability table", () => {
         const chain = load();
 
-        expect(chain.contextIndexes).toHaveLength(65 ** 2);
-        expect(chain.smallCounts).toHaveLength(1965 * 65);
-        expect(chain.largeCounts).toHaveLength(1080 * 65);
-        expect(chain.totals).toHaveLength(65 ** 2);
+        expect(chain.probabilityCodes).toHaveLength(65 ** 3);
+        expect(chain.probabilities).toHaveLength(6);
+        expect(chain.probabilities[0]).toBeCloseTo(0.0001);
     });
 
-    test("preserves inference scores", () => {
+    test("keeps representative inference scores stable", () => {
         const chain = load();
         const [probability, scores] = evaluateFull(chain, "contactInformation");
 
-        expect(probability).toBe(0.13037515438557548);
+        expect(probability).toBe(0.10493792217669691);
         expect(scores).toEqual([
-            0.24570647634955584, 0.0695517774343122, 0.12157766649506248,
-            0.05013868789194404, 0.136300600937727, 0.0008256664307619722,
-            0.2017126546146527, 0.09551724137931035, 0.1854898336414048,
-            0.6048253422555099, 0.08917037257210797, 0.2571233188967404,
-            0.22705461451074146, 0.3433357205379168, 0.2508035244243717,
-            0.6134135379935006,
+            0.1738850325345993, 0.043580953031778336, 0.1738850325345993,
+            0.043580953031778336, 0.1738850325345993, 0.0008568746852688491,
+            0.1738850325345993, 0.1738850325345993, 0.1738850325345993,
+            0.1738850325345993, 0.1738850325345993, 0.1738850325345993,
+            0.1738850325345993, 0.1738850325345993, 0.1738850325345993,
+            0.1738850325345993,
         ]);
         expect(evaluate(chain, "contactInformation")).toBe(probability);
     });
@@ -37,5 +36,80 @@ describe("Markov chain", () => {
 
         expect(evaluateFull(chain, "aébc")).toEqual([0.0001, [0.0001, 0.0001]]);
         expect(evaluate(chain, "id")).toBe(1);
+    });
+
+    test("preserves map-inference decisions near the score boundary", () => {
+        const chain = load();
+        const score = (names: string[]): number =>
+            names.reduce(
+                (product, name) => product * evaluate(chain, name),
+                1,
+            ) **
+            (1 / names.length);
+        const limit = (propertyCount: number): number => {
+            const exponent = 5;
+            const scale = 22 ** exponent;
+            return (
+                (propertyCount + 2) ** exponent / scale +
+                (0.0025 - 3 ** exponent / scale)
+            );
+        };
+        const originalClasses = [
+            [
+                "designation",
+                "discovery_date",
+                "h_mag",
+                "i_deg",
+                "moid_au",
+                "orbit_class",
+                "period_yr",
+                "pha",
+                "q_au_1",
+                "q_au_2",
+            ],
+            [
+                "id",
+                "name",
+                "dataTypeName",
+                "description",
+                "fieldName",
+                "position",
+                "renderTypeName",
+                "tableColumnId",
+                "width",
+                "cachedContents",
+                "format",
+            ],
+            [
+                "product",
+                "totallooseoffers",
+                "schk",
+                "match",
+                "details",
+                "page",
+                "totalpages",
+                "totalresultsreturned",
+                "totalresultsavailable",
+                "category",
+            ],
+        ];
+        const closestMap = [
+            "ita_contact_email",
+            "company_name",
+            "company_phone",
+            "company_address",
+            "company_website",
+            "company_description",
+            "company_email",
+            "ita_office",
+            "contact_title",
+            "contact_name",
+            "category",
+        ];
+
+        for (const names of originalClasses) {
+            expect(score(names)).toBeGreaterThan(limit(names.length));
+        }
+        expect(score(closestMap)).toBeLessThan(limit(closestMap.length));
     });
 });

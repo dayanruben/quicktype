@@ -39,46 +39,10 @@ export interface TrainingMarkovChain {
 
 export interface MarkovChain {
     depth: 3;
-    contextIndexes: Uint16Array;
-    smallCounts: Uint8Array;
-    largeCounts: Uint16Array;
-    totals: Uint32Array;
-}
-
-class BitReader {
-    private byte = 4;
-    private bit = 7;
-
-    public constructor(private readonly bytes: Uint8Array) {}
-
-    public readBit(): number {
-        const result = (this.bytes[this.byte] >> this.bit) & 1;
-        this.bit--;
-        if (this.bit < 0) {
-            this.byte++;
-            this.bit = 7;
-        }
-        return result;
-    }
-
-    private readGamma(): number {
-        let exponent = 0;
-        while (this.readBit() === 0) exponent++;
-        let value = 1;
-        for (let i = 0; i < exponent; i++) {
-            value = (value << 1) | this.readBit();
-        }
-        return value;
-    }
-
-    public readCount(riceBits: number): number {
-        const high = (this.readGamma() - 1) << riceBits;
-        let low = 0;
-        for (let i = 0; i < riceBits; i++) {
-            low = (low << 1) | this.readBit();
-        }
-        return high + low + 1;
-    }
+    // Dense [first][second][third] indexes into probabilities.  Code zero is
+    // the fixed unseen probability.
+    probabilityCodes: Uint8Array;
+    probabilities: Float32Array;
 }
 
 function decodeBase91(encoded: string): Uint8Array {
@@ -111,47 +75,153 @@ function decodeBase91(encoded: string): Uint8Array {
     return bytes.subarray(0, output);
 }
 
-function decode(encoded: string): MarkovChain {
-    const bytes = decodeBase91(encoded);
-    const contextCount = bytes[0] | (bytes[1] << 8);
-    const smallContextCount = bytes[2] | (bytes[3] << 8);
-    const largeContextCount = contextCount - smallContextCount;
-    const contextIndexes = new Uint16Array(alphabetSize ** 2);
-    const smallCounts = new Uint8Array((smallContextCount + 1) * alphabetSize);
-    const largeCounts = new Uint16Array((largeContextCount + 1) * alphabetSize);
-    const totals = new Uint32Array(alphabetSize ** 2);
-    const present = new Uint8Array(alphabetSize);
-    const reader = new BitReader(bytes);
-    let smallContext = 0;
-    let largeContext = 0;
+class RansDecoder {
+    private state: number;
+    private position: number;
 
-    for (let prefix = 0; prefix < contextIndexes.length; prefix++) {
-        if (reader.readBit() === 0) continue;
-
-        const isSmall = reader.readBit() !== 0;
-        const context = isSmall ? ++smallContext : ++largeContext;
-        contextIndexes[prefix] = isSmall ? context : 0x8000 | context;
-        let riceBits = 0;
-        for (let i = 0; i < 3; i++) {
-            riceBits = (riceBits << 1) | reader.readBit();
-        }
-        for (let character = 0; character < alphabetSize; character++) {
-            present[character] = reader.readBit();
-        }
-
-        const destination = isSmall ? smallCounts : largeCounts;
-        const offset = context * alphabetSize;
-        let total = 0;
-        for (let character = 0; character < alphabetSize; character++) {
-            if (present[character] === 0) continue;
-            const count = reader.readCount(riceBits);
-            destination[offset + character] = count;
-            total += count;
-        }
-        totals[prefix] = total;
+    public constructor(
+        private readonly bytes: Uint8Array,
+        offset: number,
+        private readonly scale: number,
+        private readonly symbolCount: number,
+    ) {
+        this.state = new DataView(
+            bytes.buffer,
+            bytes.byteOffset + offset,
+            4,
+        ).getUint32(0, true);
+        this.position = offset + 4;
     }
 
-    return { depth: 3, contextIndexes, smallCounts, largeCounts, totals };
+    public read(
+        model: number,
+        frequencies: Uint16Array,
+        cumulative: Uint16Array,
+        symbols: Uint8Array,
+    ): number {
+        const slot = this.state % this.scale;
+        const symbol = symbols[model * this.scale + slot];
+        const index = model * this.symbolCount + symbol;
+        this.state =
+            frequencies[index] * Math.floor(this.state / this.scale) +
+            slot -
+            cumulative[index];
+        while (this.state < 1 << 23) {
+            this.state = this.state * 256 + this.bytes[this.position++];
+        }
+        return symbol;
+    }
+}
+
+function makeEntropyTables(
+    frequencies: Uint16Array,
+    modelCount: number,
+    symbolCount: number,
+    scale: number,
+): { cumulative: Uint16Array; symbols: Uint8Array } {
+    const cumulative = new Uint16Array(frequencies.length);
+    const symbols = new Uint8Array(modelCount * scale);
+    for (let model = 0; model < modelCount; model++) {
+        let sum = 0;
+        for (let symbol = 0; symbol < symbolCount; symbol++) {
+            const index = model * symbolCount + symbol;
+            cumulative[index] = sum;
+            symbols.fill(
+                symbol,
+                model * scale + sum,
+                model * scale + sum + frequencies[index],
+            );
+            sum += frequencies[index];
+        }
+    }
+    return { cumulative, symbols };
+}
+
+function decode(encoded: string): MarkovChain {
+    const bytes = decodeBase91(encoded);
+    const levelCount = bytes[0];
+    const modelCount = bytes[1];
+    const scale = 1 << bytes[2];
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    let offset = 4;
+    const probabilities = new Float32Array(levelCount + 1);
+    probabilities[0] = unseenProbability;
+    for (let level = 1; level <= levelCount; level++) {
+        probabilities[level] = view.getFloat32(offset, true);
+        offset += 4;
+    }
+
+    const dataFrequencies = new Uint16Array(modelCount * (levelCount + 1));
+    for (let model = 0; model < modelCount; model++) {
+        let sum = 0;
+        for (let symbol = 0; symbol < levelCount; symbol++) {
+            const frequency = view.getUint16(offset, true);
+            offset += 2;
+            dataFrequencies[model * (levelCount + 1) + symbol] = frequency;
+            sum += frequency;
+        }
+        dataFrequencies[model * (levelCount + 1) + levelCount] = scale - sum;
+    }
+
+    const modelFrequencies = new Uint16Array(modelCount);
+    let modelFrequencySum = 0;
+    for (let model = 0; model < modelCount - 1; model++) {
+        const frequency = view.getUint16(offset, true);
+        offset += 2;
+        modelFrequencies[model] = frequency;
+        modelFrequencySum += frequency;
+    }
+    modelFrequencies[modelCount - 1] = scale - modelFrequencySum;
+    const modelStreamLength = view.getUint32(offset, true);
+    offset += 4;
+
+    const modelTables = makeEntropyTables(
+        modelFrequencies,
+        1,
+        modelCount,
+        scale,
+    );
+    const modelDecoder = new RansDecoder(bytes, offset, scale, modelCount);
+    const columnModels = new Uint8Array(alphabetSize ** 2);
+    for (let column = 0; column < columnModels.length; column++) {
+        columnModels[column] = modelDecoder.read(
+            0,
+            modelFrequencies,
+            modelTables.cumulative,
+            modelTables.symbols,
+        );
+    }
+
+    const dataTables = makeEntropyTables(
+        dataFrequencies,
+        modelCount,
+        levelCount + 1,
+        scale,
+    );
+    const dataDecoder = new RansDecoder(
+        bytes,
+        offset + modelStreamLength,
+        scale,
+        levelCount + 1,
+    );
+    const probabilityCodes = new Uint8Array(alphabetSize ** 3);
+    for (let second = 0; second < alphabetSize; second++) {
+        for (let character = 0; character < alphabetSize; character++) {
+            const model = columnModels[second * alphabetSize + character];
+            for (let first = 0; first < alphabetSize; first++) {
+                probabilityCodes[
+                    (first * alphabetSize + second) * alphabetSize + character
+                ] = dataDecoder.read(
+                    model,
+                    dataFrequencies,
+                    dataTables.cumulative,
+                    dataTables.symbols,
+                );
+            }
+        }
+    }
+
+    return { depth: 3, probabilityCodes, probabilities };
 }
 
 function characterIndex(word: string, index: number): number {
@@ -210,7 +280,7 @@ export function evaluateFull(
 ): [number, number[]] {
     if (word.length < mc.depth) return [1, []];
 
-    const { contextIndexes, smallCounts, largeCounts, totals } = mc;
+    const { probabilityCodes, probabilities } = mc;
     let first = characterIndexes[word.charCodeAt(0)];
     let second = characterIndexes[word.charCodeAt(1)];
     let probability = 1;
@@ -221,12 +291,10 @@ export function evaluateFull(
         let score = unseenProbability;
         if (first >= 0 && second >= 0 && third >= 0) {
             const prefix = first * alphabetSize + second;
-            const context = contextIndexes[prefix];
-            const count =
-                (context & 0x8000) === 0
-                    ? smallCounts[context * alphabetSize + third]
-                    : largeCounts[(context & 0x7fff) * alphabetSize + third];
-            if (count !== 0) score = count / totals[prefix];
+            const code = probabilityCodes[prefix * alphabetSize + third];
+            if (code !== 0) {
+                score = probabilities[code];
+            }
         }
         scores.push(score);
         probability *= score;
@@ -240,7 +308,7 @@ export function evaluateFull(
 export function evaluate(mc: MarkovChain, word: string): number {
     if (word.length < mc.depth) return 1;
 
-    const { contextIndexes, smallCounts, largeCounts, totals } = mc;
+    const { probabilityCodes, probabilities } = mc;
     let first = characterIndexes[word.charCodeAt(0)];
     let second = characterIndexes[word.charCodeAt(1)];
     let probability = 1;
@@ -250,12 +318,10 @@ export function evaluate(mc: MarkovChain, word: string): number {
         let score = unseenProbability;
         if (first >= 0 && second >= 0 && third >= 0) {
             const prefix = first * alphabetSize + second;
-            const context = contextIndexes[prefix];
-            const count =
-                (context & 0x8000) === 0
-                    ? smallCounts[context * alphabetSize + third]
-                    : largeCounts[(context & 0x7fff) * alphabetSize + third];
-            if (count !== 0) score = count / totals[prefix];
+            const code = probabilityCodes[prefix * alphabetSize + third];
+            if (code !== 0) {
+                score = probabilities[code];
+            }
         }
         probability *= score;
         first = second;
@@ -284,21 +350,19 @@ export function generate(
     if (first < 0 || second < 0) {
         return String.fromCharCode(randomInt(32, 127));
     }
-    const prefix = first * alphabetSize + second;
-    const context = mc.contextIndexes[prefix];
-    if (context === 0) return String.fromCharCode(randomInt(32, 127));
-
     const weights = new Array<number>(128);
+    const prefix = first * alphabetSize + second;
     let total = 0;
     for (let code = 0; code < 128; code++) {
         const index = characterIndexes[code];
-        const count =
-            index < 0
-                ? 0
-                : (context & 0x8000) === 0
-                  ? mc.smallCounts[context * alphabetSize + index]
-                  : mc.largeCounts[(context & 0x7fff) * alphabetSize + index];
-        const weight = count === 0 ? (code === 0 ? 0 : unseenWeight) : count;
+        const probabilityCode =
+            index < 0 ? 0 : mc.probabilityCodes[prefix * alphabetSize + index];
+        const weight =
+            probabilityCode === 0
+                ? code === 0
+                    ? 0
+                    : unseenWeight
+                : mc.probabilities[probabilityCode] * 1_000_000;
         weights[code] = weight;
         total += weight;
     }
