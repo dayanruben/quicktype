@@ -1458,6 +1458,7 @@ async function refsInSchemaForURI(
 class InputJSONSchemaStore extends JSONSchemaStore {
     public constructor(
         private readonly _inputs: Map<string, string>,
+        private readonly _ctx: RunContext,
         private readonly _delegate?: JSONSchemaStore,
     ) {
         super();
@@ -1466,9 +1467,11 @@ class InputJSONSchemaStore extends JSONSchemaStore {
     public async fetch(address: string): Promise<JSONSchema | undefined> {
         const maybeInput = this._inputs.get(address);
         if (maybeInput !== undefined) {
-            return checkJSONSchema(
-                parseJSON(maybeInput, "JSON Schema", address),
-                () => Ref.root(address),
+            return this._ctx.time("parse JSON Schema", () =>
+                checkJSONSchema(
+                    parseJSON(maybeInput, "JSON Schema", address),
+                    () => Ref.root(address),
+                ),
             );
         }
 
@@ -1540,6 +1543,7 @@ export class JSONSchemaInput implements Input<JSONSchemaSourceData> {
         } else {
             this._schemaStore = new InputJSONSchemaStore(
                 this._schemaInputs,
+                ctx,
                 maybeSchemaStore,
             );
             maybeSchemaStore = this._schemaStore;
