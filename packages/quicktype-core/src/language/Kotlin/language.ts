@@ -1,6 +1,7 @@
 import type { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
 import type { RenderContext } from "../../Renderer.js";
 import {
+    BooleanOption,
     EnumOption,
     StringOption,
     getOptionValues,
@@ -26,6 +27,15 @@ export const kotlinOptions = {
             kotlinx: "KotlinX",
         } as const,
         "klaxon",
+    ),
+    // The boolean spelling of `--framework just-types`, so that
+    // `--just-types` works for Kotlin like it does for most other
+    // languages.
+    justTypes: new BooleanOption(
+        "just-types",
+        "Plain types only (same as framework=just-types)",
+        false,
+        "secondary",
     ),
     acronymStyle: acronymOption(AcronymStyleOptions.Pascal),
     packageName: new StringOption("package", "Package", "PACKAGE", "quicktype"),
@@ -60,6 +70,13 @@ export class KotlinTargetLanguage extends TargetLanguage<
         renderContext: RenderContext,
         untypedOptionValues: RendererOptions<Lang>,
     ): ConvenienceRenderer {
+        if (kotlinOptions.justTypes.getValue(untypedOptionValues)) {
+            untypedOptionValues = {
+                ...untypedOptionValues,
+                framework: "just-types",
+            } as RendererOptions<Lang>;
+        }
+
         const options = getOptionValues(kotlinOptions, untypedOptionValues);
 
         switch (options.framework) {

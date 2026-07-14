@@ -117,6 +117,14 @@ export const cSharpOptions = {
         } as const,
         "complete",
     ),
+    // The boolean spelling of `--features just-types`, so that
+    // `--just-types` works for C# like it does for most other languages.
+    justTypes: new BooleanOption(
+        "just-types",
+        "Plain types only (same as features=just-types)",
+        false,
+        "secondary",
+    ),
     baseclass: new EnumOption(
         "base-class",
         "Base class",
@@ -190,6 +198,13 @@ export class CSharpTargetLanguage extends TargetLanguage<
         renderContext: RenderContext,
         untypedOptionValues: RendererOptions<Lang>,
     ): ConvenienceRenderer {
+        if (cSharpOptions.justTypes.getValue(untypedOptionValues)) {
+            untypedOptionValues = {
+                ...untypedOptionValues,
+                features: "just-types",
+            } as RendererOptions<Lang>;
+        }
+
         const options = getOptionValues(cSharpOptions, untypedOptionValues);
 
         switch (options.framework) {

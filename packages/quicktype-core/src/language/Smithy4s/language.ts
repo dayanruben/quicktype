@@ -1,6 +1,7 @@
 import type { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
 import type { RenderContext } from "../../Renderer.js";
 import {
+    BooleanOption,
     EnumOption,
     StringOption,
     getOptionValues,
@@ -22,6 +23,14 @@ export const smithyOptions = {
         "Serialization framework",
         { "just-types": Framework.None } as const,
         "just-types",
+    ),
+    // Smithy only ever generates plain types; the flag is accepted for
+    // consistency with the other languages.
+    justTypes: new BooleanOption(
+        "just-types",
+        "Plain types only (the only mode Smithy supports)",
+        false,
+        "secondary",
     ),
     packageName: new StringOption("package", "Package", "PACKAGE", "quicktype"),
 };
