@@ -15,6 +15,7 @@ import type { Type } from "./Type/Type.js";
 import type { StringTypeMapping } from "./Type/TypeBuilderUtils.js";
 import type { TypeGraph } from "./Type/TypeGraph.js";
 import type { Comment } from "./support/Comments.js";
+import { INT64_RANGE, type IntegerRange } from "./support/IntegerRange.js";
 import { defined } from "./support/Support.js";
 import type { LanguageName, RendererOptions } from "./types.js";
 
@@ -120,5 +121,23 @@ export abstract class TargetLanguage<
 
     public get dateTimeRecognizer(): DateTimeRecognizer {
         return new DefaultDateTimeRecognizer();
+    }
+
+    /**
+     * The inclusive range of whole numbers in input JSON that quicktype
+     * infers as the language's integer type.  Whole numbers outside the
+     * range are inferred as `double` instead, because the integer type
+     * could not round-trip them (issue #2931).  `null` means the
+     * language's integers are arbitrary-precision.
+     *
+     * Languages whose integer width depends on a renderer option (like
+     * cJSON's `integer-size`) override this and inspect
+     * `rendererOptions`, which are the same untyped option values that
+     * `makeRenderer` receives.
+     */
+    public getSupportedIntegerRange(
+        _rendererOptions: Record<string, unknown> = {},
+    ): IntegerRange | null {
+        return INT64_RANGE;
     }
 }

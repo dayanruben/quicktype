@@ -6,6 +6,7 @@ import {
     EnumOption,
     getOptionValues,
 } from "../../RendererOptions/index.js";
+import type { IntegerRange } from "../../support/IntegerRange.js";
 import { TargetLanguage } from "../../TargetLanguage.js";
 import type { StringTypeMapping } from "../../Type/TypeBuilderUtils.js";
 import {
@@ -57,6 +58,11 @@ export const pythonLanguageConfig = {
 export class PythonTargetLanguage extends TargetLanguage<
     typeof pythonLanguageConfig
 > {
+    // Python's integers are arbitrary-precision.
+    public getSupportedIntegerRange(): IntegerRange | null {
+        return null;
+    }
+
     public constructor() {
         super(pythonLanguageConfig);
     }

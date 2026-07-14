@@ -206,6 +206,7 @@ export function jsonInputForTargetLanguage(
     targetLanguage: LanguageName | TargetLanguage,
     languages?: TargetLanguage[],
     handleJSONRefs = false,
+    rendererOptions: Record<string, unknown> = {},
 ): JSONInput<string> {
     if (typeof targetLanguage === "string") {
         targetLanguage = defined(languageNamed(targetLanguage, languages));
@@ -214,6 +215,7 @@ export function jsonInputForTargetLanguage(
     const compressedJSON = new CompressedJSONFromString(
         targetLanguage.dateTimeRecognizer,
         handleJSONRefs,
+        targetLanguage.getSupportedIntegerRange(rendererOptions),
     );
     return new JSONInput(compressedJSON);
 }

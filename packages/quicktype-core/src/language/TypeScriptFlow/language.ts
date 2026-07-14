@@ -1,5 +1,9 @@
 import type { RenderContext } from "../../Renderer.js";
 import { BooleanOption, getOptionValues } from "../../RendererOptions/index.js";
+import {
+    JS_SAFE_INTEGER_RANGE,
+    type IntegerRange,
+} from "../../support/IntegerRange.js";
 import { TargetLanguage } from "../../TargetLanguage.js";
 import type { StringTypeMapping } from "../../Type/TypeBuilderUtils.js";
 import type {
@@ -52,6 +56,10 @@ export const typeScriptLanguageConfig = {
 export class TypeScriptTargetLanguage extends TargetLanguage<
     typeof typeScriptLanguageConfig
 > {
+    public getSupportedIntegerRange(): IntegerRange | null {
+        return JS_SAFE_INTEGER_RANGE;
+    }
+
     public constructor() {
         super(typeScriptLanguageConfig);
     }
@@ -98,6 +106,10 @@ export const flowLanguageConfig = {
 export class FlowTargetLanguage extends TargetLanguage<
     typeof flowLanguageConfig
 > {
+    public getSupportedIntegerRange(): IntegerRange | null {
+        return JS_SAFE_INTEGER_RANGE;
+    }
+
     public constructor() {
         super(flowLanguageConfig);
     }

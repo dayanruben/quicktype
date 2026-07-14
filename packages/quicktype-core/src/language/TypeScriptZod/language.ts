@@ -1,5 +1,9 @@
 import type { RenderContext } from "../../Renderer.js";
 import { BooleanOption, getOptionValues } from "../../RendererOptions/index.js";
+import {
+    JS_SAFE_INTEGER_RANGE,
+    type IntegerRange,
+} from "../../support/IntegerRange.js";
 import { TargetLanguage } from "../../TargetLanguage.js";
 import type { StringTypeMapping } from "../../Type/TypeBuilderUtils.js";
 import type {
@@ -23,6 +27,10 @@ export const typeScriptZodLanguageConfig = {
 export class TypeScriptZodTargetLanguage extends TargetLanguage<
     typeof typeScriptZodLanguageConfig
 > {
+    public getSupportedIntegerRange(): IntegerRange | null {
+        return JS_SAFE_INTEGER_RANGE;
+    }
+
     public constructor() {
         super(typeScriptZodLanguageConfig);
     }
