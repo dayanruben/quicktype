@@ -20,21 +20,22 @@ import { type Sourcelike, maybeAnnotated } from "../../Source.js";
 import { acronymStyle } from "../../support/Acronyms.js";
 import { defined } from "../../support/Support.js";
 import type { TargetLanguage } from "../../TargetLanguage.js";
-import type {
-    ClassProperty,
-    ClassType,
-    EnumType,
-    Type,
+import {
+    type ClassProperty,
+    type ClassType,
+    type EnumType,
+    type Type,
     UnionType,
 } from "../../Type/index.js";
 import {
     directlyReachableSingleNamedType,
     matchType,
     nullableFromUnion,
+    removeNullFromUnion,
 } from "../../Type/TypeUtils.js";
 
 import type { phpOptions } from "./language.js";
-import { phpNameStyle, stringEscape } from "./utils.js";
+import { phpForbiddenClassNames, phpNameStyle, stringEscape } from "./utils.js";
 
 export interface FunctionNames {
     readonly from: Name;
@@ -65,6 +66,10 @@ export class PhpRenderer extends ConvenienceRenderer {
         super(targetLanguage, renderContext);
     }
 
+    protected forbiddenNamesForGlobalNamespace(): readonly string[] {
+        return phpForbiddenClassNames;
+    }
+
     protected forbiddenForObjectProperties(
         _c: ClassType,
         _className: Name,
@@ -88,8 +93,10 @@ export class PhpRenderer extends ConvenienceRenderer {
         return this.getNameStyling("enumCaseNamingFunction");
     }
 
-    protected unionNeedsName(u: UnionType): boolean {
-        return nullableFromUnion(u) === null;
+    protected unionNeedsName(_u: UnionType): boolean {
+        // Unions are represented inline as PHP union type declarations;
+        // no named type is ever emitted for them.
+        return false;
     }
 
     protected namedTypeToNameForTopLevel(type: Type): Type | undefined {
@@ -247,6 +254,179 @@ export class PhpRenderer extends ConvenienceRenderer {
         this.emitLine("}");
     }
 
+    // Union members in runtime-dispatch order: the most specific check
+    // first, so that e.g. an int matches an integer member before a double
+    // member, and class instances are tested before the stdClass check a
+    // map member uses.  `any` goes last because it matches everything.
+    private sortedUnionMembers(u: UnionType): {
+        members: readonly Type[];
+        nullType: Type | null;
+    } {
+        const order = [
+            "class",
+            "enum",
+            "date-time",
+            "uuid",
+            "map",
+            "array",
+            "bool",
+            "integer",
+            "double",
+            "string",
+        ];
+        const [nullType, nonNulls] = removeNullFromUnion(u, (t) => {
+            const i = order.indexOf(t.kind);
+            return i === -1 ? order.length : i;
+        });
+        return { members: Array.from(nonNulls), nullType };
+    }
+
+    // The PHP union type declaration for a non-nullable union, e.g.
+    // `MixedClass|int|string` (requires PHP 8.0).  With `jsonSide` the
+    // types are those of the decoded JSON value instead, where classes
+    // and maps are stdClass and enums and dates are strings.
+    protected phpUnionType(u: UnionType, jsonSide: boolean): Sourcelike {
+        const labels: Record<string, string> = jsonSide
+            ? {
+                  any: "mixed",
+                  array: "array",
+                  bool: "bool",
+                  class: "stdClass",
+                  "date-time": "string",
+                  double: "float",
+                  enum: "string",
+                  integer: "int",
+                  map: "stdClass",
+                  string: "string",
+                  uuid: "string",
+              }
+            : {
+                  any: "mixed",
+                  array: "array",
+                  bool: "bool",
+                  "date-time": "DateTime",
+                  double: "float",
+                  integer: "int",
+                  map: "stdClass",
+                  string: "string",
+                  uuid: "string",
+              };
+        const { members, nullType } = this.sortedUnionMembers(u);
+        const parts: Sourcelike[] = [];
+        const seen = new Set<string>();
+        for (const member of members) {
+            let hint: Sourcelike;
+            const label = labels[member.kind];
+            if (label !== undefined) {
+                // Members can render to the same PHP type, like a string
+                // and a UUID member — mention it only once.
+                if (seen.has(label)) continue;
+                seen.add(label);
+                hint = label;
+            } else if (member.kind === "class" || member.kind === "enum") {
+                hint = this.nameForNamedType(member);
+            } else {
+                throw new Error(
+                    `PHP cannot represent union member type "${member.kind}"`,
+                );
+            }
+
+            if (parts.length > 0) parts.push("|");
+            parts.push(hint);
+        }
+
+        if (nullType !== null) parts.push("|null");
+        return parts;
+    }
+
+    // The runtime check deciding whether a value is this union member.
+    // Returns null for `any`, which matches everything.  With `jsonSide`
+    // the value is a decoded JSON value instead of a PHP-side one.
+    private unionMemberTypeCheck(
+        t: Type,
+        expr: Sourcelike[],
+        jsonSide: boolean,
+    ): Sourcelike[] | null {
+        switch (t.kind) {
+            case "null":
+                return ["is_null(", ...expr, ")"];
+            case "bool":
+                return ["is_bool(", ...expr, ")"];
+            case "integer":
+                return ["is_int(", ...expr, ")"];
+            case "double":
+                // PHP integers are acceptable wherever floats are.
+                return ["is_float(", ...expr, ") || is_int(", ...expr, ")"];
+            case "string":
+            case "uuid":
+                return ["is_string(", ...expr, ")"];
+            case "date-time":
+                return jsonSide
+                    ? ["is_string(", ...expr, ")"]
+                    : [...expr, " instanceof DateTime"];
+            case "enum":
+                return jsonSide
+                    ? ["is_string(", ...expr, ")"]
+                    : [...expr, " instanceof ", this.nameForNamedType(t)];
+            case "class":
+                return jsonSide
+                    ? ["is_object(", ...expr, ")"]
+                    : [...expr, " instanceof ", this.nameForNamedType(t)];
+            case "map":
+                return jsonSide
+                    ? ["is_object(", ...expr, ")"]
+                    : [...expr, " instanceof stdClass"];
+            case "array":
+                return ["is_array(", ...expr, ")"];
+            case "any":
+                return null;
+            default:
+                throw new Error(
+                    `PHP cannot check for union member type "${t.kind}"`,
+                );
+        }
+    }
+
+    // Emits an if/elseif chain over the union's members, dispatching on
+    // the runtime type of `expr`, with `emitNoMatch` as the else branch.
+    private emitUnionDispatch(
+        u: UnionType,
+        expr: Sourcelike[],
+        jsonSide: boolean,
+        emitMember: (t: Type) => void,
+        emitNoMatch: () => void,
+    ): void {
+        const { members, nullType } = this.sortedUnionMembers(u);
+        const all = nullType === null ? members : [nullType, ...members];
+        let first = true;
+        let haveCatchAll = false;
+        for (const member of all) {
+            const check = this.unionMemberTypeCheck(member, expr, jsonSide);
+            if (check === null) {
+                if (first) {
+                    emitMember(member);
+                    return;
+                }
+
+                this.emitLine("} else {");
+                this.indent(() => emitMember(member));
+                haveCatchAll = true;
+                break;
+            }
+
+            this.emitLine(first ? "if (" : "} elseif (", ...check, ") {");
+            first = false;
+            this.indent(() => emitMember(member));
+        }
+
+        if (!haveCatchAll) {
+            this.emitLine("} else {");
+            this.indent(emitNoMatch);
+        }
+
+        this.emitLine("}");
+    }
+
     protected phpType(
         _reference: boolean,
         t: Type,
@@ -276,7 +456,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                 const nullable = nullableFromUnion(unionType);
                 if (nullable !== null)
                     return this.phpType(true, nullable, true, prefix, suffix);
-                return this.nameForNamedType(unionType);
+                return this.phpUnionType(unionType, false);
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "time") {
@@ -305,10 +485,20 @@ export class PhpRenderer extends ConvenienceRenderer {
             (_integerType) => "int",
             (_doubleType) => "float",
             (_stringType) => "string",
-            (arrayType) => [
-                this.phpDocConvertType(className, arrayType.items),
-                "[]",
-            ],
+            (arrayType) => {
+                const itemsDoc = this.phpDocConvertType(
+                    className,
+                    arrayType.items,
+                );
+                if (
+                    arrayType.items instanceof UnionType &&
+                    nullableFromUnion(arrayType.items) === null
+                ) {
+                    return ["(", itemsDoc, ")[]"];
+                }
+
+                return [itemsDoc, "[]"];
+            },
             (_classType) => _classType.getCombinedName(),
             (_mapType) => "stdClass",
             (enumType) => this.nameForNamedType(enumType),
@@ -321,7 +511,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     ];
                 }
 
-                throw new Error("union are not supported");
+                return this.phpUnionType(unionType, false);
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
@@ -356,7 +546,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return ["?", this.phpConvertType(className, nullable)];
                 }
 
-                throw new Error("union are not supported");
+                return this.phpUnionType(unionType, true);
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
@@ -435,7 +625,19 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return;
                 }
 
-                throw new Error("union are not supported");
+                this.emitUnionDispatch(
+                    unionType,
+                    args,
+                    false,
+                    (member) =>
+                        this.phpToObjConvert(className, member, lhs, args),
+                    () =>
+                        this.emitLine(
+                            "throw new Exception('Union value has no matching member in ",
+                            className,
+                            "');",
+                        ),
+                );
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
@@ -546,7 +748,19 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return;
                 }
 
-                throw new Error("union are not supported");
+                this.emitUnionDispatch(
+                    unionType,
+                    args,
+                    true,
+                    (member) =>
+                        this.phpFromObjConvert(className, member, lhs, args),
+                    () =>
+                        this.emitLine(
+                            "throw new Exception('Cannot deserialize union value in ",
+                            className,
+                            "');",
+                        ),
+                );
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
@@ -717,7 +931,16 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return;
                 }
 
-                throw new Error(`union are not supported:${unionType}`);
+                // Any member's sample is a valid sample for the union.
+                const { members } = this.sortedUnionMembers(unionType);
+                this.phpSampleConvert(
+                    className,
+                    defined(members[0]),
+                    lhs,
+                    args,
+                    idx,
+                    suffix,
+                );
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
@@ -832,7 +1055,26 @@ export class PhpRenderer extends ConvenienceRenderer {
                     return;
                 }
 
-                throw new Error("not implemented");
+                this.emitUnionDispatch(
+                    unionType,
+                    [scopeAttrName],
+                    false,
+                    (member) =>
+                        this.phpValidate(
+                            className,
+                            member,
+                            attrName,
+                            scopeAttrName,
+                        ),
+                    () =>
+                        this.emitLine(
+                            'throw new Exception("Attribute Error:',
+                            className,
+                            "::",
+                            attrName,
+                            '");',
+                        ),
+                );
             },
             (transformedStringType) => {
                 if (transformedStringType.kind === "date-time") {
