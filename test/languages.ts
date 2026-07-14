@@ -427,6 +427,7 @@ export const RubyLanguage: Language = {
         "optional-union.json",
         "union-constructor-clash.json",
         "unions.json",
+        "php-mixed-union.json",
         "nbl-stats.json",
         "kitchen-sink.json",
     ],
@@ -998,6 +999,7 @@ I havea no idea how to encode these tests correctly.
         "combinations3.json",
         "combinations4.json",
         "unions.json",
+        "php-mixed-union.json",
         "nst-test-suite.json",
 
         // Scala3 has the same prelude-shadowing bug that this input
@@ -1085,6 +1087,7 @@ I havea no idea how to encode these tests correctly.
         "combinations3.json",
         "combinations4.json",
         "unions.json",
+        "php-mixed-union.json",
         "nst-test-suite.json",
     ],
     skipSchema: [],
@@ -1137,6 +1140,7 @@ export const KotlinLanguage: Language = {
         "combinations3.json",
         "combinations4.json",
         "unions.json",
+        "php-mixed-union.json",
         "nst-test-suite.json",
         // Klaxon does not support top-level primitives
         "no-classes.json",
@@ -1225,6 +1229,7 @@ export const KotlinJacksonLanguage: Language = {
         "combinations3.json",
         "combinations4.json",
         "unions.json",
+        "php-mixed-union.json",
         "nst-test-suite.json",
         // Klaxon does not support top-level primitives
         "no-classes.json",
@@ -1487,9 +1492,37 @@ export const PHPLanguage: Language = {
         "uuids.json",
         "nested-objects.json",
         "bug2663.json",
+        // Union-heavy inputs: PHP renders non-nullable unions as inline
+        // PHP 8.0 union type declarations with runtime dispatch.
+        "unions.json",
+        "union-constructor-clash.json",
+        "combinations1.json",
+        "combinations2.json",
+        "combinations3.json",
+        "combinations4.json",
+        "nst-test-suite.json",
+        "kitchen-sink.json",
+        "list.json",
+        "bug427.json",
+        // The motivating repro for non-nullable union support: a
+        // heterogeneous array under a PHP-reserved-word property name.
+        "php-mixed-union.json",
     ],
     skipMiscJSON: true,
-    skipSchema: [],
+    skipSchema: [
+        // PHP class names are case-insensitive, but the namer dedups
+        // case-sensitively, so this declares classes that collide (same
+        // reason Java and Python skip it).
+        "keyword-unions.schema",
+        // Unions are inlined as PHP union type declarations, so a
+        // top-level union produces no named TopLevel class for the driver.
+        "recursive-union-flattening.schema",
+        // The generated code for top-level enums is incompatible with the
+        // driver.
+        "top-level-enum.schema",
+        // The driver does not support top-level arrays.
+        "union.schema",
+    ],
     rendererOptions: {},
     quickTestRendererOptions: [],
     sourceFiles: ["src/language/Php/index.ts"],

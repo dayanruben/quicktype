@@ -1589,6 +1589,7 @@ export const allFixtures: Fixture[] = [
     new JSONSchemaFixture(languages.RustLanguage),
     new JSONSchemaFixture(languages.RubyLanguage),
     new JSONSchemaFixture(languages.PythonLanguage),
+    new JSONSchemaFixture(languages.PHPLanguage),
     new JSONSchemaFixture(languages.ElmLanguage),
     new JSONSchemaFixture(languages.SwiftLanguage),
     new JSONSchemaFixture(languages.TypeScriptLanguage),
