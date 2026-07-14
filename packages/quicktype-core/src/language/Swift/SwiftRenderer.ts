@@ -500,7 +500,8 @@ export class SwiftRenderer extends ConvenienceRenderer {
 
         const isClass = this._options.useClasses || this.isCycleBreakerType(c);
         const structOrClass = isClass ? "class" : "struct";
-        const finalPrefix = isClass ? "final " : "";
+        const finalPrefix =
+            isClass && this._options.finalClasses ? "final " : "";
 
         if (isClass && this._options.objcSupport) {
             // [Michael Fey (@MrRooni), 2019-4-24] Swift 5 or greater, must come before the access declaration for the class.
@@ -1165,12 +1166,14 @@ encoder.dateEncodingStrategy = .formatted(formatter)`);
                 this.emitLine(
                     this.objcMembersDeclaration,
                     this.accessLevel,
-                    "final class JSONNull: NSObject, Codable {",
+                    this._options.finalClasses ? "final " : "",
+                    "class JSONNull: NSObject, Codable {",
                 );
             } else {
                 this.emitLine(
                     this.accessLevel,
-                    "final class JSONNull: Codable, Hashable {",
+                    this._options.finalClasses ? "final " : "",
+                    "class JSONNull: Codable, Hashable {",
                 );
             }
 
@@ -1216,7 +1219,7 @@ encoder.dateEncodingStrategy = .formatted(formatter)`);
 
         if (this._needAny) {
             this.ensureBlankLine();
-            this.emitMultiline(`final class JSONCodingKey: CodingKey {
+            this.emitMultiline(`${this._options.finalClasses ? "final " : ""}class JSONCodingKey: CodingKey {
 	let key: String
 	
 	required init?(intValue: Int) {
@@ -1241,12 +1244,14 @@ encoder.dateEncodingStrategy = .formatted(formatter)`);
                 this.emitLine(
                     this.objcMembersDeclaration,
                     this.accessLevel,
-                    "final class JSONAny: NSObject, Codable {",
+                    this._options.finalClasses ? "final " : "",
+                    "class JSONAny: NSObject, Codable {",
                 );
             } else {
                 this.emitLine(
                     this.accessLevel,
-                    "final class JSONAny: Codable {",
+                    this._options.finalClasses ? "final " : "",
+                    "class JSONAny: Codable {",
                 );
             }
 

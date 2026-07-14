@@ -36,21 +36,51 @@ function classDeclarations(output: string): string[] {
 }
 
 describe("Swift class generation", () => {
-    test("marks requested model classes as final", async () => {
-        const output = await renderSwift(
-            {
+    const modelSchema = {
+        type: "object",
+        properties: {
+            child: {
+                type: "object",
+                properties: { name: { type: "string" } },
+                required: ["name"],
+            },
+        },
+        required: ["child"],
+    };
+    const recursiveSchema = {
+        $ref: "#/definitions/Node",
+        definitions: {
+            Node: {
                 type: "object",
                 properties: {
-                    child: {
-                        type: "object",
-                        properties: { name: { type: "string" } },
-                        required: ["name"],
-                    },
+                    next: { $ref: "#/definitions/Node" },
+                    value: {},
                 },
-                required: ["child"],
+                required: ["value"],
             },
-            { "struct-or-class": "class" },
+        },
+    };
+
+    test("keeps classes open by default", async () => {
+        const modelOutput = await renderSwift(modelSchema, {
+            "struct-or-class": "class",
+        });
+        const recursiveOutput = await renderSwift(recursiveSchema);
+        const declarations = classDeclarations(
+            `${modelOutput}\n${recursiveOutput}`,
         );
+
+        expect(declarations.length).toBeGreaterThan(0);
+        expect(
+            declarations.every((line) => !line.includes("final class")),
+        ).toBe(true);
+    });
+
+    test("marks requested model classes as final when enabled", async () => {
+        const output = await renderSwift(modelSchema, {
+            "struct-or-class": "class",
+            "final-classes": "true",
+        });
         const declarations = classDeclarations(output);
 
         expect(declarations).toHaveLength(2);
@@ -63,18 +93,8 @@ describe("Swift class generation", () => {
     });
 
     test("marks cycle breakers and Codable helper classes as final", async () => {
-        const output = await renderSwift({
-            $ref: "#/definitions/Node",
-            definitions: {
-                Node: {
-                    type: "object",
-                    properties: {
-                        next: { $ref: "#/definitions/Node" },
-                        value: {},
-                    },
-                    required: ["value"],
-                },
-            },
+        const output = await renderSwift(recursiveSchema, {
+            "final-classes": "true",
         });
         const declarations = classDeclarations(output);
 
