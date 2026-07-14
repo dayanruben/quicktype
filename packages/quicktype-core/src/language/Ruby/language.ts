@@ -5,6 +5,7 @@ import {
     StringOption,
     getOptionValues,
 } from "../../RendererOptions/index.js";
+import type { IntegerRange } from "../../support/IntegerRange.js";
 import { TargetLanguage } from "../../TargetLanguage.js";
 import type { LanguageName, RendererOptions } from "../../types.js";
 
@@ -41,6 +42,11 @@ export const rubyLanguageConfig = {
 export class RubyTargetLanguage extends TargetLanguage<
     typeof rubyLanguageConfig
 > {
+    // Ruby's integers are arbitrary-precision.
+    public getSupportedIntegerRange(): IntegerRange | null {
+        return null;
+    }
+
     public constructor() {
         super(rubyLanguageConfig);
     }

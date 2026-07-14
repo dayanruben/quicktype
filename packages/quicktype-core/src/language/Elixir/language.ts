@@ -4,6 +4,7 @@ import {
     StringOption,
     getOptionValues,
 } from "../../RendererOptions/index.js";
+import type { IntegerRange } from "../../support/IntegerRange.js";
 import { TargetLanguage } from "../../TargetLanguage.js";
 import type { LanguageName, RendererOptions } from "../../types.js";
 
@@ -28,6 +29,11 @@ export const elixirLanguageConfig = {
 export class ElixirTargetLanguage extends TargetLanguage<
     typeof elixirLanguageConfig
 > {
+    // Elixir's integers are arbitrary-precision.
+    public getSupportedIntegerRange(): IntegerRange | null {
+        return null;
+    }
+
     public constructor() {
         super(elixirLanguageConfig);
     }
