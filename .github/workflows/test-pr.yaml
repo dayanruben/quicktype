@@ -50,7 +50,7 @@ jobs:
                     # - swift,schema-swift # pgp issue
                     - javascript-prop-types
                     - ruby
-                    - php
+                    - php,schema-php
                     - scala3,schema-scala3
                     - elixir,schema-elixir,graphql-elixir
                     - comment-injection-treesitter,comment-injection-typescript,comment-injection-typescript-zod,comment-injection-typescript-effect-schema
