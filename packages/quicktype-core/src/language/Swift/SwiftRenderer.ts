@@ -500,6 +500,7 @@ export class SwiftRenderer extends ConvenienceRenderer {
 
         const isClass = this._options.useClasses || this.isCycleBreakerType(c);
         const structOrClass = isClass ? "class" : "struct";
+        const finalPrefix = isClass ? "final " : "";
 
         if (isClass && this._options.objcSupport) {
             // [Michael Fey (@MrRooni), 2019-4-24] Swift 5 or greater, must come before the access declaration for the class.
@@ -508,6 +509,7 @@ export class SwiftRenderer extends ConvenienceRenderer {
 
         this.emitBlockWithAccess(
             [
+                finalPrefix,
                 structOrClass,
                 " ",
                 className,
@@ -1163,12 +1165,12 @@ encoder.dateEncodingStrategy = .formatted(formatter)`);
                 this.emitLine(
                     this.objcMembersDeclaration,
                     this.accessLevel,
-                    "class JSONNull: NSObject, Codable {",
+                    "final class JSONNull: NSObject, Codable {",
                 );
             } else {
                 this.emitLine(
                     this.accessLevel,
-                    "class JSONNull: Codable, Hashable {",
+                    "final class JSONNull: Codable, Hashable {",
                 );
             }
 
@@ -1214,7 +1216,7 @@ encoder.dateEncodingStrategy = .formatted(formatter)`);
 
         if (this._needAny) {
             this.ensureBlankLine();
-            this.emitMultiline(`class JSONCodingKey: CodingKey {
+            this.emitMultiline(`final class JSONCodingKey: CodingKey {
 	let key: String
 	
 	required init?(intValue: Int) {
@@ -1239,10 +1241,13 @@ encoder.dateEncodingStrategy = .formatted(formatter)`);
                 this.emitLine(
                     this.objcMembersDeclaration,
                     this.accessLevel,
-                    "class JSONAny: NSObject, Codable {",
+                    "final class JSONAny: NSObject, Codable {",
                 );
             } else {
-                this.emitLine(this.accessLevel, "class JSONAny: Codable {");
+                this.emitLine(
+                    this.accessLevel,
+                    "final class JSONAny: Codable {",
+                );
             }
 
             this.ensureBlankLine();
