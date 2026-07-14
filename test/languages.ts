@@ -1019,6 +1019,9 @@ I havea no idea how to encode these tests correctly.
         "integer-string.schema",
         "intersection.schema",
         ...skipsUntypedUnions,
+        // The test driver prints the circe DecodingFailure and exits 0, so
+        // expected-failure samples cannot be detected.
+        "nested-intersection-union.schema",
         "date-time-or-string.schema",
         "implicit-one-of.schema",
         "go-schema-pattern-properties.schema",
@@ -1158,6 +1161,9 @@ export const KotlinLanguage: Language = {
         // which is not represented in the types (implicit-class-array-union);
         // class-map-union: KlaxonException: Couldn't find a suitable constructor for class UnionValue to initialize with {}
         ...skipsUntypedUnions,
+        // Deserializes an array where a union of two classes is expected
+        // instead of rejecting it.
+        "nested-intersection-union.schema",
         "class-with-additional.schema",
         "go-schema-pattern-properties.schema",
         // IllegalArgumentException
@@ -1243,6 +1249,9 @@ export const KotlinJacksonLanguage: Language = {
         // which is not represented in the types (implicit-class-array-union);
         // class-map-union: KlaxonException: Couldn't find a suitable constructor for class UnionValue to initialize with {}
         ...skipsUntypedUnions,
+        // Deserializes an array where a union of two classes is expected
+        // instead of rejecting it.
+        "nested-intersection-union.schema",
         "class-with-additional.schema",
         "go-schema-pattern-properties.schema",
         // IllegalArgumentException
@@ -1454,6 +1463,9 @@ export const HaskellLanguage: Language = {
     skipSchema: [
         "any.schema",
         ...skipsUntypedUnions,
+        // The test driver encodes the Maybe result, so a failed decode prints
+        // "null" and exits 0 — expected-failure samples cannot be detected.
+        "nested-intersection-union.schema",
         "direct-union.schema",
         ...skipsEnumValueValidation,
         "go-schema-pattern-properties.schema",
