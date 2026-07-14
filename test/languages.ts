@@ -1141,8 +1141,6 @@ export const KotlinLanguage: Language = {
         "nst-test-suite.json",
         // Klaxon does not support top-level primitives
         "no-classes.json",
-        // Klaxon cannot deserialize empty object map values as JsonObject: #2881
-        "bug2037.json",
         // These should be enabled
         "nbl-stats.json",
         // TODO Investigate these
