@@ -17,25 +17,16 @@ import { KotlinRenderer } from "./KotlinRenderer.js";
 import { KotlinXRenderer } from "./KotlinXRenderer.js";
 
 export const kotlinOptions = {
+    justTypes: new BooleanOption("just-types", "Plain types only", false),
     framework: new EnumOption(
         "framework",
         "Serialization framework",
         {
-            "just-types": "None",
             jackson: "Jackson",
             klaxon: "Klaxon",
             kotlinx: "KotlinX",
         } as const,
         "klaxon",
-    ),
-    // The boolean spelling of `--framework just-types`, so that
-    // `--just-types` works for Kotlin like it does for most other
-    // languages.
-    justTypes: new BooleanOption(
-        "just-types",
-        "Plain types only (same as framework=just-types)",
-        false,
-        "secondary",
     ),
     acronymStyle: acronymOption(AcronymStyleOptions.Pascal),
     packageName: new StringOption("package", "Package", "PACKAGE", "quicktype"),
@@ -70,18 +61,14 @@ export class KotlinTargetLanguage extends TargetLanguage<
         renderContext: RenderContext,
         untypedOptionValues: RendererOptions<Lang>,
     ): ConvenienceRenderer {
-        if (kotlinOptions.justTypes.getValue(untypedOptionValues)) {
-            untypedOptionValues = {
-                ...untypedOptionValues,
-                framework: "just-types",
-            } as RendererOptions<Lang>;
-        }
-
         const options = getOptionValues(kotlinOptions, untypedOptionValues);
 
+        // `--just-types` wins over whatever `--framework` says.
+        if (options.justTypes) {
+            return new KotlinRenderer(this, renderContext, options);
+        }
+
         switch (options.framework) {
-            case "None":
-                return new KotlinRenderer(this, renderContext, options);
             case "Jackson":
                 return new KotlinJacksonRenderer(this, renderContext, options);
             case "Klaxon":

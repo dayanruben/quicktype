@@ -15,24 +15,15 @@ import { Scala3Renderer } from "./Scala3Renderer.js";
 import { UpickleRenderer } from "./UpickleRenderer.js";
 
 export const scala3Options = {
+    justTypes: new BooleanOption("just-types", "Plain types only", false),
     framework: new EnumOption(
         "framework",
         "Serialization framework",
         {
-            "just-types": "None",
             circe: "Circe",
             upickle: "Upickle",
         } as const,
-        "just-types",
-    ),
-    // The boolean spelling of `--framework just-types`, so that
-    // `--just-types` works for Scala like it does for most other
-    // languages.
-    justTypes: new BooleanOption(
-        "just-types",
-        "Plain types only (same as framework=just-types)",
-        false,
-        "secondary",
+        "circe",
     ),
     packageName: new StringOption("package", "Package", "PACKAGE", "quicktype"),
 };
@@ -66,18 +57,14 @@ export class Scala3TargetLanguage extends TargetLanguage<
         renderContext: RenderContext,
         untypedOptionValues: RendererOptions<Lang>,
     ): ConvenienceRenderer {
-        if (scala3Options.justTypes.getValue(untypedOptionValues)) {
-            untypedOptionValues = {
-                ...untypedOptionValues,
-                framework: "just-types",
-            } as RendererOptions<Lang>;
-        }
-
         const options = getOptionValues(scala3Options, untypedOptionValues);
 
+        // `--just-types` wins over whatever `--framework` says.
+        if (options.justTypes) {
+            return new Scala3Renderer(this, renderContext, options);
+        }
+
         switch (options.framework) {
-            case "None":
-                return new Scala3Renderer(this, renderContext, options);
             case "Upickle":
                 return new UpickleRenderer(this, renderContext, options);
             case "Circe":

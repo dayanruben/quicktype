@@ -1,8 +1,8 @@
-// Most languages spell "generate plain types without (de)serialization
-// helpers" as a `just-types` boolean option, but C# spelled it
-// `features=just-types` and Kotlin/Scala/Smithy `framework=just-types`, so
-// the CLI's `--just-types` flag was rejected for those languages.  They now
-// also accept `just-types`, which forces the corresponding enum option.
+// Every quicktype language spells "generate plain types without
+// (de)serialization helpers" as the boolean `just-types` option.  C#'s
+// `features=just-types` / `features=just-types-and-namespace` and Kotlin's,
+// Scala 3's, and Smithy4s's `framework=just-types` are gone; the boolean
+// wins over a conflicting explicit enum value.
 import { describe, expect, test } from "vitest";
 
 import {
@@ -15,7 +15,7 @@ import {
 
 async function linesFor(
     lang: LanguageName,
-    rendererOptions: RendererOptions,
+    rendererOptions: RendererOptions = {},
 ): Promise<string> {
     const jsonInput = jsonInputForTargetLanguage(lang);
     await jsonInput.addSource({
@@ -28,39 +28,111 @@ async function linesFor(
     return result.lines.join("\n");
 }
 
-describe("just-types is accepted by every enum-spelled language", () => {
-    test("C#: just-types matches features=just-types", async () => {
-        const viaBoolean = await linesFor("csharp", { "just-types": true });
-        const viaEnum = await linesFor("csharp", { features: "just-types" });
-        expect(viaBoolean).toEqual(viaEnum);
-        expect(viaBoolean).not.toContain("JsonConverter");
+describe("just-types generates plain types in every language", () => {
+    test("C#: no attributes, no helpers, but a namespace", async () => {
+        const output = await linesFor("csharp", { "just-types": true });
+        expect(output).toContain("namespace QuickType");
+        expect(output).toContain("public partial class Person");
+        expect(output).not.toContain("JsonConverter");
+        expect(output).not.toContain("JsonProperty");
     });
 
-    test("Kotlin: just-types matches framework=just-types", async () => {
-        const viaBoolean = await linesFor("kotlin", { "just-types": true });
-        const viaEnum = await linesFor("kotlin", { framework: "just-types" });
-        expect(viaBoolean).toEqual(viaEnum);
-        expect(viaBoolean).not.toContain("Klaxon");
+    test("Kotlin: plain data classes, no Klaxon", async () => {
+        const output = await linesFor("kotlin", { "just-types": true });
+        expect(output).toContain("data class Person");
+        expect(output).not.toContain("Klaxon");
     });
 
-    test("Scala: just-types matches framework=just-types", async () => {
-        const viaBoolean = await linesFor("scala3", { "just-types": true });
-        const viaEnum = await linesFor("scala3", { framework: "just-types" });
-        expect(viaBoolean).toEqual(viaEnum);
+    test("Scala 3: plain case classes, no circe", async () => {
+        const output = await linesFor("scala3", { "just-types": true });
+        expect(output).toContain("case class Person");
+        expect(output).not.toContain("circe");
     });
 
-    test("Smithy: just-types is accepted", async () => {
+    test("Smithy: accepted (plain types is the only mode)", async () => {
         const viaBoolean = await linesFor("smithy4a", { "just-types": true });
-        const viaDefault = await linesFor("smithy4a", {});
-        expect(viaBoolean).toEqual(viaDefault);
+        expect(viaBoolean).toContain("structure Person");
+        expect(viaBoolean).toEqual(await linesFor("smithy4a"));
+    });
+});
+
+describe("the removed enum spellings are errors", () => {
+    // The old spellings aren't valid `RendererOptions` anymore, which is
+    // the point: they must also fail for API callers who evade the types.
+    test("C#: features=just-types", async () => {
+        const options = { features: "just-types" } as RendererOptions;
+        await expect(linesFor("csharp", options)).rejects.toThrow(
+            "Unknown value just-types for option features",
+        );
     });
 
-    test("the boolean wins over a conflicting enum value", async () => {
-        const viaBoolean = await linesFor("kotlin", {
+    test("C#: features=just-types-and-namespace", async () => {
+        const options = {
+            features: "just-types-and-namespace",
+        } as RendererOptions;
+        await expect(linesFor("csharp", options)).rejects.toThrow(
+            "Unknown value just-types-and-namespace for option features",
+        );
+    });
+
+    test("Kotlin: framework=just-types", async () => {
+        const options = { framework: "just-types" } as RendererOptions;
+        await expect(linesFor("kotlin", options)).rejects.toThrow(
+            "Unknown value just-types for option framework",
+        );
+    });
+
+    test("Scala 3: framework=just-types", async () => {
+        const options = { framework: "just-types" } as RendererOptions;
+        await expect(linesFor("scala3", options)).rejects.toThrow(
+            "Unknown value just-types for option framework",
+        );
+    });
+});
+
+describe("just-types wins over a conflicting enum option", () => {
+    test("C#: just-types beats features=attributes-only", async () => {
+        const output = await linesFor("csharp", {
+            "just-types": true,
+            features: "attributes-only",
+        });
+        expect(output).toEqual(
+            await linesFor("csharp", { "just-types": true }),
+        );
+        expect(output).not.toContain("JsonProperty");
+    });
+
+    test("Kotlin: just-types beats framework=jackson", async () => {
+        const output = await linesFor("kotlin", {
             "just-types": true,
             framework: "jackson",
         });
-        const plain = await linesFor("kotlin", { framework: "just-types" });
-        expect(viaBoolean).toEqual(plain);
+        expect(output).toEqual(
+            await linesFor("kotlin", { "just-types": true }),
+        );
+        expect(output).not.toContain("jackson");
+    });
+
+    test("Scala 3: just-types beats framework=upickle", async () => {
+        const output = await linesFor("scala3", {
+            "just-types": true,
+            framework: "upickle",
+        });
+        expect(output).toEqual(
+            await linesFor("scala3", { "just-types": true }),
+        );
+        expect(output).not.toContain("upickle");
+    });
+});
+
+describe("framework defaults", () => {
+    test("Scala 3 defaults to circe", async () => {
+        const output = await linesFor("scala3");
+        expect(output).toContain("io.circe");
+    });
+
+    test("Kotlin defaults to Klaxon", async () => {
+        const output = await linesFor("kotlin");
+        expect(output).toContain("com.beust.klaxon");
     });
 });
