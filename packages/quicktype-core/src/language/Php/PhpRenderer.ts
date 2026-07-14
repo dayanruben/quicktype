@@ -74,7 +74,9 @@ export class PhpRenderer extends ConvenienceRenderer {
         _c: ClassType,
         _className: Name,
     ): ForbiddenWordsInfo {
-        return { names: [], includeGlobalForbidden: true };
+        // `$this` is the only variable name PHP reserves; a property named
+        // "this" would produce an illegal `$this` constructor parameter.
+        return { names: ["this"], includeGlobalForbidden: true };
     }
 
     protected makeNamedTypeNamer(): Namer {
@@ -364,10 +366,30 @@ export class PhpRenderer extends ConvenienceRenderer {
                 return jsonSide
                     ? ["is_string(", ...expr, ")"]
                     : [...expr, " instanceof DateTime"];
-            case "enum":
-                return jsonSide
-                    ? ["is_string(", ...expr, ")"]
-                    : [...expr, " instanceof ", this.nameForNamedType(t)];
+            case "enum": {
+                if (!jsonSide) {
+                    return [...expr, " instanceof ", this.nameForNamedType(t)];
+                }
+
+                // On the JSON side an enum value is a string, but a plain
+                // string member may share the union, so check membership in
+                // the enum's values rather than just `is_string`.
+                const check: Sourcelike[] = [
+                    "is_string(",
+                    ...expr,
+                    ") && in_array(",
+                    ...expr,
+                    ", [",
+                ];
+                let first = true;
+                for (const jsonName of (t as EnumType).cases) {
+                    if (!first) check.push(", ");
+                    check.push("'", stringEscape(jsonName), "'");
+                    first = false;
+                }
+                check.push("], true)");
+                return check;
+            }
             case "class":
                 return jsonSide
                     ? ["is_object(", ...expr, ")"]
@@ -441,9 +463,9 @@ export class PhpRenderer extends ConvenienceRenderer {
         return matchType<Sourcelike>(
             t,
             (_anyType) =>
-                maybeAnnotated(isOptional, anyTypeIssueAnnotation, "Object"),
+                maybeAnnotated(isOptional, anyTypeIssueAnnotation, "mixed"),
             (_nullType) =>
-                maybeAnnotated(isOptional, nullTypeIssueAnnotation, "Object"),
+                maybeAnnotated(isOptional, nullTypeIssueAnnotation, "mixed"),
             (_boolType) => optionalize("bool"),
             (_integerType) => optionalize("int"),
             (_doubleType) => optionalize("float"),
@@ -468,10 +490,10 @@ export class PhpRenderer extends ConvenienceRenderer {
                 }
 
                 if (transformedStringType.kind === "date-time") {
-                    return "DateTime";
+                    return optionalize("DateTime");
                 }
 
-                return "string";
+                return optionalize("string");
             },
         );
     }
@@ -530,8 +552,8 @@ export class PhpRenderer extends ConvenienceRenderer {
     protected phpConvertType(className: Name, t: Type): Sourcelike {
         return matchType<Sourcelike>(
             t,
-            (_anyType) => "any",
-            (_nullType) => "null",
+            (_anyType) => "mixed",
+            (_nullType) => "mixed",
             (_boolType) => "bool",
             (_integerType) => "int",
             (_doubleType) => "float",
@@ -743,7 +765,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                         this.phpFromObjConvert(className, nullable, lhs, args),
                     );
                     this.emitLine("} else {");
-                    this.indent(() => this.emitLine("return null;"));
+                    this.indent(() => this.emitLine(...lhs, " null;"));
                     this.emitLine("}");
                     return;
                 }
@@ -883,7 +905,7 @@ export class PhpRenderer extends ConvenienceRenderer {
                         "",
                     );
                 });
-                this.emitLine("); /* ", `${idx}`, ":", args, "*/");
+                this.emitLine(")", suffix, " /* ", `${idx}`, ":", args, "*/");
             },
             (classType) =>
                 this.emitLine(
@@ -898,16 +920,30 @@ export class PhpRenderer extends ConvenienceRenderer {
                     "*/",
                 ),
             (mapType) => {
-                this.emitLine("$out = new stdClass();");
-                this.phpSampleConvert(
-                    className,
-                    mapType.values,
-                    ["$out->{'", className, "'} = "],
+                // An immediately-invoked closure, so the sample is an
+                // expression and can nest inside arrays and other maps.
+                this.emitLine(...lhs, " (function () {");
+                this.indent(() => {
+                    this.emitLine("$out = new stdClass();");
+                    this.phpSampleConvert(
+                        className,
+                        mapType.values,
+                        ["$out->{'", className, "'} = "],
+                        args,
+                        idx,
+                        ";",
+                    );
+                    this.emitLine("return $out;");
+                });
+                this.emitLine(
+                    "})()",
+                    suffix,
+                    " /* ",
+                    `${idx}`,
+                    ":",
                     args,
-                    idx,
-                    ";",
+                    "*/",
                 );
-                this.emitLine("return $out;");
             },
             (enumType) =>
                 this.emitLine(
@@ -995,11 +1031,36 @@ export class PhpRenderer extends ConvenienceRenderer {
 
         matchType(
             t,
-            (_anyType) => is("defined"),
+            (_anyType) => {
+                // Every value is a valid `any`; there is nothing to check.
+                // (This used to call `defined()`, which tests whether a
+                // *constant* of the given name exists and throws for
+                // non-string arguments.)
+            },
             (_nullType) => is("is_null"),
             (_boolType) => is("is_bool"),
             (_integerType) => is("is_integer"),
-            (_doubleType) => is("is_float"),
+            (_doubleType) => {
+                // PHP integers are acceptable wherever floats are, and
+                // json_decode gives an int for a whole JSON number.
+                this.emitBlock(
+                    [
+                        "if (!is_float(",
+                        scopeAttrName,
+                        ") && !is_int(",
+                        scopeAttrName,
+                        "))",
+                    ],
+                    () =>
+                        this.emitLine(
+                            'throw new Exception("Attribute Error:',
+                            className,
+                            "::",
+                            attrName,
+                            '");',
+                        ),
+                );
+            },
             (_stringType) => is("is_string"),
             (arrayType) => {
                 is("is_array");
@@ -1462,6 +1523,12 @@ export class PhpRenderer extends ConvenienceRenderer {
                             p = "|| ";
                         },
                     );
+                    if (lines.length === 0) {
+                        // A class without properties has nothing to check.
+                        this.emitLine("return true;");
+                        return;
+                    }
+
                     lines.forEach((line, jdx) => {
                         this.emitLine(
                             ...line,
