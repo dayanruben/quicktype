@@ -13,9 +13,7 @@ import {
     quicktype,
 } from "../../packages/quicktype-core/src/index.js";
 
-async function kotlinKlaxonForSamples(
-    samples: string[],
-): Promise<string> {
+async function kotlinKlaxonForSamples(samples: string[]): Promise<string> {
     const jsonInput = jsonInputForTargetLanguage("kotlin");
     await jsonInput.addSource({ name: "TopLevel", samples });
 
