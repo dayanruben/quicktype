@@ -1,6 +1,7 @@
 import type { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
 import type { RenderContext } from "../../Renderer.js";
 import {
+    BooleanOption,
     EnumOption,
     StringOption,
     getOptionValues,
@@ -16,11 +17,11 @@ import { KotlinRenderer } from "./KotlinRenderer.js";
 import { KotlinXRenderer } from "./KotlinXRenderer.js";
 
 export const kotlinOptions = {
+    justTypes: new BooleanOption("just-types", "Plain types only", false),
     framework: new EnumOption(
         "framework",
         "Serialization framework",
         {
-            "just-types": "None",
             jackson: "Jackson",
             klaxon: "Klaxon",
             kotlinx: "KotlinX",
@@ -62,9 +63,12 @@ export class KotlinTargetLanguage extends TargetLanguage<
     ): ConvenienceRenderer {
         const options = getOptionValues(kotlinOptions, untypedOptionValues);
 
+        // `--just-types` wins over whatever `--framework` says.
+        if (options.justTypes) {
+            return new KotlinRenderer(this, renderContext, options);
+        }
+
         switch (options.framework) {
-            case "None":
-                return new KotlinRenderer(this, renderContext, options);
             case "Jackson":
                 return new KotlinJacksonRenderer(this, renderContext, options);
             case "Klaxon":

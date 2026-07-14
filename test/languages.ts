@@ -1089,7 +1089,7 @@ I havea no idea how to encode these tests correctly.
     ],
     skipSchema: [],
     skipMiscJSON: false,
-    rendererOptions: { framework: "just-types" },
+    rendererOptions: { "just-types": "true" },
     quickTestRendererOptions: [],
     sourceFiles: ["src/language/Smithy4s/index.ts"],
 };
