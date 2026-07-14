@@ -113,10 +113,11 @@ export interface NonInferenceOptions<Lang extends LanguageName = LanguageName> {
      */
     outputFilename: string;
     /** Options for the target language's renderer */
-    rendererOptions: RendererOptions<Lang>;
+    rendererOptions: Partial<RendererOptions<Lang>>;
 }
 
-export type Options = NonInferenceOptions & InferenceFlags;
+export type Options<Lang extends LanguageName = LanguageName> =
+    NonInferenceOptions<Lang> & InferenceFlags;
 
 const defaultOptions: NonInferenceOptions = {
     lang: "ts",
@@ -600,15 +601,15 @@ class Run implements RunContext {
  * @param options Partial options.  For options that are not defined, the
  * defaults will be used.
  */
-export async function quicktypeMultiFile(
-    options: Partial<Options>,
-): Promise<MultiFileRenderResult> {
+export async function quicktypeMultiFile<
+    Lang extends LanguageName = LanguageName,
+>(options: Partial<Options<Lang>>): Promise<MultiFileRenderResult> {
     return await new Run(options).run();
 }
 
-export function quicktypeMultiFileSync(
-    options: Partial<Options>,
-): MultiFileRenderResult {
+export function quicktypeMultiFileSync<
+    Lang extends LanguageName = LanguageName,
+>(options: Partial<Options<Lang>>): MultiFileRenderResult {
     return new Run(options).runSync();
 }
 
@@ -664,8 +665,8 @@ export function combineRenderResults(
  * @param options Partial options.  For options that are not defined, the
  * defaults will be used.
  */
-export async function quicktype(
-    options: Partial<Options>,
+export async function quicktype<Lang extends LanguageName = LanguageName>(
+    options: Partial<Options<Lang>>,
 ): Promise<SerializedRenderResult> {
     const result = await quicktypeMultiFile(options);
     return combineRenderResults(result);

@@ -54,7 +54,13 @@ export type OptionValue<O> =
 export type OptionKey<O> =
     O extends EnumOption<string, Record<string, unknown>, infer EnumKey>
         ? EnumKey
-        : O;
+        : O extends Option<string, infer Value>
+          ? Value extends boolean
+              ? // `BooleanOption.getValue` also accepts the strings
+                // "true" and "false", which is what the CLI passes.
+                boolean | `${boolean}`
+              : Value
+          : never;
 
 // FIXME: Merge these and use camelCase user-facing keys (v24)
 export type OptionMap<T> = {
