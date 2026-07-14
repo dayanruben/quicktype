@@ -52,8 +52,8 @@ describe("rendererOptions typing", () => {
     test("rejects another language's option name", () => {
         void quicktype({
             inputData,
-            lang: "kotlin",
-            // @ts-expect-error `just-types` is a C#/TypeScript spelling; Kotlin has no such option
+            lang: "rust",
+            // @ts-expect-error Rust has no `just-types` option
             rendererOptions: { "just-types": "true" },
         });
     });

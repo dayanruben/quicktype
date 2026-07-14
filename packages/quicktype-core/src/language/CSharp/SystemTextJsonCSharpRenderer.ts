@@ -69,8 +69,10 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         >,
     ) {
         super(targetLanguage, renderContext, _options);
-        this._needHelpers = _options.features.helpers;
-        this._needAttributes = _options.features.attributes;
+        // `--just-types` wins over whatever `--features` says.
+        this._needHelpers = _options.features.helpers && !_options.justTypes;
+        this._needAttributes =
+            _options.features.attributes && !_options.justTypes;
         this._needNamespaces = _options.features.namespaces;
     }
 

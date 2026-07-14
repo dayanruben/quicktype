@@ -1,6 +1,7 @@
 import type { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
 import type { RenderContext } from "../../Renderer.js";
 import {
+    BooleanOption,
     EnumOption,
     StringOption,
     getOptionValues,
@@ -14,15 +15,15 @@ import { Scala3Renderer } from "./Scala3Renderer.js";
 import { UpickleRenderer } from "./UpickleRenderer.js";
 
 export const scala3Options = {
+    justTypes: new BooleanOption("just-types", "Plain types only", false),
     framework: new EnumOption(
         "framework",
         "Serialization framework",
         {
-            "just-types": "None",
             circe: "Circe",
             upickle: "Upickle",
         } as const,
-        "just-types",
+        "circe",
     ),
     packageName: new StringOption("package", "Package", "PACKAGE", "quicktype"),
 };
@@ -58,9 +59,12 @@ export class Scala3TargetLanguage extends TargetLanguage<
     ): ConvenienceRenderer {
         const options = getOptionValues(scala3Options, untypedOptionValues);
 
+        // `--just-types` wins over whatever `--framework` says.
+        if (options.justTypes) {
+            return new Scala3Renderer(this, renderContext, options);
+        }
+
         switch (options.framework) {
-            case "None":
-                return new Scala3Renderer(this, renderContext, options);
             case "Upickle":
                 return new UpickleRenderer(this, renderContext, options);
             case "Circe":
