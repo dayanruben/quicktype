@@ -620,7 +620,6 @@ export const CPlusPlusLanguage: Language = {
     ],
     rendererOptions: {},
     quickTestRendererOptions: [
-        { unions: "indirection" },
         { "source-style": "multi-source" },
         { "code-format": "with-struct" },
         { wstring: "use-wstring" },
@@ -852,7 +851,6 @@ export const TypeScriptLanguage: Language = {
         { "runtime-typecheck": "false" },
         { "runtime-typecheck-ignore-unknown-properties": "true" },
         { "nice-property-names": "true" },
-        { "declare-unions": "true" },
         ["pokedex.json", { "prefer-types": "true" }],
         { "acronym-style": "pascal" },
         { converters: "all-objects" },
@@ -910,11 +908,7 @@ export const JavaScriptPropTypesLanguage: Language = {
     skipSchema: [],
     skipMiscJSON: false,
     rendererOptions: { "module-system": "es6" },
-    quickTestRendererOptions: [
-        { "runtime-typecheck": "false" },
-        { "runtime-typecheck-ignore-unknown-properties": "true" },
-        { converters: "top-level" },
-    ],
+    quickTestRendererOptions: [{ converters: "top-level" }],
     sourceFiles: ["src/language/JavaScriptPropTypes/index.ts"],
 };
 
@@ -940,7 +934,6 @@ export const FlowLanguage: Language = {
         { "runtime-typecheck": "false" },
         { "runtime-typecheck-ignore-unknown-properties": "true" },
         { "nice-property-names": "true" },
-        { "declare-unions": "true" },
     ],
     sourceFiles: ["src/language/Flow/index.ts"],
 };
@@ -1602,7 +1595,7 @@ export const TypeScriptZodLanguage: Language = {
         "required-non-properties.schema",
     ],
     rendererOptions: {},
-    quickTestRendererOptions: [{ "array-type": "list" }],
+    quickTestRendererOptions: [],
     sourceFiles: ["src/language/TypeScriptZod/index.ts"],
 };
 
@@ -1717,7 +1710,7 @@ export const TypeScriptEffectSchemaLanguage: Language = {
         "required-non-properties.schema",
     ],
     rendererOptions: {},
-    quickTestRendererOptions: [{ "array-type": "list" }],
+    quickTestRendererOptions: [],
     sourceFiles: ["src/language/TypeScriptEffectSchema/index.ts"],
 };
 

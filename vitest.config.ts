@@ -5,5 +5,10 @@ export default defineConfig({
         environment: "node",
         include: ["test/unit/**/*.test.ts"],
         testTimeout: 30_000,
+        typecheck: {
+            enabled: true,
+            include: ["test/unit/**/*.test-d.ts"],
+            tsconfig: "./test/unit/tsconfig.json",
+        },
     },
 });
