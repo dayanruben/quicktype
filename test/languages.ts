@@ -769,6 +769,10 @@ export const SwiftLanguage: Language = {
     quickTestRendererOptions: [
         { "support-linux": "false" },
         { "struct-or-class": "class" },
+        [
+            "simple-object.json",
+            { "struct-or-class": "class", "final-classes": "true" },
+        ],
         { density: "dense" },
         { density: "normal" },
         { "access-level": "internal" },
