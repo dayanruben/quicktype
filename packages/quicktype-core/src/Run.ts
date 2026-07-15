@@ -108,12 +108,19 @@ export interface NonInferenceOptions<Lang extends LanguageName = LanguageName> {
     leadingComments?: Comment[];
     /** Don't render output.  This is mainly useful for benchmarking. */
     noRender: boolean;
+    /** Called after each measured pipeline pass.  This is mainly useful for benchmarking. */
+    onTiming?: (timing: QuicktypeTiming) => void;
     /** Name of the output file.  Note that quicktype will not write that file, but you'll get its name
      * back as a key in the resulting `Map`.
      */
     outputFilename: string;
     /** Options for the target language's renderer */
     rendererOptions: Partial<RendererOptions<Lang>>;
+}
+
+export interface QuicktypeTiming {
+    milliseconds: number;
+    name: string;
 }
 
 export type Options<Lang extends LanguageName = LanguageName> =
@@ -126,6 +133,7 @@ const defaultOptions: NonInferenceOptions = {
     allPropertiesOptional: false,
     fixedTopLevels: false,
     noRender: false,
+    onTiming: undefined,
     leadingComments: undefined,
     rendererOptions: {},
     indentation: undefined,
@@ -195,23 +203,27 @@ class Run implements RunContext {
     }
 
     public async timeSync<T>(name: string, f: () => Promise<T>): Promise<T> {
-        const start = Date.now();
+        const start = performance.now();
         const result = await f();
-        const end = Date.now();
+        const milliseconds = performance.now() - start;
         if (this._options.debugPrintTimes) {
-            console.log(`${name} took ${end - start}ms`);
+            console.log(`${name} took ${milliseconds.toFixed(3)}ms`);
         }
+
+        this._options.onTiming?.({ name, milliseconds });
 
         return result;
     }
 
     public time<T>(name: string, f: () => T): T {
-        const start = Date.now();
+        const start = performance.now();
         const result = f();
-        const end = Date.now();
+        const milliseconds = performance.now() - start;
         if (this._options.debugPrintTimes) {
-            console.log(`${name} took ${end - start}ms`);
+            console.log(`${name} took ${milliseconds.toFixed(3)}ms`);
         }
+
+        this._options.onTiming?.({ name, milliseconds });
 
         return result;
     }
@@ -580,18 +592,20 @@ class Run implements RunContext {
         targetLanguage: TargetLanguage,
         graph: TypeGraph,
     ): MultiFileRenderResult {
-        if (this._options.noRender) {
-            return this.makeSimpleTextResult(["Done.", ""]);
-        }
+        return this.time("render", () => {
+            if (this._options.noRender) {
+                return this.makeSimpleTextResult(["Done.", ""]);
+            }
 
-        return targetLanguage.renderGraphAndSerialize(
-            graph,
-            this._options.outputFilename,
-            this._options.alphabetizeProperties,
-            this._options.leadingComments,
-            this._options.rendererOptions,
-            this._options.indentation,
-        );
+            return targetLanguage.renderGraphAndSerialize(
+                graph,
+                this._options.outputFilename,
+                this._options.alphabetizeProperties,
+                this._options.leadingComments,
+                this._options.rendererOptions,
+                this._options.indentation,
+            );
+        });
     }
 }
 

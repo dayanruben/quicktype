@@ -1,5 +1,6 @@
 export {
     type Options,
+    type QuicktypeTiming,
     getTargetLanguage,
     quicktypeMultiFile,
     quicktypeMultiFileSync,

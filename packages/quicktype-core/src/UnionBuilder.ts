@@ -78,6 +78,8 @@ function addAttributesToBuilder<T extends TypeKind>(
     if (arr === undefined) {
         arr = [];
         builder.set(kind, arr);
+    } else if (newAttributes.size === 0) {
+        return;
     }
 
     arr.push(newAttributes);
@@ -107,6 +109,8 @@ export class UnionAccumulator<TArray, TObject>
 
     private readonly _stringTypeAttributes: TypeAttributeMapBuilder<PrimitiveStringTypeKind> =
         new Map();
+
+    private readonly _stringCases = new Map<string, number>();
 
     public readonly arrayData: TArray[] = [];
 
@@ -251,7 +255,14 @@ export class UnionAccumulator<TArray, TObject>
     }
 
     public addStringCases(cases: string[], attributes: TypeAttributes): void {
-        this.addFullStringType(attributes, StringTypes.fromCases(cases));
+        addAttributesToBuilder(
+            this._stringTypeAttributes,
+            "string",
+            attributes,
+        );
+        for (const s of new Set(cases)) {
+            this._stringCases.set(s, (this._stringCases.get(s) ?? 0) + 1);
+        }
     }
 
     public addStringCase(
@@ -259,7 +270,12 @@ export class UnionAccumulator<TArray, TObject>
         count: number,
         attributes: TypeAttributes,
     ): void {
-        this.addFullStringType(attributes, StringTypes.fromCase(s, count));
+        addAttributesToBuilder(
+            this._stringTypeAttributes,
+            "string",
+            attributes,
+        );
+        this._stringCases.set(s, (this._stringCases.get(s) ?? 0) + count);
     }
 
     public get enumCases(): ReadonlySet<string> {
@@ -272,9 +288,22 @@ export class UnionAccumulator<TArray, TObject>
             "We can't have both strings and enums in the same union",
         );
 
+        const stringTypeAttributes = buildTypeAttributeMap(
+            this._stringTypeAttributes,
+        );
+        if (this._stringCases.size > 0) {
+            setAttributes(
+                stringTypeAttributes,
+                "string",
+                stringTypesTypeAttributeKind.makeAttributes(
+                    new StringTypes(new Map(this._stringCases), new Set()),
+                ),
+            );
+        }
+
         const merged = mapMerge(
             buildTypeAttributeMap(this._nonStringTypeAttributes),
-            buildTypeAttributeMap(this._stringTypeAttributes),
+            stringTypeAttributes,
         );
 
         if (merged.size === 0) {

@@ -14,7 +14,11 @@ export function parseJSON(
             text = text.slice(1);
         }
 
-        return YAML.parse(text);
+        try {
+            return JSON.parse(text);
+        } catch {
+            return YAML.parse(text);
+        }
     } catch (e) {
         let message: string;
 
