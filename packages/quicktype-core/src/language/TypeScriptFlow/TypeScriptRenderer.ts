@@ -50,7 +50,7 @@ export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
 
     protected emitModuleExports(): void {}
 
-    protected emitUsageImportComment(): void {
+    protected emitUsageImportComment(givenOutputFilename: string): void {
         const topLevelNames: Sourcelike[] = [];
         this.forEachTopLevel(
             "none",
@@ -59,10 +59,18 @@ export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
             },
             isNamedType,
         );
+        const moduleName =
+            givenOutputFilename === "stdout"
+                ? "file"
+                : givenOutputFilename
+                      .replace(/^.*[/\\]/, "")
+                      .replace(/\.[^.]+$/, "");
         this.emitLine(
             "//   import { Convert",
             topLevelNames,
-            ' } from "./file";',
+            ' } from "./',
+            moduleName,
+            '";',
         );
     }
 

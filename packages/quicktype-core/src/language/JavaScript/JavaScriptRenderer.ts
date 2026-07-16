@@ -493,15 +493,15 @@ function r(name${stringAnnotation}) {
 
     protected emitTypes(): void {}
 
-    protected emitUsageImportComment(): void {
+    protected emitUsageImportComment(_givenOutputFilename: string): void {
         this.emitLine('//   const Convert = require("./file");');
     }
 
-    protected emitUsageComments(): void {
+    protected emitUsageComments(givenOutputFilename: string): void {
         this.emitMultiline(`// To parse this data:
 //`);
 
-        this.emitUsageImportComment();
+        this.emitUsageImportComment(givenOutputFilename);
         this.emitLine("//");
         this.forEachTopLevel("none", (_t, name) => {
             const camelCaseName = modifySource(camelCase, name);
@@ -537,11 +537,11 @@ function r(name${stringAnnotation}) {
         });
     }
 
-    protected emitSourceStructure(): void {
+    protected emitSourceStructure(givenOutputFilename: string): void {
         if (this.leadingComments !== undefined) {
             this.emitComments(this.leadingComments);
         } else {
-            this.emitUsageComments();
+            this.emitUsageComments(givenOutputFilename);
         }
 
         this.emitTypes();

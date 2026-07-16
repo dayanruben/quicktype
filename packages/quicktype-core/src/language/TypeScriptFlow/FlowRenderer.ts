@@ -39,9 +39,9 @@ export class FlowRenderer extends TypeScriptFlowBaseRenderer {
         });
     }
 
-    protected emitSourceStructure(): void {
+    protected emitSourceStructure(givenOutputFilename: string): void {
         this.emitLine("// @flow");
         this.ensureBlankLine();
-        super.emitSourceStructure();
+        super.emitSourceStructure(givenOutputFilename);
     }
 }
