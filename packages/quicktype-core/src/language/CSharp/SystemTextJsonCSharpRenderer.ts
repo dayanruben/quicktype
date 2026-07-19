@@ -3,14 +3,14 @@ import { arrayIntercalate } from "collection-utils";
 import {
     type ForbiddenWordsInfo,
     inferredNameOrder,
-} from "../../ConvenienceRenderer";
-import { DependencyName, type Name, SimpleName } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, modifySource } from "../../Source";
-import { camelCase, utf16StringEscape } from "../../support/Strings";
-import { defined, panic } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../ConvenienceRenderer.js";
+import { DependencyName, type Name, SimpleName } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, modifySource } from "../../Source.js";
+import { camelCase, utf16StringEscape } from "../../support/Strings.js";
+import { defined, panic } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayDecodingTransformer,
     ArrayEncodingTransformer,
@@ -30,7 +30,7 @@ import {
     UnionMemberMatchTransformer,
     followTargetType,
     transformationForType,
-} from "../../Transformers";
+} from "../../Transformers.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -38,11 +38,11 @@ import {
     EnumType,
     type Type,
     UnionType,
-} from "../../Type";
-import { nullableFromUnion } from "../../Type/TypeUtils";
+} from "../../Type/index.js";
+import { nullableFromUnion } from "../../Type/TypeUtils.js";
 
-import { CSharpRenderer } from "./CSharpRenderer";
-import type { systemTextJsonCSharpOptions } from "./language";
+import { CSharpRenderer } from "./CSharpRenderer.js";
+import type { systemTextJsonCSharpOptions } from "./language.js";
 import {
     AccessModifier,
     alwaysApplyTransformation,
@@ -50,7 +50,7 @@ import {
     denseNullValueHandlingEnumName,
     isValueType,
     namingFunction,
-} from "./utils";
+} from "./utils.js";
 
 export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
     private readonly _enumExtensionsNames = new Map<Name, Name>();
@@ -69,8 +69,10 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         >,
     ) {
         super(targetLanguage, renderContext, _options);
-        this._needHelpers = _options.features.helpers;
-        this._needAttributes = _options.features.attributes;
+        // `--just-types` wins over whatever `--features` says.
+        this._needHelpers = _options.features.helpers && !_options.justTypes;
+        this._needAttributes =
+            _options.features.attributes && !_options.justTypes;
         this._needNamespaces = _options.features.namespaces;
     }
 
@@ -629,9 +631,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                 this.csType(targetType.items),
                 ">();",
             );
-            this.emitLine(
-                "while (reader.TokenType != JsonTokenType.EndArray)",
-            );
+            this.emitLine("while (reader.TokenType != JsonTokenType.EndArray)");
             this.emitBlock(() => {
                 this.emitDecodeTransformer(
                     xfer.itemTransformer,
@@ -672,7 +672,11 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                 }
 
                 // Handle number (integer/double) union properly
-                if (xfer.integerTransformer !== undefined && xfer.doubleTransformer !== undefined) {
+                const { integerTransformer, doubleTransformer } = xfer;
+                if (
+                    integerTransformer !== undefined &&
+                    doubleTransformer !== undefined
+                ) {
                     varGen.counter++;
                     const intTryVar = `intTryValue${varGen.counter}`;
                     varGen.counter++;
@@ -681,10 +685,12 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     const doubleVar = `doubleValue${varGen.counter}`;
                     this.emitTokenCase("Number");
                     this.indent(() => {
-                        this.emitLine(`if (reader.TryGetInt64(out long ${intTryVar}))`);
+                        this.emitLine(
+                            `if (reader.TryGetInt64(out long ${intTryVar}))`,
+                        );
                         this.emitBlock(() => {
                             const allHandled = this.emitDecodeTransformer(
-                                xfer.integerTransformer!,
+                                integerTransformer,
                                 targetType,
                                 emitFinish,
                                 intVar,
@@ -697,7 +703,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                         this.emitLine("else");
                         this.emitBlock(() => {
                             const allHandled = this.emitDecodeTransformer(
-                                xfer.doubleTransformer!,
+                                doubleTransformer,
                                 targetType,
                                 emitFinish,
                                 doubleVar,
@@ -708,31 +714,29 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                             }
                         });
                     });
-                } else {
+                } else if (xfer.integerTransformer !== undefined) {
                     // Only one present, emit as before
-                    if (xfer.integerTransformer !== undefined) {
-                        varGen.counter++;
-                        const intVar = `intValue${varGen.counter}`;
-                        this.emitDecoderTransformerCase(
-                            ["Number"],
-                            intVar,
-                            xfer.integerTransformer,
-                            targetType,
-                            emitFinish,
-                            varGen,
-                        );
-                    } else if (xfer.doubleTransformer !== undefined) {
-                        varGen.counter++;
-                        const doubleVar = `doubleValue${varGen.counter}`;
-                        this.emitDecoderTransformerCase(
-                            ["Number"],
-                            doubleVar,
-                            xfer.doubleTransformer,
-                            targetType,
-                            emitFinish,
-                            varGen,
-                        );
-                    }
+                    varGen.counter++;
+                    const intVar = `intValue${varGen.counter}`;
+                    this.emitDecoderTransformerCase(
+                        ["Number"],
+                        intVar,
+                        xfer.integerTransformer,
+                        targetType,
+                        emitFinish,
+                        varGen,
+                    );
+                } else if (xfer.doubleTransformer !== undefined) {
+                    varGen.counter++;
+                    const doubleVar = `doubleValue${varGen.counter}`;
+                    this.emitDecoderTransformerCase(
+                        ["Number"],
+                        doubleVar,
+                        xfer.doubleTransformer,
+                        targetType,
+                        emitFinish,
+                        varGen,
+                    );
                 }
 
                 this.emitDecoderTransformerCase(
@@ -952,9 +956,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     itemVariable,
                     xfer.itemTransformer,
                     xfer.itemTargetType,
-                    () => {
-                        return;
-                    },
+                    () => {},
                 );
             });
             this.emitLine("writer.WriteEndArray();");

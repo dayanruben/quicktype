@@ -9,31 +9,31 @@ import {
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import { type Name, type Namer, funPrefixNamer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import type { Sourcelike } from "../../Source";
-import { stringEscape } from "../../support/Strings";
-import { defined, panic } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
-import { followTargetType } from "../../Transformers";
+} from "../../ConvenienceRenderer.js";
+import { type Name, type Namer, funPrefixNamer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import type { Sourcelike } from "../../Source.js";
+import { stringEscape } from "../../support/Strings.js";
+import { defined, panic } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
+import { followTargetType } from "../../Transformers.js";
 import {
     type ClassProperty,
     ClassType,
     EnumType,
     type Type,
     UnionType,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     matchType,
     nullableFromUnion,
     removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import { forbiddenPropertyNames, forbiddenTypeNames } from "./constants";
-import type { pythonOptions } from "./language";
-import { classNameStyle, snakeNameStyle } from "./utils";
+import { forbiddenPropertyNames, forbiddenTypeNames } from "./constants.js";
+import type { pythonOptions } from "./language.js";
+import { classNameStyle, snakeNameStyle } from "./utils.js";
 
 export class PythonRenderer extends ConvenienceRenderer {
     private readonly imports: Map<string, Set<string>> = new Map();
@@ -323,7 +323,7 @@ export class PythonRenderer extends ConvenienceRenderer {
         ) {
             return mapSortBy(properties, (p: ClassProperty) => {
                 return (p.type instanceof UnionType &&
-                    nullableFromUnion(p.type) != null) ||
+                    nullableFromUnion(p.type) !== null) ||
                     p.isOptional
                     ? 1
                     : 0;
@@ -390,13 +390,9 @@ export class PythonRenderer extends ConvenienceRenderer {
         });
     }
 
-    protected emitSupportCode(): void {
-        return;
-    }
+    protected emitSupportCode(): void {}
 
-    protected emitClosingCode(): void {
-        return;
-    }
+    protected emitClosingCode(): void {}
 
     protected emitSourceStructure(_givenOutputFilename: string): void {
         const declarationLines = this.gatherSource(() => {
@@ -404,9 +400,7 @@ export class PythonRenderer extends ConvenienceRenderer {
                 ["interposing", 2],
                 (c: ClassType) => this.emitClass(c),
                 (e) => this.emitEnum(e),
-                (_u) => {
-                    return;
-                },
+                (_u) => {},
             );
         });
 

@@ -1,11 +1,11 @@
 import { arrayIntercalate } from "collection-utils";
 
-import { ConvenienceRenderer } from "../../ConvenienceRenderer";
-import { type Name, type Namer, funPrefixNamer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import type { Sourcelike } from "../../Source";
-import { AcronymStyleOptions, acronymStyle } from "../../support/Acronyms";
+import { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
+import { type Name, type Namer, funPrefixNamer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import type { Sourcelike } from "../../Source.js";
+import { AcronymStyleOptions, acronymStyle } from "../../support/Acronyms.js";
 import {
     allLowerWordStyle,
     capitalize,
@@ -15,9 +15,9 @@ import {
     splitIntoWords,
     stringEscape,
     utf16StringEscape,
-} from "../../support/Strings";
-import { panic } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../support/Strings.js";
+import { panic } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -26,11 +26,11 @@ import {
     ObjectType,
     SetOperationType,
     type Type,
-} from "../../Type";
-import { matchType } from "../../Type/TypeUtils";
-import { legalizeName } from "../JavaScript/utils";
+} from "../../Type/index.js";
+import { matchType } from "../../Type/TypeUtils.js";
+import { legalizeName } from "../JavaScript/utils.js";
 
-import type { typeScriptZodOptions } from "./language";
+import type { typeScriptZodOptions } from "./language.js";
 
 export class TypeScriptZodRenderer extends ConvenienceRenderer {
     /** TypeRefs of object types that participate in a reference cycle.
@@ -132,6 +132,9 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
             (_transformedStringType) => {
                 if (_transformedStringType.kind === "date-time") {
                     return "z.coerce.date()";
+                }
+                if (_transformedStringType.kind === "uuid") {
+                    return "z.string().uuid()";
                 }
 
                 return "z.string()";
@@ -410,9 +413,9 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
         // which we can get back to the same type by following child type
         // references. Those can never be topologically ordered.
         const indexForTypeRef = new Map<number, number>();
-        mapTypeRef.forEach((typeRef, index) =>
-            indexForTypeRef.set(typeRef, index),
-        );
+        mapTypeRef.forEach((typeRef, index) => {
+            indexForTypeRef.set(typeRef, index);
+        });
         this._recursiveTypeRefs = new Set();
         mapType.forEach((_, startIndex) => {
             const visited = new Set<number>();
@@ -465,10 +468,7 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
                         // find this childs's ordinal, if it has already been added
                         // faster to go through what we've defined so far than all definitions
 
-                        // FIXME: refactor this
-                        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-                        for (let j = 0; j < order.length; j++) {
-                            const childIndex = order[j];
+                        for (const childIndex of order) {
                             if (mapTypeRef[childIndex] === childRef) {
                                 found = true;
                                 break;
@@ -507,13 +507,13 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
         } while (indices.length > 0 && passNum <= MAX_PASSES);
 
         // now emit ordered source
-        order.forEach((i) =>
+        order.forEach((i) => {
             this.emitGatheredSource(
-                this.gatherSource(() =>
-                    this.emitObject(mapName[i], mapType[i]),
-                ),
-            ),
-        );
+                this.gatherSource(() => {
+                    this.emitObject(mapName[i], mapType[i]);
+                }),
+            );
+        });
     }
 
     protected emitSourceStructure(): void {
