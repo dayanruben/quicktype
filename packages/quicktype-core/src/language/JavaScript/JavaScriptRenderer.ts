@@ -493,8 +493,20 @@ function r(name${stringAnnotation}) {
 
     protected emitTypes(): void {}
 
-    protected emitUsageImportComment(_givenOutputFilename: string): void {
-        this.emitLine('//   const Convert = require("./file");');
+    protected usageModuleName(givenOutputFilename: string): string {
+        return givenOutputFilename === "stdout"
+            ? "file"
+            : givenOutputFilename
+                  .replace(/^.*[/\\]/, "")
+                  .replace(/\.[^.]+$/, "");
+    }
+
+    protected emitUsageImportComment(givenOutputFilename: string): void {
+        this.emitLine(
+            '//   const Convert = require("./',
+            this.usageModuleName(givenOutputFilename),
+            '");',
+        );
     }
 
     protected emitUsageComments(givenOutputFilename: string): void {

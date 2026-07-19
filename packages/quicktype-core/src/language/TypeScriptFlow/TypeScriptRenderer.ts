@@ -59,17 +59,11 @@ export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
             },
             isNamedType,
         );
-        const moduleName =
-            givenOutputFilename === "stdout"
-                ? "file"
-                : givenOutputFilename
-                      .replace(/^.*[/\\]/, "")
-                      .replace(/\.[^.]+$/, "");
         this.emitLine(
             "//   import { Convert",
             topLevelNames,
             ' } from "./',
-            moduleName,
+            this.usageModuleName(givenOutputFilename),
             '";',
         );
     }
