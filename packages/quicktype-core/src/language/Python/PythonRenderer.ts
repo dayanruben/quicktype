@@ -28,11 +28,7 @@ import {
     type Type,
     UnionType,
 } from "../../Type/index.js";
-import {
-    matchType,
-    nullableFromUnion,
-    removeNullFromUnion,
-} from "../../Type/TypeUtils.js";
+import { matchType, removeNullFromUnion } from "../../Type/TypeUtils.js";
 
 import { forbiddenPropertyNames, forbiddenTypeNames } from "./constants.js";
 import type { pythonOptions } from "./language.js";
@@ -202,20 +198,44 @@ export class PythonRenderer extends ConvenienceRenderer {
 
         union.push(quote);
 
-        if (
-            hasNull !== null &&
-            !this.getAlphabetizeProperties() &&
-            (this.pyOptions.features.dataClasses ||
-                this.pyOptions.pydanticBaseModel) &&
-            isRootTypeDef
-        ) {
-            // Only push "= None" if this is a root level type def
-            //   otherwise we may get type defs like list[int | None = None]
-            //   which are invalid
-            union.push(" = None");
+        if (hasNull !== null) {
+            union.push(...this.noneDefault(isRootTypeDef));
         }
 
         return union;
+    }
+
+    // A `" = None"` default for a class property whose value can be `None`.
+    // Only emitted for root level type defs, otherwise we may get type defs
+    // like `List[Optional[int] = None]`, which are invalid.  Every property
+    // that gets a default must sort after all properties that don't — see
+    // `sortClassProperties`.
+    private noneDefault(isRootTypeDef: boolean): string[] {
+        if (
+            isRootTypeDef &&
+            !this.getAlphabetizeProperties() &&
+            (this.pyOptions.features.dataClasses ||
+                this.pyOptions.pydanticBaseModel)
+        ) {
+            return [" = None"];
+        }
+
+        return [];
+    }
+
+    // Does `pythonType(p.type, true)` end in a `" = None"` default?  This
+    // must mirror the `noneDefault` calls in `pythonType` exactly: nullable
+    // unions, plus `Any` and `None` typed properties — an optional `Any`
+    // stays `Any` (`null` is absorbed by it), and an optional `null`
+    // collapses to just `null`, so those also default to `None`.
+    private classPropertyHasNoneDefault(p: ClassProperty): boolean {
+        const actualType = followTargetType(p.type);
+        if (actualType instanceof UnionType) {
+            const [hasNull] = removeNullFromUnion(actualType);
+            return hasNull !== null;
+        }
+
+        return actualType.kind === "any" || actualType.kind === "null";
     }
 
     protected pythonType(
@@ -227,8 +247,11 @@ export class PythonRenderer extends ConvenienceRenderer {
 
         return matchType<Sourcelike>(
             actualType,
-            (_anyType) => this.withTyping("Any"),
-            (_nullType) => "None",
+            (_anyType) => [
+                this.withTyping("Any"),
+                ...this.noneDefault(_isRootTypeDef),
+            ],
+            (_nullType) => ["None", ...this.noneDefault(_isRootTypeDef)],
             (_boolType) => "bool",
             (_integerType) => "int",
             (_doubletype) => "float",
@@ -266,18 +289,7 @@ export class PythonRenderer extends ConvenienceRenderer {
                 );
 
                 if (hasNull !== null) {
-                    const rest: string[] = [];
-                    if (
-                        !this.getAlphabetizeProperties() &&
-                        (this.pyOptions.features.dataClasses ||
-                            this.pyOptions.pydanticBaseModel) &&
-                        _isRootTypeDef
-                    ) {
-                        // Only push "= None" if this is a root level type def
-                        //   otherwise we may get type defs like List[Optional[int] = None]
-                        //   which are invalid
-                        rest.push(" = None");
-                    }
+                    const rest = this.noneDefault(_isRootTypeDef);
 
                     if (nonNulls.size > 1) {
                         this.withImport("typing", "Union");
@@ -412,13 +424,11 @@ export class PythonRenderer extends ConvenienceRenderer {
             this.pyOptions.features.dataClasses ||
             this.pyOptions.pydanticBaseModel
         ) {
-            return mapSortBy(properties, (p: ClassProperty) => {
-                return (p.type instanceof UnionType &&
-                    nullableFromUnion(p.type) !== null) ||
-                    p.isOptional
-                    ? 1
-                    : 0;
-            });
+            // Properties that get a `" = None"` default must come after all
+            // properties that don't, or the generated dataclass is invalid.
+            return mapSortBy(properties, (p: ClassProperty) =>
+                this.classPropertyHasNoneDefault(p) ? 1 : 0,
+            );
         }
 
         return super.sortClassProperties(properties, propertyNames);
