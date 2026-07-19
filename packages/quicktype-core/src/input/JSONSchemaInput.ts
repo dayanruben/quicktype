@@ -1057,6 +1057,25 @@ async function addTypesInSchema(
                         );
                     },
                 );
+                // In 2020-12 an object-form `items` next to `prefixItems`
+                // describes the rest elements of an open tuple.  quicktype
+                // models tuples as arrays of a union of the member types, so
+                // the rest type joins that union.  A boolean `items` (`false`
+                // closes the tuple, `true` allows anything) is ignored.
+                if (
+                    tupleKey === "prefixItems" &&
+                    typeof items === "object" &&
+                    !Array.isArray(items)
+                ) {
+                    const restItemsLoc = loc.push("items");
+                    itemTypes.push(
+                        await toType(
+                            checkJSONSchema(items, restItemsLoc.canonicalRef),
+                            restItemsLoc,
+                            singularAttributes,
+                        ),
+                    );
+                }
                 itemType = typeBuilder.getUnionType(
                     emptyTypeAttributes,
                     new Set(itemTypes),
