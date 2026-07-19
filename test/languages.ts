@@ -114,7 +114,9 @@ export const CSharpLanguage: Language = {
     skipSchema: [
         "top-level-enum.schema", // The code we generate for top-level enums is incompatible with the driver
     ],
-    rendererOptions: { "check-required": "true" },
+    // The default framework is SystemTextJson; this fixture deliberately
+    // pins NewtonSoft so the Newtonsoft renderer keeps end-to-end coverage.
+    rendererOptions: { "check-required": "true", framework: "NewtonSoft" },
     quickTestRendererOptions: [
         { "array-type": "list" },
         { "csharp-version": "5" },

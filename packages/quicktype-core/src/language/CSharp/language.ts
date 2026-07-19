@@ -35,7 +35,7 @@ export const cSharpOptions = {
             NewtonSoft: "NewtonSoft",
             SystemTextJson: "SystemTextJson",
         } as const,
-        "NewtonSoft",
+        "SystemTextJson",
     ),
     useList: new EnumOption(
         "array-type",
