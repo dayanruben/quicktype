@@ -81,6 +81,8 @@ jobs:
                     # Kotlin is also slow
                     - fixture: kotlin,schema-kotlin,kotlin-jackson,schema-kotlin-jackson
                       runs-on: ubuntu-latest-16-cores
+                    - fixture: kotlinx,schema-kotlinx
+                      runs-on: ubuntu-latest-16-cores
 
                     # - fixture: objective-c # segfault on compiled test cmd
                     #   runs-on: macos-latest

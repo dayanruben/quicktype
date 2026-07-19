@@ -1282,6 +1282,137 @@ export const KotlinJacksonLanguage: Language = {
     sourceFiles: ["src/language/Kotlin/index.ts"],
 };
 
+export const KotlinXLanguage: Language = {
+    name: "kotlin",
+    base: "test/fixtures/kotlinx",
+    compileCommand: "./build.sh",
+    runCommand(sample: string) {
+        return `./run.sh "${sample}"`;
+    },
+    diffViaSchema: true,
+    skipDiffViaSchema: [
+        "bug427.json",
+        "keywords.json",
+        // TODO Investigate these
+        "34702.json",
+        "76ae1.json",
+    ],
+    allowMissingNull: true,
+    // No "union": the kotlinx renderer emits unions as sealed classes
+    // without any serializer wiring, so they don't (de)serialize
+    // (documented TODO in KotlinXRenderer.ts).
+    features: ["enum", "no-defaults"],
+    output: "TopLevel.kt",
+    topLevel: "TopLevel",
+    skipJSON: [
+        // Top-level arrays render as `typealias TopLevel = JsonArray<T>`,
+        // which doesn't compile — kotlinx's JsonArray takes no type
+        // arguments (documented TODO in KotlinXRenderer.ts).
+        "bug863.json",
+        "github-events.json",
+        "optional-union.json",
+        "00c36.json",
+        "010b1.json",
+        "050b0.json",
+        "06bee.json",
+        "07c75.json",
+        "0a91a.json",
+        "10be4.json",
+        "13d8d.json",
+        "1a7f5.json",
+        "2df80.json",
+        "32d5c.json",
+        "3536b.json",
+        "43970.json",
+        "570ec.json",
+        "5eae5.json",
+        "66121.json",
+        "6eb00.json",
+        "77392.json",
+        "7f568.json",
+        "7fbfb.json",
+        "9847b.json",
+        "996bd.json",
+        "9a503.json",
+        "9eed5.json",
+        "a45b0.json",
+        "ab0d1.json",
+        "ad8be.json",
+        "b4865.json",
+        "c8c7e.json",
+        "cda6c.json",
+        "e2a58.json",
+        "e53b5.json",
+        "e8a0b.json",
+        "e8b04.json",
+        "f3139.json",
+        "f3edf.json",
+        "f466a.json",
+        // Unions render as sealed classes without serializer wiring, so
+        // deserialization fails at runtime (documented TODO in
+        // KotlinXRenderer.ts).
+        "combinations1.json",
+        "combinations2.json",
+        "combinations3.json",
+        "combinations4.json",
+        "kitchen-sink.json",
+        "nbl-stats.json",
+        "nst-test-suite.json",
+        "php-mixed-union.json",
+        "union-constructor-clash.json",
+        "unions.json",
+        "26c9c.json",
+        "29f47.json",
+        "33d2e.json",
+        "421d4.json",
+        "5f7fe.json",
+        "617e8.json",
+        "a0496.json",
+        "a3d8c.json",
+        "f74d5.json",
+        "fcca3.json",
+        // stringEscape renders astral-plane characters as `\u{5 hex digits}`,
+        // which Kotlin misparses (it only supports 4-digit `\u` escapes), so
+        // the @SerialName annotations don't match the JSON keys.
+        "blns-object.json",
+        "identifiers.json",
+    ],
+    skipSchema: [
+        // Unions render as sealed classes without serializer wiring, so
+        // deserialization fails at runtime (documented TODO in
+        // KotlinXRenderer.ts).
+        "accessors.schema",
+        "bool-string.schema",
+        "class-map-union.schema",
+        "class-with-additional.schema",
+        "date-time.schema",
+        "description.schema",
+        "direct-union.schema",
+        "enum.schema", // enum.3.json contains an int|string union
+        "implicit-class-array-union.schema",
+        "integer-float-union.schema",
+        "integer-string.schema",
+        "minmaxlength.schema",
+        "multi-type-enum.schema",
+        "mutually-recursive.schema",
+        "prefix-items.schema",
+        "recursive-union-flattening.schema",
+        "tuple.schema",
+        "union-int-double.schema",
+        "union-list.schema",
+        // Additionally exceeds the JVM's 255-parameter limit when the
+        // serialization plugin generates the synthesized constructors.
+        "keyword-unions.schema",
+        // Top-level array: `typealias TopLevel = JsonArray<T>` doesn't
+        // compile (documented TODO in KotlinXRenderer.ts).
+        "union.schema",
+    ],
+    skipMiscJSON: false,
+    rendererOptions: { framework: "kotlinx" },
+    quickTestRendererOptions: [],
+    sourceFiles: ["src/language/Kotlin/index.ts"],
+};
+
 export const DartLanguage: Language = {
     name: "dart",
     base: "test/fixtures/dart",
