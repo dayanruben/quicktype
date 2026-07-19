@@ -1731,7 +1731,9 @@ export const HaskellLanguage: Language = {
         "required-non-properties.schema",
     ],
     rendererOptions: {},
-    quickTestRendererOptions: [{ "array-type": "list" }],
+    // The default is array-type=list; this keeps the Vector code path
+    // covered.
+    quickTestRendererOptions: [{ "array-type": "array" }],
     sourceFiles: ["src/language/Haskell/index.ts"],
 };
 
