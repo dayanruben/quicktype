@@ -1323,7 +1323,11 @@ export const KotlinXLanguage: Language = {
     // No "union": the kotlinx renderer emits unions as sealed classes
     // without any serializer wiring, so they don't (de)serialize
     // (documented TODO in KotlinXRenderer.ts).
-    features: ["enum", "no-defaults"],
+    // "date-time" is supported via emitted KSerializers, but note that
+    // date-time.schema itself stays skipped: its union-array properties
+    // hit the union limitation above. The serializers are exercised by
+    // the JSON inputs with inferred date-times instead.
+    features: ["enum", "no-defaults", "date-time"],
     output: "TopLevel.kt",
     topLevel: "TopLevel",
     skipJSON: [
@@ -1398,6 +1402,16 @@ export const KotlinXLanguage: Language = {
         // the @SerialName annotations don't match the JSON keys.
         "blns-object.json",
         "identifiers.json",
+        // Contain date-time values with trailing zeros in the fractional
+        // seconds, which java.time does not re-serialize identically
+        // (77392.json and b4865.json are already skipped above).
+        "54d32.json",
+        "0a358.json",
+        "80aff.json",
+        "9ac3b.json",
+        "337ed.json",
+        "734ad.json",
+        "d23d5.json",
     ],
     skipSchema: [
         // Unions render as sealed classes without serializer wiring, so
@@ -1408,6 +1422,9 @@ export const KotlinXLanguage: Language = {
         "class-map-union.schema",
         "class-with-additional.schema",
         "date-time.schema",
+        // The string|date-time property becomes a union once Kotlin maps
+        // date-time (it was a plain string before).
+        "date-time-or-string.schema",
         "description.schema",
         "direct-union.schema",
         "enum.schema", // enum.3.json contains an int|string union
