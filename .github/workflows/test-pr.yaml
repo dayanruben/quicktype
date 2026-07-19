@@ -24,6 +24,7 @@ jobs:
                     - javascript,schema-javascript
                     - golang,schema-golang
                     - cjson,schema-cjson
+                    - cjson-default,cjson-multi-header,cjson-multi-split
                     - cplusplus,schema-cplusplus
                     - flow,schema-flow
                     - java,schema-java
