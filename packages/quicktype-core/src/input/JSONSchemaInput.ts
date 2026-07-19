@@ -1034,17 +1034,48 @@ async function addTypesInSchema(
         async function makeArrayType(): Promise<TypeRef> {
             const singularAttributes = singularizeTypeNames(typeAttributes);
             const items = schema.items;
+            // JSON Schema 2020-12 renamed the array (tuple) form of `items` to
+            // `prefixItems`; treat it the same as a draft-07 array-valued
+            // `items` so tuple schemas produced by e.g. Pydantic v2 and
+            // schemars are not silently dropped.
+            const prefixItems = schema.prefixItems;
+            const tupleItems = Array.isArray(prefixItems) ? prefixItems : items;
+            const tupleKey = Array.isArray(prefixItems)
+                ? "prefixItems"
+                : "items";
             let itemType: TypeRef;
-            if (Array.isArray(items)) {
-                const itemsLoc = loc.push("items");
-                const itemTypes = await arrayMapSync(items, async (item, i) => {
-                    const itemLoc = itemsLoc.push(i.toString());
-                    return await toType(
-                        checkJSONSchema(item, itemLoc.canonicalRef),
-                        itemLoc,
-                        singularAttributes,
+            if (Array.isArray(tupleItems)) {
+                const itemsLoc = loc.push(tupleKey);
+                const itemTypes = await arrayMapSync(
+                    tupleItems,
+                    async (item, i) => {
+                        const itemLoc = itemsLoc.push(i.toString());
+                        return await toType(
+                            checkJSONSchema(item, itemLoc.canonicalRef),
+                            itemLoc,
+                            singularAttributes,
+                        );
+                    },
+                );
+                // In 2020-12 an object-form `items` next to `prefixItems`
+                // describes the rest elements of an open tuple.  quicktype
+                // models tuples as arrays of a union of the member types, so
+                // the rest type joins that union.  A boolean `items` (`false`
+                // closes the tuple, `true` allows anything) is ignored.
+                if (
+                    tupleKey === "prefixItems" &&
+                    typeof items === "object" &&
+                    !Array.isArray(items)
+                ) {
+                    const restItemsLoc = loc.push("items");
+                    itemTypes.push(
+                        await toType(
+                            checkJSONSchema(items, restItemsLoc.canonicalRef),
+                            restItemsLoc,
+                            singularAttributes,
+                        ),
                     );
-                });
+                }
                 itemType = typeBuilder.getUnionType(
                     emptyTypeAttributes,
                     new Set(itemTypes),
@@ -1229,6 +1260,7 @@ async function addTypesInSchema(
             schema.properties !== undefined ||
             schema.additionalProperties !== undefined ||
             schema.items !== undefined ||
+            schema.prefixItems !== undefined ||
             schema.required !== undefined ||
             enumArray !== undefined ||
             isConst;
