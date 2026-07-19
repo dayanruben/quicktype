@@ -273,9 +273,14 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         const isNullable = followTargetType(property.type).isNullable;
         const isOptional = property.isOptional;
 
-        if (!isOptional) {
-            attributes.push(["[", "JsonRequired", "]"]);
-        } else if (isOptional && !isNullable) {
+        // [JsonRequired] makes deserialization fail if the property is
+        // missing from the JSON.  It requires System.Text.Json 7.0 or
+        // later (.NET 7+).
+        if (this._options.checkRequired && !isOptional) {
+            attributes.push(["[JsonRequired]"]);
+        }
+
+        if (isOptional && !isNullable) {
             attributes.push([
                 "[",
                 "JsonIgnore",
