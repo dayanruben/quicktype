@@ -198,6 +198,7 @@ export class NewtonsoftCSharpRenderer extends CSharpRenderer {
         this.emitLine("#pragma warning restore CS8618");
         this.emitLine("#pragma warning restore CS8601");
         this.emitLine("#pragma warning restore CS8603");
+        this.emitLine("#pragma warning restore CS8765");
     }
 
     protected emitDefaultLeadingComments(): void {
@@ -239,6 +240,7 @@ export class NewtonsoftCSharpRenderer extends CSharpRenderer {
             this.emitLine("#pragma warning disable CS8618");
             this.emitLine("#pragma warning disable CS8601");
             this.emitLine("#pragma warning disable CS8603");
+            this.emitLine("#pragma warning disable CS8765");
         }
     }
 
