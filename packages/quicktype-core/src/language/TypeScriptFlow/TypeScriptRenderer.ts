@@ -1,12 +1,12 @@
-import type { Name } from "../../Naming";
-import { type Sourcelike, modifySource } from "../../Source";
-import { camelCase, utf16StringEscape } from "../../support/Strings";
-import type { ClassType, EnumType, Type } from "../../Type";
-import { isNamedType } from "../../Type/TypeUtils";
-import type { JavaScriptTypeAnnotations } from "../JavaScript";
+import type { Name } from "../../Naming.js";
+import { type Sourcelike, modifySource } from "../../Source.js";
+import { camelCase, utf16StringEscape } from "../../support/Strings.js";
+import type { ClassType, EnumType, Type } from "../../Type/index.js";
+import { isNamedType } from "../../Type/TypeUtils.js";
+import type { JavaScriptTypeAnnotations } from "../JavaScript/index.js";
 
-import { TypeScriptFlowBaseRenderer } from "./TypeScriptFlowBaseRenderer";
-import { tsFlowTypeAnnotations } from "./utils";
+import { TypeScriptFlowBaseRenderer } from "./TypeScriptFlowBaseRenderer.js";
+import { tsFlowTypeAnnotations } from "./utils.js";
 
 export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
     protected forbiddenNamesForGlobalNamespace(): string[] {
@@ -45,14 +45,12 @@ export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
     }
 
     protected get typeAnnotations(): JavaScriptTypeAnnotations {
-        return Object.assign({ never: ": never" }, tsFlowTypeAnnotations);
+        return { never: ": never", ...tsFlowTypeAnnotations };
     }
 
-    protected emitModuleExports(): void {
-        return;
-    }
+    protected emitModuleExports(): void {}
 
-    protected emitUsageImportComment(): void {
+    protected emitUsageImportComment(givenOutputFilename: string): void {
         const topLevelNames: Sourcelike[] = [];
         this.forEachTopLevel(
             "none",
@@ -64,7 +62,9 @@ export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
         this.emitLine(
             "//   import { Convert",
             topLevelNames,
-            ' } from "./file";',
+            ' } from "./',
+            this.usageModuleName(givenOutputFilename),
+            '";',
         );
     }
 

@@ -1,39 +1,39 @@
 import {
     anyTypeIssueAnnotation,
     nullTypeIssueAnnotation,
-} from "../../Annotation";
+} from "../../Annotation.js";
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import { DependencyName, type Name, type Namer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, maybeAnnotated, modifySource } from "../../Source";
-import { decapitalize, snakeCase } from "../../support/Strings";
-import { defined } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../ConvenienceRenderer.js";
+import { DependencyName, type Name, type Namer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, maybeAnnotated, modifySource } from "../../Source.js";
+import { decapitalize, snakeCase } from "../../support/Strings.js";
+import { defined } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     type ClassProperty,
     type ClassType,
     EnumType,
     type Type,
     type UnionType,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     directlyReachableSingleNamedType,
     matchType,
     nullableFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import { keywords } from "./constants";
-import type { dartOptions } from "./language";
+import { keywords } from "./constants.js";
+import type { dartOptions } from "./language.js";
 import {
     enumCaseNamingFunction,
     propertyNamingFunction,
     stringEscape,
     typeNamingFunction,
-} from "./utils";
+} from "./utils.js";
 
 interface TopLevelDependents {
     decoder: Name;
@@ -419,8 +419,8 @@ export class DartRenderer extends ConvenienceRenderer {
     // If the first time is the unionType type, after nullableFromUnion conversion,
     // the isNullable property will become false, which is obviously wrong,
     // so add isNullable property
-    // eslint-disable-next-line @typescript-eslint/default-param-last
     protected fromDynamicExpression(
+        // biome-ignore lint/style/useDefaultParameterLast: part of the exported DartRenderer API; removing the default would break downstream subclasses
         isNullable = false,
         t: Type,
         ...dynamic: Sourcelike[]
@@ -517,8 +517,8 @@ export class DartRenderer extends ConvenienceRenderer {
     // If the first time is the unionType type, after nullableFromUnion conversion,
     // the isNullable property will become false, which is obviously wrong,
     // so add isNullable property
-    // eslint-disable-next-line @typescript-eslint/default-param-last
     protected toDynamicExpression(
+        // biome-ignore lint/style/useDefaultParameterLast: part of the exported DartRenderer API; removing the default would break downstream subclasses
         isNullable = false,
         t: Type,
         ...dynamic: Sourcelike[]
@@ -840,64 +840,72 @@ export class DartRenderer extends ConvenienceRenderer {
         this.emitDescription(this.descriptionForType(c));
 
         this.emitLine("@freezed");
-        this.emitBlock(["abstract class ", className, " with _$", className], () => {
-            if (c.getProperties().size === 0) {
-                this.emitLine(
-                    "const factory ",
-                    className,
-                    "() = _",
-                    className,
-                    ";",
-                );
-            } else {
-                this.emitLine("const factory ", className, "({");
-                this.indent(() => {
-                    this.forEachClassProperty(
-                        c,
-                        "none",
-                        (name, jsonName, prop) => {
-                            const description =
-                                this.descriptionForClassProperty(c, jsonName);
-                            if (description !== undefined) {
-                                this.emitDescription(description);
-                            }
-
-                            const required =
-                                this._options.requiredProperties ||
-                                (this._options.nullSafety &&
-                                    (!prop.type.isNullable ||
-                                        !prop.isOptional));
-                            if (this._options.useJsonAnnotation) {
-                                this.classPropertyCounter++;
-                                this.emitLine(`@JsonKey(name: "${jsonName}")`);
-                            }
-
-                            this.emitLine(
-                                required ? "required " : "",
-                                this.dartType(prop.type, true),
-                                " ",
-                                name,
-                                ",",
-                            );
-                        },
+        this.emitBlock(
+            ["abstract class ", className, " with _$", className],
+            () => {
+                if (c.getProperties().size === 0) {
+                    this.emitLine(
+                        "const factory ",
+                        className,
+                        "() = _",
+                        className,
+                        ";",
                     );
-                });
-                this.emitLine("}) = _", className, ";");
-            }
+                } else {
+                    this.emitLine("const factory ", className, "({");
+                    this.indent(() => {
+                        this.forEachClassProperty(
+                            c,
+                            "none",
+                            (name, jsonName, prop) => {
+                                const description =
+                                    this.descriptionForClassProperty(
+                                        c,
+                                        jsonName,
+                                    );
+                                if (description !== undefined) {
+                                    this.emitDescription(description);
+                                }
 
-            if (this._options.justTypes) return;
+                                const required =
+                                    this._options.requiredProperties ||
+                                    (this._options.nullSafety &&
+                                        (!prop.type.isNullable ||
+                                            !prop.isOptional));
+                                if (this._options.useJsonAnnotation) {
+                                    this.classPropertyCounter++;
+                                    this.emitLine(
+                                        `@JsonKey(name: "${jsonName}")`,
+                                    );
+                                }
 
-            this.ensureBlankLine();
-            this.emitLine(
-                // factory PublicAnswer.fromJson(Map<String, dynamic> json) => _$PublicAnswerFromJson(json);
-                "factory ",
-                className,
-                ".fromJson(Map<String, dynamic> json) => ",
-                "_$",
-                className,
-                "FromJson(json);",
-            );
-        });
+                                this.emitLine(
+                                    required ? "required " : "",
+                                    this.dartType(prop.type, true),
+                                    " ",
+                                    name,
+                                    ",",
+                                );
+                            },
+                        );
+                    });
+                    this.emitLine("}) = _", className, ";");
+                }
+
+                if (this._options.justTypes) return;
+
+                this.ensureBlankLine();
+                this.emitLine(
+                    // factory PublicAnswer.fromJson(Map<String, dynamic> json) => _$PublicAnswerFromJson(json);
+                    "factory ",
+                    className,
+                    ".fromJson(Map<String, dynamic> json) => ",
+                    "_$",
+                    className,
+                    "FromJson(json);",
+                );
+            },
+        );
     }
 
     protected emitEnumDefinition(e: EnumType, enumName: Name): void {

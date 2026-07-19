@@ -1,14 +1,14 @@
-import type { Name } from "../../Naming";
-import type { Sourcelike } from "../../Source";
-import type { ClassType, EnumType, Type, UnionType } from "../../Type";
+import type { Name } from "../../Naming.js";
+import type { Sourcelike } from "../../Source.js";
 import {
     matchType,
     nullableFromUnion,
     removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
+import type { ClassType, EnumType, Type, UnionType } from "../../Type/index.js";
 
-import { Scala3Renderer } from "./Scala3Renderer";
-import { shouldAddBacktick, wrapOption } from "./utils";
+import { Scala3Renderer } from "./Scala3Renderer.js";
+import { shouldAddBacktick, wrapOption } from "./utils.js";
 
 export class UpickleRenderer extends Scala3Renderer {
     private seenUnionTypes: string[] = [];
