@@ -875,8 +875,9 @@ export const SwiftLanguage: Language = {
             "simple-object.json",
             { "struct-or-class": "class", "final-classes": "true" },
         ],
+        // The default is density=normal; this keeps the dense code path
+        // covered.
         { density: "dense" },
-        { density: "normal" },
         { "access-level": "internal" },
         { "access-level": "public" },
         { protocol: "equatable" },
