@@ -942,7 +942,9 @@ const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
     {
         displayName: "cjson",
         language: languages.CJSONLanguage,
-        output: "TopLevel.c",
+        // CJSONLanguage renders with header-only=false, so this produces
+        // both TopLevel.h and TopLevel.c; both are collected and parsed.
+        output: "TopLevel.h",
         wasmModule: "tree-sitter-c/tree-sitter-c.wasm",
         extensions: [".c", ".h"],
         schema: commentInjectionSchema,
@@ -1546,6 +1548,9 @@ export const allFixtures: Fixture[] = [
     new JSONFixture(languages.JavaLanguageWithLombok, "java-lombok"),
     new JSONFixture(languages.GoLanguage),
     new JSONFixture(languages.CJSONLanguage),
+    new JSONFixture(languages.CJSONDefaultLanguage, "cjson-default"),
+    new JSONFixture(languages.CJSONMultiHeaderLanguage, "cjson-multi-header"),
+    new JSONFixture(languages.CJSONMultiSplitLanguage, "cjson-multi-split"),
     new JSONFixture(languages.CPlusPlusLanguage),
     new JSONFixture(languages.PHPLanguage),
     new JSONFixture(languages.RustLanguage),

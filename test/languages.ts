@@ -482,16 +482,26 @@ export const GoLanguage: Language = {
     sourceFiles: ["src/language/Golang/index.ts"],
 };
 
+/* The vendored dependencies are downloaded into deps/ and included via
+ * -isystem so that generated cross-file includes must be quoted includes
+ * (resolved relative to the including file): a generated
+ * `#include <TopLevel.h>` fails to compile. */
+const cJSONSetupCommand =
+    "mkdir -p deps && curl -o deps/cJSON.c https://raw.githubusercontent.com/DaveGamble/cJSON/v1.7.15/cJSON.c && curl -o deps/cJSON.h https://raw.githubusercontent.com/DaveGamble/cJSON/v1.7.15/cJSON.h && curl -o deps/list.h https://raw.githubusercontent.com/joelguittet/c-list/master/include/list.h && curl -o deps/list.c https://raw.githubusercontent.com/joelguittet/c-list/master/src/list.c && curl -o deps/hashtable.h https://raw.githubusercontent.com/joelguittet/c-hashtable/master/include/hashtable.h && curl -o deps/hashtable.c https://raw.githubusercontent.com/joelguittet/c-hashtable/master/src/hashtable.c";
+
+function cJSONRunCommand(sample: string): string {
+    return `valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./quicktype "${sample}"`;
+}
+
 export const CJSONLanguage: Language = {
     name: "cjson",
     base: "test/fixtures/cjson",
-    setupCommand:
-        "curl -o cJSON.c https://raw.githubusercontent.com/DaveGamble/cJSON/v1.7.15/cJSON.c && curl -o cJSON.h https://raw.githubusercontent.com/DaveGamble/cJSON/v1.7.15/cJSON.h && curl -o list.h https://raw.githubusercontent.com/joelguittet/c-list/master/include/list.h && curl -o list.c https://raw.githubusercontent.com/joelguittet/c-list/master/src/list.c && curl -o hashtable.h https://raw.githubusercontent.com/joelguittet/c-hashtable/master/include/hashtable.h && curl -o hashtable.c https://raw.githubusercontent.com/joelguittet/c-hashtable/master/src/hashtable.c",
+    setupCommand: cJSONSetupCommand,
+    /* second.c is a second translation unit including TopLevel.h; it verifies
+     * that the generated header/source split supports multi-TU builds. */
     compileCommand:
-        "gcc -O0 -o quicktype -I. cJSON.c hashtable.c list.c main.c -lpthread",
-    runCommand(sample: string) {
-        return `valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./quicktype "${sample}"`;
-    },
+        "gcc -O0 -o quicktype -isystem deps deps/cJSON.c deps/hashtable.c deps/list.c main.c second.c TopLevel.c -lpthread",
+    runCommand: cJSONRunCommand,
     diffViaSchema: true,
     skipDiffViaSchema: [
         /* Enum constants are different when generating with schema */
@@ -566,8 +576,88 @@ export const CJSONLanguage: Language = {
         /* Class elements with invalid type are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         ...skipsUntypedUnions,
     ],
+    rendererOptions: { "header-only": "false" },
+    quickTestRendererOptions: [
+        { "source-style": "single-source", "header-only": "false" },
+    ],
+    sourceFiles: ["src/language/CJSON/index.ts"],
+};
+
+/* Minimal fixtures covering the remaining source-style / header-only mode
+ * combinations on a single complex input (enums, unions, many classes).
+ * They share the cjson driver directory and setup. */
+
+/* Default options: single-source, header-only.  Single translation unit,
+ * no generated TopLevel.c — the pre-existing output mode. */
+export const CJSONDefaultLanguage: Language = {
+    name: "cjson",
+    base: "test/fixtures/cjson",
+    setupCommand: cJSONSetupCommand,
+    compileCommand:
+        "gcc -O0 -o quicktype -isystem deps deps/cJSON.c deps/hashtable.c deps/list.c main.c -lpthread",
+    runCommand: cJSONRunCommand,
+    diffViaSchema: false,
+    skipDiffViaSchema: [],
+    allowMissingNull: false,
+    features: [],
+    output: "TopLevel.h",
+    topLevel: "TopLevel",
+    includeJSON: ["nbl-stats.json"],
+    skipMiscJSON: true,
+    skipSchema: [],
     rendererOptions: {},
-    quickTestRendererOptions: [{ "source-style": "single-source" }],
+    quickTestRendererOptions: [],
+    sourceFiles: ["src/language/CJSON/index.ts"],
+};
+
+/* Multi-source, header-only.  One header per type; still a single
+ * translation unit, since header-only output defines functions in the
+ * headers and cannot link from multiple translation units. */
+export const CJSONMultiHeaderLanguage: Language = {
+    name: "cjson",
+    base: "test/fixtures/cjson",
+    setupCommand: cJSONSetupCommand,
+    compileCommand:
+        "gcc -O0 -o quicktype -isystem deps deps/cJSON.c deps/hashtable.c deps/list.c main.c -lpthread",
+    runCommand: cJSONRunCommand,
+    diffViaSchema: false,
+    skipDiffViaSchema: [],
+    allowMissingNull: false,
+    features: [],
+    output: "TopLevel.h",
+    topLevel: "TopLevel",
+    includeJSON: ["nbl-stats.json"],
+    skipMiscJSON: true,
+    skipSchema: [],
+    rendererOptions: { "source-style": "multi-source" },
+    quickTestRendererOptions: [],
+    sourceFiles: ["src/language/CJSON/index.ts"],
+};
+
+/* Multi-source, split header/source pairs.  The wildcard picks up main.c,
+ * second.c and every generated .c file; linking the two translation units
+ * verifies the core promise of the split mode (issue #2617). */
+export const CJSONMultiSplitLanguage: Language = {
+    name: "cjson",
+    base: "test/fixtures/cjson",
+    setupCommand: cJSONSetupCommand,
+    compileCommand:
+        "gcc -O0 -o quicktype -isystem deps deps/cJSON.c deps/hashtable.c deps/list.c *.c -lpthread",
+    runCommand: cJSONRunCommand,
+    diffViaSchema: false,
+    skipDiffViaSchema: [],
+    allowMissingNull: false,
+    features: [],
+    output: "TopLevel.h",
+    topLevel: "TopLevel",
+    includeJSON: ["nbl-stats.json"],
+    skipMiscJSON: true,
+    skipSchema: [],
+    rendererOptions: {
+        "source-style": "multi-source",
+        "header-only": "false",
+    },
+    quickTestRendererOptions: [],
     sourceFiles: ["src/language/CJSON/index.ts"],
 };
 
