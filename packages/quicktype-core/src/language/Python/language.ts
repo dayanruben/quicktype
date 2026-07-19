@@ -20,8 +20,12 @@ import { JSONPythonRenderer } from "./JSONPythonRenderer";
 import { PythonRenderer } from "./PythonRenderer";
 
 export interface PythonFeatures {
+    /** PEP 585 builtin generics (`list[str]`, `dict[str, int]`), Python 3.9+ */
+    builtinGenerics: boolean;
     dataClasses: boolean;
     typeHints: boolean;
+    /** PEP 604 union operators (`str | None`), Python 3.10+ */
+    unionOperators: boolean;
 }
 
 export const pythonOptions = {
@@ -29,12 +33,38 @@ export const pythonOptions = {
         "python-version",
         "Python version",
         {
-            "3.5": { typeHints: false, dataClasses: false, builtinGenerics: false },
-            "3.6": { typeHints: true, dataClasses: false, builtinGenerics: false },
-            "3.7": { typeHints: true, dataClasses: true, builtinGenerics: false },
-            "3.9": { typeHints: true, dataClasses: true, builtinGenerics: true },
-        },
-        "3.9",
+            "3.5": {
+                typeHints: false,
+                dataClasses: false,
+                builtinGenerics: false,
+                unionOperators: false,
+            },
+            "3.6": {
+                typeHints: true,
+                dataClasses: false,
+                builtinGenerics: false,
+                unionOperators: false,
+            },
+            "3.7": {
+                typeHints: true,
+                dataClasses: true,
+                builtinGenerics: false,
+                unionOperators: false,
+            },
+            "3.9": {
+                typeHints: true,
+                dataClasses: true,
+                builtinGenerics: true,
+                unionOperators: false,
+            },
+            "3.10": {
+                typeHints: true,
+                dataClasses: true,
+                builtinGenerics: true,
+                unionOperators: true,
+            },
+        } satisfies Record<string, PythonFeatures>,
+        "3.10",
     ),
     justTypes: new BooleanOption("just-types", "Classes only", false),
     nicePropertyNames: new BooleanOption(

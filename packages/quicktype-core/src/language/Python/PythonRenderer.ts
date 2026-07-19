@@ -1,6 +1,7 @@
 import {
     arrayIntercalate,
     iterableFirst,
+    iterableSome,
     mapSortBy,
     mapUpdateInto,
     setUnionInto,
@@ -19,9 +20,11 @@ import { defined, panic } from "../../support/Support";
 import type { TargetLanguage } from "../../TargetLanguage";
 import { followTargetType } from "../../Transformers";
 import {
+    ArrayType,
     type ClassProperty,
     ClassType,
     EnumType,
+    MapType,
     type Type,
     UnionType,
 } from "../../Type";
@@ -137,13 +140,89 @@ export class PythonRenderer extends ConvenienceRenderer {
         return this.withImport("typing", name);
     }
 
-    protected namedType(t: Type, _suppressQuotes: boolean = false): Sourcelike {
+    protected namedType(t: Type, suppressQuotes = false): Sourcelike {
         const name = this.nameForNamedType(t);
-        if (_suppressQuotes || this.declaredTypes.has(t)) return name;
+        if (suppressQuotes || this.declaredTypes.has(t)) return name;
         return ["'", name, "'"];
     }
 
-    protected pythonType(t: Type, _isRootTypeDef = false, _suppressQuotes = false): Sourcelike {
+    // Would rendering `t` as a type annotation right now require a forward
+    // reference, i.e. does it mention a named type that hasn't been declared
+    // yet?
+    private typeContainsForwardRef(t: Type): boolean {
+        const actualType = followTargetType(t);
+        if (actualType instanceof ClassType || actualType instanceof EnumType) {
+            return !this.declaredTypes.has(actualType);
+        }
+
+        if (actualType instanceof ArrayType) {
+            return this.typeContainsForwardRef(actualType.items);
+        }
+
+        if (actualType instanceof MapType) {
+            return this.typeContainsForwardRef(actualType.values);
+        }
+
+        if (actualType instanceof UnionType) {
+            return iterableSome(actualType.members, (m) =>
+                this.typeContainsForwardRef(m),
+            );
+        }
+
+        return false;
+    }
+
+    // Renders a union with PEP 604 syntax: `A | B | None`.  A quoted forward
+    // reference is not allowed as an operand of `|` (`'A' | None` is a runtime
+    // `TypeError`), so if any member needs a forward reference we quote the
+    // whole union expression instead, suppressing the quotes on the individual
+    // names.  A `" = None"` default, if required, must go outside the closing
+    // quote: `foo: 'Foo | None' = None`.
+    private pep604UnionType(
+        unionType: UnionType,
+        isRootTypeDef: boolean,
+        suppressQuotes: boolean,
+    ): Sourcelike {
+        const [hasNull, nonNulls] = removeNullFromUnion(unionType);
+        const needsQuotes =
+            !suppressQuotes &&
+            iterableSome(nonNulls, (m) => this.typeContainsForwardRef(m));
+        const quote = needsQuotes ? "'" : "";
+        const memberTypes = Array.from(nonNulls).map((m) =>
+            this.pythonType(m, false, true),
+        );
+
+        const union: Sourcelike[] = [
+            quote,
+            arrayIntercalate(" | ", memberTypes),
+        ];
+        if (hasNull !== null) {
+            union.push(" | None");
+        }
+
+        union.push(quote);
+
+        if (
+            hasNull !== null &&
+            !this.getAlphabetizeProperties() &&
+            (this.pyOptions.features.dataClasses ||
+                this.pyOptions.pydanticBaseModel) &&
+            isRootTypeDef
+        ) {
+            // Only push "= None" if this is a root level type def
+            //   otherwise we may get type defs like list[int | None = None]
+            //   which are invalid
+            union.push(" = None");
+        }
+
+        return union;
+    }
+
+    protected pythonType(
+        t: Type,
+        _isRootTypeDef = false,
+        suppressQuotes = false,
+    ): Sourcelike {
         const actualType = followTargetType(t);
 
         return matchType<Sourcelike>(
@@ -155,31 +234,36 @@ export class PythonRenderer extends ConvenienceRenderer {
             (_doubletype) => "float",
             (_stringType) => "str",
             (arrayType) => [
-                this.pyOptions.features.builtinGenerics ? "list" : this.withTyping("List"),
+                this.pyOptions.features.builtinGenerics
+                    ? "list"
+                    : this.withTyping("List"),
                 "[",
-                this.pythonType(arrayType.items),
+                this.pythonType(arrayType.items, false, suppressQuotes),
                 "]",
             ],
-            (classType) => this.namedType(classType, _suppressQuotes),
+            (classType) => this.namedType(classType, suppressQuotes),
             (mapType) => [
-                this.pyOptions.features.builtinGenerics ? "dict" : this.withTyping("Dict"),
+                this.pyOptions.features.builtinGenerics
+                    ? "dict"
+                    : this.withTyping("Dict"),
                 "[str, ",
-                this.pythonType(mapType.values),
+                this.pythonType(mapType.values, false, suppressQuotes),
                 "]",
             ],
-            (enumType) => this.namedType(enumType, _suppressQuotes),
+            (enumType) => this.namedType(enumType, suppressQuotes),
             (unionType) => {
-                const [hasNull, nonNulls] = removeNullFromUnion(unionType);
-                const hasClassOrEnumType = Array.from(nonNulls).some(
-                    t => t instanceof ClassType || t instanceof EnumType
-                );
-                const encapsulator = hasClassOrEnumType ? "'" : ""
-                
-                const memberTypes = Array.from(nonNulls).map((m) =>
-                    // Suppress quotes for namedType
-                    this.pythonType(m, false, true),
-                );
+                if (this.pyOptions.features.unionOperators) {
+                    return this.pep604UnionType(
+                        unionType,
+                        _isRootTypeDef,
+                        suppressQuotes,
+                    );
+                }
 
+                const [hasNull, nonNulls] = removeNullFromUnion(unionType);
+                const memberTypes = Array.from(nonNulls).map((m) =>
+                    this.pythonType(m, false, suppressQuotes),
+                );
 
                 if (hasNull !== null) {
                     const rest: string[] = [];
@@ -196,16 +280,6 @@ export class PythonRenderer extends ConvenienceRenderer {
                     }
 
                     if (nonNulls.size > 1) {
-                        if (this.pyOptions.features.builtinGenerics) {
-                            return [
-                                encapsulator,
-                                arrayIntercalate(" | ", memberTypes),
-                                " | None",
-                                ...rest,
-                                encapsulator
-                            ];
-                        }
-                            
                         this.withImport("typing", "Union");
                         return [
                             this.withTyping("Optional"),
@@ -216,29 +290,12 @@ export class PythonRenderer extends ConvenienceRenderer {
                         ];
                     }
 
-                    if (this.pyOptions.features.builtinGenerics) {
-                        return [
-                            encapsulator,
-                            defined(iterableFirst(memberTypes)),
-                            " | None",
-                            ...rest,
-                            encapsulator
-                        ];
-                    }
                     return [
                         this.withTyping("Optional"),
                         "[",
                         defined(iterableFirst(memberTypes)),
                         "]",
                         ...rest,
-                    ];
-                }
-
-                if (this.pyOptions.features.builtinGenerics) {
-                    return [
-                        encapsulator,
-                        arrayIntercalate(" | ", memberTypes),
-                        encapsulator
                     ];
                 }
 
