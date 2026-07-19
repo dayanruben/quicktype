@@ -242,7 +242,10 @@ export class JavaScriptRenderer extends ConvenienceRenderer {
     /** The expression a deserializer returns when runtime typechecks
      * are disabled.  Subclasses can wrap it in a cast to the target
      * type if `parsedJson`'s type isn't assignable to it. */
-    protected uncheckedParsedJson(_t: Type, parsedJson: Sourcelike): Sourcelike {
+    protected uncheckedParsedJson(
+        _t: Type,
+        parsedJson: Sourcelike,
+    ): Sourcelike {
         return parsedJson;
     }
 

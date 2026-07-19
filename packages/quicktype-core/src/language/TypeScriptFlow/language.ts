@@ -48,7 +48,7 @@ export const tsFlowOptions = {
     preferUnknown: new BooleanOption(
         "prefer-unknown",
         "Use unknown (TypeScript) or mixed (Flow) instead of any",
-        false,
+        true,
     ),
 };
 

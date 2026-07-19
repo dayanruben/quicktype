@@ -25,7 +25,13 @@ export class FlowRenderer extends TypeScriptFlowBaseRenderer {
             this._tsFlowOptions.rawType !== "json" &&
             this._tsFlowOptions.preferUnknown
         ) {
-            return ["((", parsedJson, ": any): ", this.sourceFor(t).source, ")"];
+            return [
+                "((",
+                parsedJson,
+                ": any): ",
+                this.sourceFor(t).source,
+                ")",
+            ];
         }
 
         return parsedJson;
