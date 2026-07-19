@@ -1,23 +1,24 @@
 import { iterableSome } from "collection-utils";
 
-import type { RenderContext } from "../../Renderer";
+import type { RenderContext } from "../../Renderer.js";
 import {
     BooleanOption,
     EnumOption,
     getOptionValues,
-} from "../../RendererOptions";
-import { TargetLanguage } from "../../TargetLanguage";
+} from "../../RendererOptions/index.js";
+import type { IntegerRange } from "../../support/IntegerRange.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
+import type { StringTypeMapping } from "../../Type/TypeBuilderUtils.js";
 import {
     type PrimitiveStringTypeKind,
     type TransformedStringTypeKind,
     type Type,
     UnionType,
-} from "../../Type";
-import type { StringTypeMapping } from "../../Type/TypeBuilderUtils";
-import type { LanguageName, RendererOptions } from "../../types";
+} from "../../Type/index.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { JSONPythonRenderer } from "./JSONPythonRenderer";
-import { PythonRenderer } from "./PythonRenderer";
+import { JSONPythonRenderer } from "./JSONPythonRenderer.js";
+import { PythonRenderer } from "./PythonRenderer.js";
 
 export interface PythonFeatures {
     /** PEP 585 builtin generics (`list[str]`, `dict[str, int]`), Python 3.9+ */
@@ -88,6 +89,11 @@ export const pythonLanguageConfig = {
 export class PythonTargetLanguage extends TargetLanguage<
     typeof pythonLanguageConfig
 > {
+    // Python's integers are arbitrary-precision.
+    public getSupportedIntegerRange(): IntegerRange | null {
+        return null;
+    }
+
     public constructor() {
         super(pythonLanguageConfig);
     }

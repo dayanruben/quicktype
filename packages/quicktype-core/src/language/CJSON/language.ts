@@ -21,16 +21,23 @@
  * See test/languages.ts for the test cases which are not implmented/checked.
  */
 
-import type { RenderContext } from "../../Renderer";
+import type { RenderContext } from "../../Renderer.js";
 import {
     EnumOption,
     StringOption,
     getOptionValues,
-} from "../../RendererOptions";
-import { TargetLanguage } from "../../TargetLanguage";
-import type { LanguageName, RendererOptions } from "../../types";
+} from "../../RendererOptions/index.js";
+import {
+    INT8_RANGE,
+    INT16_RANGE,
+    INT32_RANGE,
+    INT64_RANGE,
+    type IntegerRange,
+} from "../../support/IntegerRange.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { CJSONRenderer } from "./CJSONRenderer";
+import { CJSONRenderer } from "./CJSONRenderer.js";
 
 /* Naming styles */
 const namingStyles = {
@@ -140,6 +147,28 @@ export class CJSONTargetLanguage extends TargetLanguage<
      */
     public get supportsUnionsWithBothNumberTypes(): boolean {
         return true;
+    }
+
+    /**
+     * Return the range of whole numbers the generated integer type can
+     * represent, which depends on the `integer-size` renderer option
+     * (int64_t by default)
+     * @param rendererOptions: untyped renderer option values
+     * @return the range of the configured integer type
+     */
+    public getSupportedIntegerRange(
+        rendererOptions: Record<string, unknown> = {},
+    ): IntegerRange | null {
+        switch (cJSONOptions.typeIntegerSize.getValue(rendererOptions)) {
+            case "int8_t":
+                return INT8_RANGE;
+            case "int16_t":
+                return INT16_RANGE;
+            case "int32_t":
+                return INT32_RANGE;
+            default:
+                return INT64_RANGE;
+        }
     }
 
     /**
