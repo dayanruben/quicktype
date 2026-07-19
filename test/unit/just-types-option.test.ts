@@ -131,8 +131,8 @@ describe("framework defaults", () => {
         expect(output).toContain("io.circe");
     });
 
-    test("Kotlin defaults to Klaxon", async () => {
+    test("Kotlin defaults to Jackson", async () => {
         const output = await linesFor("kotlin");
-        expect(output).toContain("com.beust.klaxon");
+        expect(output).toContain("com.fasterxml.jackson");
     });
 });

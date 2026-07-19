@@ -1278,7 +1278,9 @@ export const KotlinLanguage: Language = {
         "recursive-union-flattening.schema",
     ],
     skipMiscJSON: false,
-    rendererOptions: {},
+    // The default framework is jackson; this fixture deliberately pins
+    // klaxon so the Klaxon renderer keeps end-to-end coverage.
+    rendererOptions: { framework: "klaxon" },
     quickTestRendererOptions: [],
     sourceFiles: ["src/language/Kotlin/index.ts"],
 };
