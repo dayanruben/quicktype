@@ -721,7 +721,9 @@ export const CPlusPlusLanguage: Language = {
         { "code-format": "with-struct" },
         { wstring: "use-wstring" },
         { "const-style": "east-const" },
-        { boost: "false" },
+        // The default is boost=false (C++17); this keeps the boost code
+        // path covered.
+        { boost: "true" },
     ],
     sourceFiles: ["src/language/CPlusPlus/index.ts"],
 };
