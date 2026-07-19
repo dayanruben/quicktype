@@ -547,6 +547,7 @@ export const CJSONLanguage: Language = {
         "go-schema-pattern-properties.schema",
         "multi-type-enum.schema",
         "nested-intersection-union.schema",
+        "prefix-items.schema",
         /* Constraints (min/max and regex) are not supported (for the current implementation, can be added later, should abord parsing and return NULL) */
         "minmaxlength.schema",
         "optional-const-ref.schema",
