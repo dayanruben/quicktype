@@ -1022,6 +1022,7 @@ I havea no idea how to encode these tests correctly.
         // The test driver prints the circe DecodingFailure and exits 0, so
         // expected-failure samples cannot be detected.
         "nested-intersection-union.schema",
+        "prefix-items.schema",
         "date-time-or-string.schema",
         "implicit-one-of.schema",
         "go-schema-pattern-properties.schema",
@@ -1467,6 +1468,7 @@ export const HaskellLanguage: Language = {
         // The test driver encodes the Maybe result, so a failed decode prints
         // "null" and exits 0 — expected-failure samples cannot be detected.
         "nested-intersection-union.schema",
+        "prefix-items.schema",
         "direct-union.schema",
         ...skipsEnumValueValidation,
         "go-schema-pattern-properties.schema",
