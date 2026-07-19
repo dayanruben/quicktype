@@ -1,4 +1,5 @@
 import type { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
+import type { DateTimeRecognizer } from "../../DateTime.js";
 import type { RenderContext } from "../../Renderer.js";
 import {
     BooleanOption,
@@ -20,6 +21,7 @@ import { KotlinJacksonRenderer } from "./KotlinJacksonRenderer.js";
 import { KotlinKlaxonRenderer } from "./KotlinKlaxonRenderer.js";
 import { KotlinRenderer } from "./KotlinRenderer.js";
 import { KotlinXRenderer } from "./KotlinXRenderer.js";
+import { KotlinDateTimeRecognizer } from "./utils.js";
 
 export const kotlinOptions = {
     justTypes: new BooleanOption("just-types", "Plain types only", false),
@@ -69,6 +71,12 @@ export class KotlinTargetLanguage extends TargetLanguage<
         mapping.set("time", "time");
         mapping.set("date-time", "date-time");
         return mapping;
+    }
+
+    // Only infer date/time types from JSON strings that java.time's ISO
+    // formatters round-trip byte-identically; see KotlinDateTimeRecognizer.
+    public get dateTimeRecognizer(): DateTimeRecognizer {
+        return new KotlinDateTimeRecognizer();
     }
 
     protected makeRenderer<Lang extends LanguageName = "kotlin">(

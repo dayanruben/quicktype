@@ -1156,17 +1156,6 @@ export const KotlinLanguage: Language = {
         "af2d1.json",
         "32431.json",
         "bug427.json",
-        // Contain date-time values with trailing zeros in the fractional
-        // seconds, which java.time does not re-serialize identically
-        "54d32.json",
-        "77392.json",
-        "0a358.json",
-        "80aff.json",
-        "b4865.json",
-        "9ac3b.json",
-        "337ed.json",
-        "734ad.json",
-        "d23d5.json",
     ],
     skipSchema: [
         // Very weird - the types are correct, but it can (de)serialize the string,
@@ -1256,17 +1245,6 @@ export const KotlinJacksonLanguage: Language = {
         "af2d1.json",
         "32431.json",
         "bug427.json",
-        // Contain date-time values with trailing zeros in the fractional
-        // seconds, which java.time does not re-serialize identically
-        "54d32.json",
-        "77392.json",
-        "0a358.json",
-        "80aff.json",
-        "b4865.json",
-        "9ac3b.json",
-        "337ed.json",
-        "734ad.json",
-        "d23d5.json",
     ],
     skipSchema: [
         // Very weird - the types are correct, but it can (de)serialize the string,
@@ -1402,16 +1380,6 @@ export const KotlinXLanguage: Language = {
         // the @SerialName annotations don't match the JSON keys.
         "blns-object.json",
         "identifiers.json",
-        // Contain date-time values with trailing zeros in the fractional
-        // seconds, which java.time does not re-serialize identically
-        // (77392.json and b4865.json are already skipped above).
-        "54d32.json",
-        "0a358.json",
-        "80aff.json",
-        "9ac3b.json",
-        "337ed.json",
-        "734ad.json",
-        "d23d5.json",
     ],
     skipSchema: [
         // Unions render as sealed classes without serializer wiring, so
