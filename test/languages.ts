@@ -1584,7 +1584,9 @@ export const DartLanguage: Language = {
     ],
     skipMiscJSON: true,
     rendererOptions: {},
-    quickTestRendererOptions: [],
+    // The default is final-props=true; this keeps the mutable-property
+    // code path covered.
+    quickTestRendererOptions: [{ "final-props": "false" }],
     sourceFiles: ["src/language/Dart/index.ts"],
 };
 
