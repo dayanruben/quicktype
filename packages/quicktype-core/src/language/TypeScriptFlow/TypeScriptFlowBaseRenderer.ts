@@ -191,9 +191,9 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
         );
     }
 
-    protected emitUsageComments(): void {
+    protected emitUsageComments(givenOutputFilename: string): void {
         if (this._tsFlowOptions.justTypes) return;
-        super.emitUsageComments();
+        super.emitUsageComments(givenOutputFilename);
     }
 
     protected deserializerFunctionLine(t: Type, name: Name): Sourcelike {
