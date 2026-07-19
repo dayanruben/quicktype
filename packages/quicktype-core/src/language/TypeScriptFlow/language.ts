@@ -32,7 +32,7 @@ export const tsFlowOptions = {
     preferUnions: new BooleanOption(
         "prefer-unions",
         "Use union type instead of enum",
-        false,
+        true,
     ),
     preferTypes: new BooleanOption(
         "prefer-types",

@@ -963,6 +963,9 @@ export const TypeScriptLanguage: Language = {
         { "acronym-style": "pascal" },
         { converters: "all-objects" },
         { readonly: "true" },
+        // The default is prefer-unions=true; this keeps the TypeScript
+        // enum code path covered.
+        { "prefer-unions": "false" },
     ],
     sourceFiles: ["src/language/TypeScript/index.ts"],
 };
@@ -1042,6 +1045,10 @@ export const FlowLanguage: Language = {
         { "runtime-typecheck": "false" },
         { "runtime-typecheck-ignore-unknown-properties": "true" },
         { "nice-property-names": "true" },
+        // Flow always renders enums as unions of string literals, so
+        // this only asserts that the flipped default stays a no-op for
+        // Flow output.
+        { "prefer-unions": "false" },
     ],
     sourceFiles: ["src/language/Flow/index.ts"],
 };
