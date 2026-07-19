@@ -227,6 +227,12 @@ export class KotlinRenderer extends ConvenienceRenderer {
         // To be overridden
     }
 
+    // Emitted between the usage header and the package declaration —
+    // the only place Kotlin allows `@file:`-targeted annotations.
+    protected emitFileAnnotations(): void {
+        // To be overridden
+    }
+
     protected emitHeader(): void {
         if (this.leadingComments !== undefined) {
             this.emitComments(this.leadingComments);
@@ -235,6 +241,7 @@ export class KotlinRenderer extends ConvenienceRenderer {
         }
 
         this.ensureBlankLine();
+        this.emitFileAnnotations();
         this.emitLine("package ", this._kotlinOptions.packageName);
         this.ensureBlankLine();
 
