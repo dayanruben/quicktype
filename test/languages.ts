@@ -305,8 +305,13 @@ export const RustLanguage: Language = {
     quickTestRendererOptions: [
         { density: "dense" },
         { visibility: "crate" },
-        { visibility: "private" },
-        { visibility: "public" },
+        // The pre-flip defaults: private fields without Debug/Clone
+        // derives, kept covered after the defaults changed.
+        {
+            visibility: "private",
+            "derive-debug": "false",
+            "derive-clone": "false",
+        },
     ],
     sourceFiles: ["src/language/Rust/index.ts"],
 };

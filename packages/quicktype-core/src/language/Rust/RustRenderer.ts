@@ -376,11 +376,7 @@ export class RustRenderer extends ConvenienceRenderer {
         }
 
         this.ensureBlankLine();
-        if (this._options.edition2018) {
-            this.emitLine("use serde::{Serialize, Deserialize};");
-        } else {
-            this.emitLine("extern crate serde_derive;");
-        }
+        this.emitLine("use serde::{Serialize, Deserialize};");
 
         if (this.haveMaps) {
             this.emitLine("use std::collections::HashMap;");
