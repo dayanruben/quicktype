@@ -3,31 +3,31 @@ import { mapContains } from "collection-utils";
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import type { Name, Namer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
+} from "../../ConvenienceRenderer.js";
+import type { Name, Namer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
 import {
     type MultiWord,
     type Sourcelike,
     multiWord,
     parenIfNeeded,
     singleWord,
-} from "../../Source";
-import { stringEscape } from "../../support/Strings";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../Source.js";
+import { stringEscape } from "../../support/Strings.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import type {
     ClassProperty,
     ClassType,
     EnumType,
     Type,
     UnionType,
-} from "../../Type";
-import { matchType, nullableFromUnion } from "../../Type/TypeUtils";
+} from "../../Type/index.js";
+import { matchType, nullableFromUnion } from "../../Type/TypeUtils.js";
 
-import { forbiddenNames } from "./constants";
-import type { haskellOptions } from "./language";
-import { lowerNamingFunction, upperNamingFunction } from "./utils";
+import { forbiddenNames } from "./constants.js";
+import type { haskellOptions } from "./language.js";
+import { lowerNamingFunction, upperNamingFunction } from "./utils.js";
 
 export class HaskellRenderer extends ConvenienceRenderer {
     public constructor(

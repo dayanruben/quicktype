@@ -1,15 +1,15 @@
 import {
     anyTypeIssueAnnotation,
     nullTypeIssueAnnotation,
-} from "../../Annotation";
-import { ConvenienceRenderer } from "../../ConvenienceRenderer";
-import { DependencyName, type Name, type Namer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, maybeAnnotated, modifySource } from "../../Source";
-import { camelCase, stringEscape } from "../../support/Strings";
-import { assert, defined } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../Annotation.js";
+import { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
+import { DependencyName, type Name, type Namer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, maybeAnnotated, modifySource } from "../../Source.js";
+import { camelCase, stringEscape } from "../../support/Strings.js";
+import { assert, defined } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     type ClassProperty,
     type ClassType,
@@ -17,21 +17,21 @@ import {
     type Type,
     type TypeKind,
     UnionType,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     matchType,
     nullableFromUnion,
     removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import type { goOptions } from "./language";
+import type { goOptions } from "./language.js";
 import {
     canOmitEmpty,
     compoundTypeKinds,
     isValueType,
     namingFunction,
     primitiveValueTypeKinds,
-} from "./utils";
+} from "./utils.js";
 
 export class GoRenderer extends ConvenienceRenderer {
     private readonly _topLevelUnmarshalNames = new Map<Name, Name>();
@@ -249,14 +249,16 @@ export class GoRenderer extends ConvenienceRenderer {
             const description = this.descriptionForClassProperty(c, jsonName);
             const docStrings =
                 description !== undefined && description.length > 0
-                    ? description.map((d) => "// " + d)
+                    ? description.map((d) => `// ${d}`)
                     : [];
             const goType = this.propertyGoType(p);
             const omitEmpty = canOmitEmpty(p, this._options.omitEmpty)
                 ? ",omitempty"
                 : [];
 
-            docStrings.forEach((doc) => columns.push([doc]));
+            docStrings.forEach((doc) => {
+                columns.push([doc]);
+            });
             const tags = this._options.fieldTags
                 .split(",")
                 .map((tag) => `${tag}:"${stringEscape(jsonName)}${omitEmpty}"`)

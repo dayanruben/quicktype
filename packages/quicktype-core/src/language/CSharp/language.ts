@@ -1,24 +1,24 @@
-import type { ConvenienceRenderer } from "../../ConvenienceRenderer";
-import type { RenderContext } from "../../Renderer";
+import type { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
+import type { RenderContext } from "../../Renderer.js";
 import {
     BooleanOption,
     EnumOption,
     StringOption,
     getOptionValues,
-} from "../../RendererOptions";
-import { assertNever } from "../../support/Support";
-import { TargetLanguage } from "../../TargetLanguage";
+} from "../../RendererOptions/index.js";
+import { assertNever } from "../../support/Support.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
 import type {
     PrimitiveStringTypeKind,
     TransformedStringTypeKind,
     Type,
-} from "../../Type";
-import type { StringTypeMapping } from "../../Type/TypeBuilderUtils";
-import type { LanguageName, RendererOptions } from "../../types";
+} from "../../Type/index.js";
+import type { StringTypeMapping } from "../../Type/TypeBuilderUtils.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { NewtonsoftCSharpRenderer } from "./NewtonSoftCSharpRenderer";
-import { SystemTextJsonCSharpRenderer } from "./SystemTextJsonCSharpRenderer";
-import { needTransformerForType } from "./utils";
+import { NewtonsoftCSharpRenderer } from "./NewtonSoftCSharpRenderer.js";
+import { SystemTextJsonCSharpRenderer } from "./SystemTextJsonCSharpRenderer.js";
+import { needTransformerForType } from "./utils.js";
 
 export interface OutputFeatures {
     attributes: boolean;
@@ -104,19 +104,10 @@ export const cSharpOptions = {
                 helpers: false,
                 attributes: true,
             },
-            "just-types-and-namespace": {
-                namespaces: true,
-                helpers: false,
-                attributes: false,
-            },
-            "just-types": {
-                namespaces: true,
-                helpers: false,
-                attributes: false,
-            },
         } as const,
         "complete",
     ),
+    justTypes: new BooleanOption("just-types", "Plain types only", false),
     baseclass: new EnumOption(
         "base-class",
         "Base class",
@@ -139,9 +130,9 @@ export const cSharpOptions = {
     ),
 } as const;
 
-export const newtonsoftCSharpOptions = Object.assign({}, cSharpOptions, {});
+export const newtonsoftCSharpOptions = { ...cSharpOptions };
 
-export const systemTextJsonCSharpOptions = Object.assign({}, cSharpOptions, {});
+export const systemTextJsonCSharpOptions = { ...cSharpOptions };
 
 export const cSharpLanguageConfig = {
     displayName: "C#",

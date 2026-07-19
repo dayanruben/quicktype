@@ -1,4 +1,4 @@
-import { Scala3Renderer } from "./Scala3Renderer";
+import { Scala3Renderer } from "./Scala3Renderer.js";
 
 export class UpickleRenderer extends Scala3Renderer {
     protected emitClassDefinitionMethods(): void {

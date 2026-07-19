@@ -6,7 +6,7 @@ import { exceptionToString } from "@glideapps/ts-necessities";
 import chalk from "chalk";
 import {
     definedMap,
-    // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
+    // biome-ignore lint/suspicious/noShadowRestrictedNames: collection-utils exports this name
     hasOwnProperty,
     mapFromObject,
     mapMap,
@@ -74,7 +74,7 @@ const wordWrap: (s: string) => string = _wordwrap(90);
 
 export interface CLIOptions<Lang extends LanguageName = LanguageName> {
     // We use this to access the inference flags
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: heterogeneous by design
     [option: string]: any;
     additionalSchema: string[];
     allPropertiesOptional: boolean;
@@ -120,7 +120,8 @@ async function sourceFromFileOrUrlArray(
 
 function typeNameFromFilename(filename: string): string {
     const name = path.basename(filename);
-    return name.substring(0, name.lastIndexOf("."));
+    const extIndex = name.lastIndexOf(".");
+    return extIndex === -1 ? "" : name.slice(0, extIndex);
 }
 
 async function samplesFromDirectory(
@@ -137,8 +138,8 @@ async function samplesFromDirectory(
         // Each file is a (Name, JSON | URL)
         const sourcesInDir: TypeSource[] = [];
         const graphQLSources: GraphQLTypeSource[] = [];
-        let graphQLSchema: Readable | undefined = undefined;
-        let graphQLSchemaFileName: string | undefined = undefined;
+        let graphQLSchema: Readable | undefined;
+        let graphQLSchemaFileName: string | undefined;
         for (let file of files) {
             const name = typeNameFromFilename(file);
 
@@ -241,7 +242,7 @@ async function samplesFromDirectory(
             schemaSources.length + graphQLSources.length > 0
         ) {
             return messageError("DriverCannotMixJSONWithOtherSamples", {
-                dir: dir,
+                dir,
             });
         }
 
@@ -252,7 +253,7 @@ async function samplesFromDirectory(
             oneUnlessEmpty(schemaSources) + oneUnlessEmpty(graphQLSources) >
             1
         ) {
-            return messageError("DriverCannotMixNonJSONInputs", { dir: dir });
+            return messageError("DriverCannotMixNonJSONInputs", { dir });
         }
 
         if (jsonSamples.length > 0) {
@@ -351,7 +352,7 @@ function inferCLIOptions(
     const options: CLIOptions = {
         src: opts.src ?? [],
         srcUrls: opts.srcUrls,
-        srcLang: srcLang,
+        srcLang,
         lang: language.name as LanguageName,
         topLevel: opts.topLevel ?? inferTopLevel(opts),
         noRender: !!opts.noRender,
@@ -395,7 +396,7 @@ function negatedInferenceFlagName(name: string): string {
         name = name.slice(prefix.length);
     }
 
-    return "no" + capitalize(name);
+    return `no${capitalize(name)}`;
 }
 
 function dashedFromCamelCase(name: string): string {
@@ -470,7 +471,7 @@ function makeOptionDefinitions(
             return {
                 name: dashedFromCamelCase(negatedInferenceFlagName(name)),
                 optionType: "boolean" as const,
-                description: flag.negationDescription + ".",
+                description: `${flag.negationDescription}.`,
                 kind: "cli" as const,
             };
         }).values(),
@@ -580,6 +581,20 @@ function makeOptionDefinitions(
     return beforeLang.concat(lang, afterLang, inference, afterInference);
 }
 
+// command-line-usage defaults to a "string" type placeholder for any option
+// definition that has neither a `type` function nor a `typeLabel`.  Map our
+// `optionType` to a `type` function (like `parseOptions` does for
+// command-line-args) so boolean flags are rendered without a bogus value
+// placeholder, while options that take values keep their explicit `typeLabel`.
+function optionDefinitionsForUsage(
+    definitions: OptionDefinition[],
+): OptionDefinition[] {
+    return definitions.map((def) => ({
+        ...def,
+        type: def.optionType === "boolean" ? Boolean : String,
+    }));
+}
+
 interface ColumnDefinition {
     name: string;
     padding?: { left: string; right: string };
@@ -637,7 +652,9 @@ function makeSectionsBeforeRenderers(
         },
         {
             header: "Options",
-            optionList: makeOptionDefinitions(targetLanguages),
+            optionList: optionDefinitionsForUsage(
+                makeOptionDefinitions(targetLanguages),
+            ),
             hide: ["no-render", "build-markov-chain"],
             tableOptions: tableOptionsForOptions,
         },
@@ -785,7 +802,7 @@ function usage(targetLanguages: readonly TargetLanguage[]): void {
 
         rendererSections.push({
             header: `Options for ${language.displayName}`,
-            optionList: definitions,
+            optionList: optionDefinitionsForUsage(definitions),
             tableOptions: tableOptionsForOptions,
         });
     }
@@ -879,16 +896,17 @@ async function getSources(options: CLIOptions): Promise<TypeSource[]> {
 }
 
 function makeTypeScriptSource(fileNames: string[]): SchemaTypeSource {
-    return Object.assign(
-        { kind: "schema" },
-        schemaForTypeScriptSources(fileNames),
-    ) as SchemaTypeSource;
+    return {
+        kind: "schema",
+        ...schemaForTypeScriptSources(fileNames),
+    } as SchemaTypeSource;
 }
 
 export function jsonInputForTargetLanguage(
     targetLanguage: string | TargetLanguage,
     languages?: TargetLanguage[],
     handleJSONRefs = false,
+    rendererOptions: Record<string, unknown> = {},
 ): JSONInput<Readable> {
     if (typeof targetLanguage === "string") {
         const languageName = isLanguageName(targetLanguage)
@@ -900,6 +918,7 @@ export function jsonInputForTargetLanguage(
     const compressedJSON = new CompressedJSONFromStream(
         targetLanguage.dateTimeRecognizer,
         handleJSONRefs,
+        targetLanguage.getSupportedIntegerRange(rendererOptions),
     );
     return new JSONInput(compressedJSON);
 }
@@ -909,6 +928,7 @@ async function makeInputData(
     targetLanguage: TargetLanguage,
     additionalSchemaAddresses: readonly string[],
     handleJSONRefs: boolean,
+    rendererOptions: Record<string, unknown>,
     httpHeaders?: string[],
 ): Promise<InputData> {
     const inputData = new InputData();
@@ -928,6 +948,7 @@ async function makeInputData(
                         targetLanguage,
                         undefined,
                         handleJSONRefs,
+                        rendererOptions,
                     ),
                 );
                 break;
@@ -987,11 +1008,11 @@ export async function makeQuicktypeOptions(
     }
 
     let sources: TypeSource[] = [];
-    let leadingComments: string[] | undefined = undefined;
+    let leadingComments: string[] | undefined;
     let fixedTopLevels = false;
     switch (options.srcLang) {
-        case "graphql":
-            let schemaString: string | undefined = undefined;
+        case "graphql": {
+            let schemaString: string | undefined;
             let wroteSchemaToFile = false;
             if (options.graphqlIntrospect !== undefined) {
                 schemaString = await introspectServer(
@@ -1024,7 +1045,7 @@ export async function makeQuicktypeOptions(
 
             const gqlSources: GraphQLTypeSource[] = [];
             for (const queryFile of options.src) {
-                let schemaFileName: string | undefined = undefined;
+                let schemaFileName: string | undefined;
                 if (schemaString === undefined) {
                     schemaFileName = defined(options.graphqlSchema);
                     schemaString = fs.readFileSync(schemaFileName, "utf8");
@@ -1047,6 +1068,7 @@ export async function makeQuicktypeOptions(
 
             sources = gqlSources;
             break;
+        }
         case "json":
         case "schema":
             sources = await getSources(options);
@@ -1063,12 +1085,10 @@ export async function makeQuicktypeOptions(
                         collectionFile,
                     );
                 for (const src of postmanSources) {
-                    sources.push(
-                        Object.assign(
-                            { kind: "json" },
-                            stringSourceDataToStreamSourceData(src),
-                        ) as JSONTypeSource,
-                    );
+                    sources.push({
+                        kind: "json",
+                        ...stringSourceDataToStreamSourceData(src),
+                    } as JSONTypeSource);
                 }
 
                 if (postmanSources.length > 1) {
@@ -1161,6 +1181,7 @@ export async function makeQuicktypeOptions(
         lang,
         options.additionalSchema,
         quicktypeOptions.ignoreJsonRefs !== true,
+        options.rendererOptions,
         options.httpHeader,
     );
 

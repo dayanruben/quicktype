@@ -1,10 +1,12 @@
-import type { Name } from "../../Naming";
-import { utf16StringEscape } from "../../support/Strings";
-import { defined } from "../../support/Support";
-import type { ClassType, EnumType } from "../../Type";
-import type { JavaScriptTypeAnnotations } from "../JavaScript";
+import type { Name } from "../../Naming.js";
+import type { Sourcelike } from "../../Source.js";
+import { utf16StringEscape } from "../../support/Strings.js";
+import { defined } from "../../support/Support.js";
+import type { ClassType, EnumType, Type } from "../../Type/index.js";
+import type { JavaScriptTypeAnnotations } from "../JavaScript/index.js";
 
-import { TypeScriptFlowBaseRenderer } from "./TypeScriptFlowBaseRenderer";
+import { TypeScriptFlowBaseRenderer } from "./TypeScriptFlowBaseRenderer.js";
+import { tsFlowTypeAnnotations } from "./utils.js";
 
 export class FlowRenderer extends TypeScriptFlowBaseRenderer {
     protected anyType(): string {
@@ -15,16 +17,22 @@ export class FlowRenderer extends TypeScriptFlowBaseRenderer {
         return ["Class", "Date", "Object", "String", "Array", "JSON", "Error"];
     }
 
+    protected uncheckedParsedJson(t: Type, parsedJson: Sourcelike): Sourcelike {
+        // With `raw-type any` and `prefer-unknown` the deserializer's
+        // parameter is `mixed`, which can't be returned as the target
+        // type without a cast.
+        if (
+            this._tsFlowOptions.rawType !== "json" &&
+            this._tsFlowOptions.preferUnknown
+        ) {
+            return ["((", parsedJson, ": any): ", this.sourceFor(t).source, ")"];
+        }
+
+        return parsedJson;
+    }
+
     protected get typeAnnotations(): JavaScriptTypeAnnotations {
-        const a = this.anyType();
-        return Object.assign({ never: "" }, {
-            any: `: ${a}`,
-            anyArray: `: ${a}[]`,
-            anyMap: `: { [k: string]: ${a} }`,
-            string: ": string",
-            stringArray: ": string[]",
-            boolean: ": boolean",
-        });
+        return { never: "", ...tsFlowTypeAnnotations };
     }
 
     protected emitEnum(e: EnumType, enumName: Name): void {
@@ -50,9 +58,9 @@ export class FlowRenderer extends TypeScriptFlowBaseRenderer {
         });
     }
 
-    protected emitSourceStructure(): void {
+    protected emitSourceStructure(givenOutputFilename: string): void {
         this.emitLine("// @flow");
         this.ensureBlankLine();
-        super.emitSourceStructure();
+        super.emitSourceStructure(givenOutputFilename);
     }
 }

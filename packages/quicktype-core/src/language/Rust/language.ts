@@ -1,14 +1,14 @@
-import type { RenderContext } from "../../Renderer";
+import type { RenderContext } from "../../Renderer.js";
 import {
     BooleanOption,
     EnumOption,
     getOptionValues,
-} from "../../RendererOptions";
-import { TargetLanguage } from "../../TargetLanguage";
-import type { LanguageName, RendererOptions } from "../../types";
+} from "../../RendererOptions/index.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { RustRenderer } from "./RustRenderer";
-import { Density, Visibility } from "./utils";
+import { RustRenderer } from "./RustRenderer.js";
+import { Density, Visibility } from "./utils.js";
 
 export const rustOptions = {
     density: new EnumOption(
