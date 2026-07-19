@@ -331,7 +331,13 @@ export class KotlinRenderer extends ConvenienceRenderer {
                     meta.push(() => this.emitDescription(description));
                 }
 
-                this.renameAttribute(name, jsonName, !nullableOrOptional, meta);
+                this.renameAttribute(
+                    name,
+                    jsonName,
+                    !nullableOrOptional,
+                    meta,
+                    p,
+                );
 
                 if (meta.length > 0 && !first) {
                     this.ensureBlankLine();
@@ -377,6 +383,7 @@ export class KotlinRenderer extends ConvenienceRenderer {
         _jsonName: string,
         _required: boolean,
         _meta: Array<() => void>,
+        _p: ClassProperty,
     ): void {
         // to be overridden
     }

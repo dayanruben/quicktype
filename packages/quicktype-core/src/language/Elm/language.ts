@@ -5,6 +5,10 @@ import {
     StringOption,
     getOptionValues,
 } from "../../RendererOptions/index.js";
+import {
+    type IntegerRange,
+    JS_SAFE_INTEGER_RANGE,
+} from "../../support/IntegerRange.js";
 import { TargetLanguage } from "../../TargetLanguage.js";
 import type { LanguageName, RendererOptions } from "../../types.js";
 
@@ -53,6 +57,12 @@ export class ElmTargetLanguage extends TargetLanguage<
 
     public get supportsUnionsWithBothNumberTypes(): boolean {
         return true;
+    }
+
+    // Elm compiles to JavaScript, where `Int` is an IEEE-754 double at
+    // runtime, so integers are only exact within the JS safe range.
+    public getSupportedIntegerRange(): IntegerRange | null {
+        return JS_SAFE_INTEGER_RANGE;
     }
 
     protected makeRenderer<Lang extends LanguageName = "elm">(

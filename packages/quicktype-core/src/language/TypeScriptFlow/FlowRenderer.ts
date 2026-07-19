@@ -13,7 +13,7 @@ export class FlowRenderer extends TypeScriptFlowBaseRenderer {
     }
 
     protected get typeAnnotations(): JavaScriptTypeAnnotations {
-        return Object.assign({ never: "" }, tsFlowTypeAnnotations);
+        return { never: "", ...tsFlowTypeAnnotations };
     }
 
     protected emitEnum(e: EnumType, enumName: Name): void {
@@ -39,9 +39,9 @@ export class FlowRenderer extends TypeScriptFlowBaseRenderer {
         });
     }
 
-    protected emitSourceStructure(): void {
+    protected emitSourceStructure(givenOutputFilename: string): void {
         this.emitLine("// @flow");
         this.ensureBlankLine();
-        super.emitSourceStructure();
+        super.emitSourceStructure(givenOutputFilename);
     }
 }

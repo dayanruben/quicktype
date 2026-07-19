@@ -323,7 +323,7 @@ export class PythonRenderer extends ConvenienceRenderer {
         ) {
             return mapSortBy(properties, (p: ClassProperty) => {
                 return (p.type instanceof UnionType &&
-                    nullableFromUnion(p.type) != null) ||
+                    nullableFromUnion(p.type) !== null) ||
                     p.isOptional
                     ? 1
                     : 0;
@@ -390,13 +390,9 @@ export class PythonRenderer extends ConvenienceRenderer {
         });
     }
 
-    protected emitSupportCode(): void {
-        return;
-    }
+    protected emitSupportCode(): void {}
 
-    protected emitClosingCode(): void {
-        return;
-    }
+    protected emitClosingCode(): void {}
 
     protected emitSourceStructure(_givenOutputFilename: string): void {
         const declarationLines = this.gatherSource(() => {
@@ -404,9 +400,7 @@ export class PythonRenderer extends ConvenienceRenderer {
                 ["interposing", 2],
                 (c: ClassType) => this.emitClass(c),
                 (e) => this.emitEnum(e),
-                (_u) => {
-                    return;
-                },
+                (_u) => {},
             );
         });
 

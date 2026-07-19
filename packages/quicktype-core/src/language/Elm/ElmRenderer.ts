@@ -75,7 +75,7 @@ export class ElmRenderer extends ConvenienceRenderer {
             topLevelName.order,
             (lookup) => `${lookup(topLevelName)}_to_string`,
         );
-        let decoder: DependencyName | undefined = undefined;
+        let decoder: DependencyName | undefined;
         if (this.namedTypeToNameForTopLevel(t) === undefined) {
             decoder = new DependencyName(
                 lowerNamingFunction,
@@ -564,7 +564,7 @@ export class ElmRenderer extends ConvenienceRenderer {
                 return " xdouble";
             }
             if (t.isPrimitive()) {
-                return " " + t.kind;
+                return ` ${t.kind}`;
             }
 
             return t.kind;

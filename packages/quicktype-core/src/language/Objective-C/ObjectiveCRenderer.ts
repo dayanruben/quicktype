@@ -408,7 +408,7 @@ export class ObjectiveCRenderer extends ConvenienceRenderer {
     }
 
     protected implicitlyConvertsToJSON(t: Type): boolean {
-        return this.implicitlyConvertsFromJSON(t) && "bool" !== t.kind;
+        return this.implicitlyConvertsFromJSON(t) && t.kind !== "bool";
     }
 
     protected emitPropertyAssignment(

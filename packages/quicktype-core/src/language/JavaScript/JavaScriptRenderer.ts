@@ -279,16 +279,10 @@ export class JavaScriptRenderer extends ConvenienceRenderer {
                                 "), null, 2);",
                             );
                         }
+                    } else if (!this._jsOptions.runtimeTypecheck) {
+                        this.emitLine("return value;");
                     } else {
-                        if (!this._jsOptions.runtimeTypecheck) {
-                            this.emitLine("return value;");
-                        } else {
-                            this.emitLine(
-                                "return uncast(value, ",
-                                typeMap,
-                                ");",
-                            );
-                        }
+                        this.emitLine("return uncast(value, ", typeMap, ");");
                     }
                 },
             );
@@ -497,19 +491,29 @@ function r(name${stringAnnotation}) {
         }
     }
 
-    protected emitTypes(): void {
-        return;
+    protected emitTypes(): void {}
+
+    protected usageModuleName(givenOutputFilename: string): string {
+        return givenOutputFilename === "stdout"
+            ? "file"
+            : givenOutputFilename
+                  .replace(/^.*[/\\]/, "")
+                  .replace(/\.[^.]+$/, "");
     }
 
-    protected emitUsageImportComment(): void {
-        this.emitLine('//   const Convert = require("./file");');
+    protected emitUsageImportComment(givenOutputFilename: string): void {
+        this.emitLine(
+            '//   const Convert = require("./',
+            this.usageModuleName(givenOutputFilename),
+            '");',
+        );
     }
 
-    protected emitUsageComments(): void {
+    protected emitUsageComments(givenOutputFilename: string): void {
         this.emitMultiline(`// To parse this data:
 //`);
 
-        this.emitUsageImportComment();
+        this.emitUsageImportComment(givenOutputFilename);
         this.emitLine("//");
         this.forEachTopLevel("none", (_t, name) => {
             const camelCaseName = modifySource(camelCase, name);
@@ -545,11 +549,11 @@ function r(name${stringAnnotation}) {
         });
     }
 
-    protected emitSourceStructure(): void {
+    protected emitSourceStructure(givenOutputFilename: string): void {
         if (this.leadingComments !== undefined) {
             this.emitComments(this.leadingComments);
         } else {
-            this.emitUsageComments();
+            this.emitUsageComments(givenOutputFilename);
         }
 
         this.emitTypes();

@@ -69,8 +69,10 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         >,
     ) {
         super(targetLanguage, renderContext, _options);
-        this._needHelpers = _options.features.helpers;
-        this._needAttributes = _options.features.attributes;
+        // `--just-types` wins over whatever `--features` says.
+        this._needHelpers = _options.features.helpers && !_options.justTypes;
+        this._needAttributes =
+            _options.features.attributes && !_options.justTypes;
         this._needNamespaces = _options.features.namespaces;
     }
 
@@ -622,9 +624,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                 this.csType(targetType.items),
                 ">();",
             );
-            this.emitLine(
-                "while (reader.TokenType != JsonTokenType.EndArray)",
-            );
+            this.emitLine("while (reader.TokenType != JsonTokenType.EndArray)");
             this.emitBlock(() => {
                 this.emitDecodeTransformer(
                     xfer.itemTransformer,
@@ -665,7 +665,11 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                 }
 
                 // Handle number (integer/double) union properly
-                if (xfer.integerTransformer !== undefined && xfer.doubleTransformer !== undefined) {
+                const { integerTransformer, doubleTransformer } = xfer;
+                if (
+                    integerTransformer !== undefined &&
+                    doubleTransformer !== undefined
+                ) {
                     varGen.counter++;
                     const intTryVar = `intTryValue${varGen.counter}`;
                     varGen.counter++;
@@ -674,10 +678,12 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     const doubleVar = `doubleValue${varGen.counter}`;
                     this.emitTokenCase("Number");
                     this.indent(() => {
-                        this.emitLine(`if (reader.TryGetInt64(out long ${intTryVar}))`);
+                        this.emitLine(
+                            `if (reader.TryGetInt64(out long ${intTryVar}))`,
+                        );
                         this.emitBlock(() => {
                             const allHandled = this.emitDecodeTransformer(
-                                xfer.integerTransformer!,
+                                integerTransformer,
                                 targetType,
                                 emitFinish,
                                 intVar,
@@ -690,7 +696,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                         this.emitLine("else");
                         this.emitBlock(() => {
                             const allHandled = this.emitDecodeTransformer(
-                                xfer.doubleTransformer!,
+                                doubleTransformer,
                                 targetType,
                                 emitFinish,
                                 doubleVar,
@@ -701,31 +707,29 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                             }
                         });
                     });
-                } else {
+                } else if (xfer.integerTransformer !== undefined) {
                     // Only one present, emit as before
-                    if (xfer.integerTransformer !== undefined) {
-                        varGen.counter++;
-                        const intVar = `intValue${varGen.counter}`;
-                        this.emitDecoderTransformerCase(
-                            ["Number"],
-                            intVar,
-                            xfer.integerTransformer,
-                            targetType,
-                            emitFinish,
-                            varGen,
-                        );
-                    } else if (xfer.doubleTransformer !== undefined) {
-                        varGen.counter++;
-                        const doubleVar = `doubleValue${varGen.counter}`;
-                        this.emitDecoderTransformerCase(
-                            ["Number"],
-                            doubleVar,
-                            xfer.doubleTransformer,
-                            targetType,
-                            emitFinish,
-                            varGen,
-                        );
-                    }
+                    varGen.counter++;
+                    const intVar = `intValue${varGen.counter}`;
+                    this.emitDecoderTransformerCase(
+                        ["Number"],
+                        intVar,
+                        xfer.integerTransformer,
+                        targetType,
+                        emitFinish,
+                        varGen,
+                    );
+                } else if (xfer.doubleTransformer !== undefined) {
+                    varGen.counter++;
+                    const doubleVar = `doubleValue${varGen.counter}`;
+                    this.emitDecoderTransformerCase(
+                        ["Number"],
+                        doubleVar,
+                        xfer.doubleTransformer,
+                        targetType,
+                        emitFinish,
+                        varGen,
+                    );
                 }
 
                 this.emitDecoderTransformerCase(
@@ -945,9 +949,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     itemVariable,
                     xfer.itemTransformer,
                     xfer.itemTargetType,
-                    () => {
-                        return;
-                    },
+                    () => {},
                 );
             });
             this.emitLine("writer.WriteEndArray();");

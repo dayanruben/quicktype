@@ -45,7 +45,7 @@ export function kotlinNameStyle(
 }
 
 function unicodeEscape(codePoint: number): string {
-    return "\\u" + intToHex(codePoint, 4);
+    return `\\u${intToHex(codePoint, 4)}`;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

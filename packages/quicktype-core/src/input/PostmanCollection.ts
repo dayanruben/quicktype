@@ -1,4 +1,4 @@
-import { parseJSON } from "../support/Support.js";
+import { parseJSON } from "../support/ParseJSON.js";
 
 import type { JSONSourceData } from "./Inputs.js";
 import type { JSONSchema } from "./JSONSchemaStore.js";
@@ -7,7 +7,7 @@ function isValidJSON(s: string): boolean {
     try {
         JSON.parse(s);
         return true;
-    } catch (error) {
+    } catch {
         return false;
     }
 }
@@ -96,7 +96,7 @@ export function sourcesFromPostmanCollection(
     );
 
     const joinedDescription = descriptions.join("\n\n").trim();
-    let description: string | undefined = undefined;
+    let description: string | undefined;
     if (joinedDescription !== "") {
         description = joinedDescription;
     }

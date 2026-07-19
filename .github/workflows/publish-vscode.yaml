@@ -9,7 +9,10 @@ concurrency:
 
 jobs:
     publish-vscode:
-        if: github.event.release.prerelease == false
+        # The Marketplace does not accept SemVer prerelease suffixes. npm
+        # prereleases still publish from -preN tags; the extension waits for
+        # the corresponding stable release.
+        if: ${{ !contains(github.event.release.tag_name, '-pre') }}
         runs-on: ubuntu-22.04
         permissions:
             contents: read

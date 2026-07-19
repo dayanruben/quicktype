@@ -65,8 +65,17 @@ export const all = [
     new TypeScriptZodTargetLanguage(),
 ] as const;
 
+// biome-ignore lint/suspicious/noUnusedExpressions: compile-time type check via satisfies
 all satisfies readonly TargetLanguage[];
 
+/**
+ * Returns the `TargetLanguage` registered under `name`.
+ *
+ * `name` must be one of the `LanguageName` literals, so plain strings from
+ * CLI arguments or configuration must first be narrowed with
+ * {@link isLanguageName}.  Throws if no language in `targetLanguages` is
+ * named `name`, which can only happen when passing a custom language list.
+ */
 export function languageNamed<Name extends LanguageName>(
     name: Name,
     targetLanguages: readonly TargetLanguage[] = all,
@@ -81,6 +90,21 @@ export function languageNamed<Name extends LanguageName>(
     return foundLanguage as LanguageNameMap[Name];
 }
 
+/**
+ * Type guard that narrows a runtime `string` to `LanguageName`.
+ *
+ * Use this to validate untrusted input — CLI arguments, configuration
+ * files, HTTP parameters — before passing it to `quicktype` or
+ * `jsonInputForTargetLanguage`, instead of casting with `as LanguageName`.
+ *
+ * @example
+ * const lang = process.argv[2];
+ * if (!isLanguageName(lang)) {
+ *     throw new Error(`Unknown language: ${lang}`);
+ * }
+ * // lang now has type LanguageName
+ * await quicktype({ inputData, lang });
+ */
 export function isLanguageName(maybeName: string): maybeName is LanguageName {
     if (
         all.some((lang) =>

@@ -120,6 +120,10 @@ export class JSONInput<T> implements Input<JSONSourceData<T>> {
 
     public async addSource(source: JSONSourceData<T>): Promise<void> {
         const { name, samples, description } = source;
+        if (samples.length === 0) {
+            return messageError("DriverNoSamplesForTopLevel", { name });
+        }
+
         try {
             const values = await arrayMapSync(
                 samples,
@@ -133,6 +137,10 @@ export class JSONInput<T> implements Input<JSONSourceData<T>> {
 
     public addSourceSync(source: JSONSourceData<T>): void {
         const { name, samples, description } = source;
+        if (samples.length === 0) {
+            return messageError("DriverNoSamplesForTopLevel", { name });
+        }
+
         try {
             const values = samples.map((s) =>
                 this._compressedJSON.parseSync(s),
@@ -198,6 +206,7 @@ export function jsonInputForTargetLanguage(
     targetLanguage: LanguageName | TargetLanguage,
     languages?: TargetLanguage[],
     handleJSONRefs = false,
+    rendererOptions: Record<string, unknown> = {},
 ): JSONInput<string> {
     if (typeof targetLanguage === "string") {
         targetLanguage = defined(languageNamed(targetLanguage, languages));
@@ -206,13 +215,14 @@ export function jsonInputForTargetLanguage(
     const compressedJSON = new CompressedJSONFromString(
         targetLanguage.dateTimeRecognizer,
         handleJSONRefs,
+        targetLanguage.getSupportedIntegerRange(rendererOptions),
     );
     return new JSONInput(compressedJSON);
 }
 
 export class InputData {
     // FIXME: Make into a Map, indexed by kind.
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: heterogeneous by design
     private _inputs: Set<Input<any>> = new Set();
 
     public addInput<T>(input: Input<T>): void {

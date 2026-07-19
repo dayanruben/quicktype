@@ -21,14 +21,14 @@ export const shouldAddBacktick = (paramName: string): boolean => {
     return (
         keywords.some((s) => paramName === s) ||
         invalidSymbols.some((s) => paramName.includes(s)) ||
-        !isNaN(+Number.parseFloat(paramName)) ||
-        !isNaN(Number.parseInt(paramName.charAt(0)))
+        !Number.isNaN(+Number.parseFloat(paramName)) ||
+        !Number.isNaN(Number.parseInt(paramName.charAt(0), 10))
     );
 };
 
 export const wrapOption = (s: string, optional: boolean): string => {
     if (optional) {
-        return "Option[" + s + "]";
+        return `Option[${s}]`;
     } else {
         return s;
     }

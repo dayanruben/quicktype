@@ -6,6 +6,10 @@ import {
 } from "../../RendererOptions/index.js";
 import { AcronymStyleOptions, acronymOption } from "../../support/Acronyms.js";
 import { convertersOption } from "../../support/Converters.js";
+import {
+    JS_SAFE_INTEGER_RANGE,
+    type IntegerRange,
+} from "../../support/IntegerRange.js";
 import { TargetLanguage } from "../../TargetLanguage.js";
 import type {
     PrimitiveStringTypeKind,
@@ -51,6 +55,10 @@ export const javaScriptLanguageConfig = {
 export class JavaScriptTargetLanguage extends TargetLanguage<
     typeof javaScriptLanguageConfig
 > {
+    public getSupportedIntegerRange(): IntegerRange | null {
+        return JS_SAFE_INTEGER_RANGE;
+    }
+
     public constructor() {
         super(javaScriptLanguageConfig);
     }

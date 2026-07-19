@@ -54,6 +54,11 @@ export const swiftOptions = {
         } as const,
         "struct",
     ),
+    finalClasses: new BooleanOption(
+        "final-classes",
+        "Mark classes as final",
+        false,
+    ),
     mutableProperties: new BooleanOption(
         "mutable-properties",
         "Use var instead of let for object properties",

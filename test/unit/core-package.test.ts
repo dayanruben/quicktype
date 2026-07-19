@@ -268,56 +268,50 @@ describe("quicktype-core package", () => {
         "packages/quicktype-core",
         "packages/quicktype-graphql-input",
         "packages/quicktype-typescript-input",
-    ])(
-        "declaration files in %s only reference dependencies that resolve with types",
-        (relativePackageDirectory) => {
-            const packageDirectory = path.join(
-                repositoryRoot,
-                relativePackageDirectory,
-            );
-            const declarationFiles = findDeclarationFiles(
-                path.join(packageDirectory, "dist"),
-            );
-            expect(declarationFiles.length).toBeGreaterThan(0);
+    ])("declaration files in %s only reference dependencies that resolve with types", (relativePackageDirectory) => {
+        const packageDirectory = path.join(
+            repositoryRoot,
+            relativePackageDirectory,
+        );
+        const declarationFiles = findDeclarationFiles(
+            path.join(packageDirectory, "dist"),
+        );
+        expect(declarationFiles.length).toBeGreaterThan(0);
 
-            const manifest = JSON.parse(
-                fs.readFileSync(
-                    path.join(packageDirectory, "package.json"),
-                    "utf8",
-                ),
-            ) as { dependencies: Record<string, string> };
-            const dependencies = manifest.dependencies;
+        const manifest = JSON.parse(
+            fs.readFileSync(
+                path.join(packageDirectory, "package.json"),
+                "utf8",
+            ),
+        ) as { dependencies: Record<string, string> };
+        const dependencies = manifest.dependencies;
 
-            const offenders: string[] = [];
-            for (const declarationFile of declarationFiles) {
-                const contents = fs.readFileSync(declarationFile, "utf8");
-                for (const match of contents.matchAll(
-                    declarationSpecifierPattern,
-                )) {
-                    const specifier = match[1] ?? match[2];
-                    if (specifier.startsWith(".")) continue;
+        const offenders: string[] = [];
+        for (const declarationFile of declarationFiles) {
+            const contents = fs.readFileSync(declarationFile, "utf8");
+            for (const match of contents.matchAll(
+                declarationSpecifierPattern,
+            )) {
+                const specifier = match[1] ?? match[2];
+                if (specifier.startsWith(".")) continue;
 
-                    const packageName = packageNameOfSpecifier(specifier);
-                    const problem =
-                        dependencies[packageName] === undefined
-                            ? "is not a runtime dependency"
-                            : dependencies[typesPackageFor(packageName)] ===
-                                    undefined &&
-                                !packageShipsTypes(
-                                    packageName,
-                                    packageDirectory,
-                                )
-                              ? "has no type declarations"
-                              : undefined;
-                    if (problem !== undefined) {
-                        offenders.push(
-                            `${path.relative(repositoryRoot, declarationFile)}: "${specifier}" ${problem}`,
-                        );
-                    }
+                const packageName = packageNameOfSpecifier(specifier);
+                const problem =
+                    dependencies[packageName] === undefined
+                        ? "is not a runtime dependency"
+                        : dependencies[typesPackageFor(packageName)] ===
+                                undefined &&
+                            !packageShipsTypes(packageName, packageDirectory)
+                          ? "has no type declarations"
+                          : undefined;
+                if (problem !== undefined) {
+                    offenders.push(
+                        `${path.relative(repositoryRoot, declarationFile)}: "${specifier}" ${problem}`,
+                    );
                 }
             }
+        }
 
-            expect(offenders).toEqual([]);
-        },
-    );
+        expect(offenders).toEqual([]);
+    });
 });

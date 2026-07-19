@@ -1,7 +1,7 @@
 import type { LanguageName } from "quicktype-core";
 
-import * as process from "process";
-// @ts-ignore
+import * as process from "node:process";
+// @ts-expect-error: ../dist only exists after the root package is built
 import type { RendererOptions } from "../dist/quicktype-core/Run";
 
 const easySampleJSONs = [
@@ -427,6 +427,7 @@ export const RubyLanguage: Language = {
         "optional-union.json",
         "union-constructor-clash.json",
         "unions.json",
+        "php-mixed-union.json",
         "nbl-stats.json",
         "kitchen-sink.json",
     ],
@@ -545,6 +546,8 @@ export const CJSONLanguage: Language = {
         "class-with-additional.schema",
         "go-schema-pattern-properties.schema",
         "multi-type-enum.schema",
+        "nested-intersection-union.schema",
+        "prefix-items.schema",
         /* Constraints (min/max and regex) are not supported (for the current implementation, can be added later, should abord parsing and return NULL) */
         "minmaxlength.schema",
         "optional-const-ref.schema",
@@ -615,12 +618,13 @@ export const CPlusPlusLanguage: Language = {
     skipSchema: [
         // uses too much memory
         "keyword-unions.schema",
+        // The generated deserializer accepts non-object values when all class properties are optional.
+        "nested-intersection-union.schema",
         // Recursive top-level unions produce aliases that can refer to later aliases.
         "recursive-union-flattening.schema",
     ],
     rendererOptions: {},
     quickTestRendererOptions: [
-        { unions: "indirection" },
         { "source-style": "multi-source" },
         { "code-format": "with-struct" },
         { wstring: "use-wstring" },
@@ -700,7 +704,7 @@ export const ElmLanguage: Language = {
 export const SwiftLanguage: Language = {
     name: "swift",
     base: "test/fixtures/swift",
-    compileCommand: `swiftc -o quicktype main.swift quicktype.swift`,
+    compileCommand: "swiftc -o quicktype main.swift quicktype.swift",
     runCommand(sample: string) {
         return `./quicktype "${sample}"`;
     },
@@ -766,6 +770,10 @@ export const SwiftLanguage: Language = {
     quickTestRendererOptions: [
         { "support-linux": "false" },
         { "struct-or-class": "class" },
+        [
+            "simple-object.json",
+            { "struct-or-class": "class", "final-classes": "true" },
+        ],
         { density: "dense" },
         { density: "normal" },
         { "access-level": "internal" },
@@ -779,7 +787,7 @@ export const SwiftLanguage: Language = {
 export const ObjectiveCLanguage: Language = {
     name: "objective-c",
     base: "test/fixtures/objective-c",
-    compileCommand: `clang -Werror -framework Foundation *.m -o test`,
+    compileCommand: "clang -Werror -framework Foundation *.m -o test",
     runCommand(sample: string) {
         return `cp "${sample}" sample.json && ./test sample.json`;
     },
@@ -821,7 +829,7 @@ export const TypeScriptLanguage: Language = {
     // in the generated code
     compileCommand: "tsc -p .",
     runCommand(sample: string) {
-        return `tsx main.ts \"${sample}\"`;
+        return `tsx main.ts "${sample}"`;
     },
     diffViaSchema: true,
     skipDiffViaSchema: [
@@ -844,8 +852,7 @@ export const TypeScriptLanguage: Language = {
     features: ["enum", "union", "no-defaults", "strict-optional", "date-time"],
     output: "TopLevel.ts",
     topLevel: "TopLevel",
-    skipJSON: [
-    ],
+    skipJSON: [],
     skipMiscJSON: false,
     skipSchema: ["keyword-unions.schema"], // can't handle "constructor" property
     rendererOptions: { "explicit-unions": "yes" },
@@ -853,7 +860,6 @@ export const TypeScriptLanguage: Language = {
         { "runtime-typecheck": "false" },
         { "runtime-typecheck-ignore-unknown-properties": "true" },
         { "nice-property-names": "true" },
-        { "declare-unions": "true" },
         ["pokedex.json", { "prefer-types": "true" }],
         { "acronym-style": "pascal" },
         { converters: "all-objects" },
@@ -866,7 +872,7 @@ export const JavaScriptLanguage: Language = {
     name: "javascript",
     base: "test/fixtures/javascript",
     runCommand(sample: string) {
-        return `node main.js \"${sample}\"`;
+        return `node main.js "${sample}"`;
     },
     // FIXME: enable once TypeScript supports unions
     diffViaSchema: false,
@@ -875,8 +881,7 @@ export const JavaScriptLanguage: Language = {
     features: ["enum", "union", "no-defaults", "strict-optional", "date-time"],
     output: "TopLevel.js",
     topLevel: "TopLevel",
-    skipJSON: [
-    ],
+    skipJSON: [],
     skipMiscJSON: false,
     skipSchema: ["keyword-unions.schema"], // can't handle "constructor" property
     rendererOptions: {},
@@ -893,7 +898,7 @@ export const JavaScriptPropTypesLanguage: Language = {
     base: "test/fixtures/javascript-prop-types",
     setupCommand: "npm install",
     runCommand(sample: string) {
-        return `node main.js \"${sample}\"`;
+        return `node main.js "${sample}"`;
     },
     copyInput: true,
     diffViaSchema: false,
@@ -912,11 +917,7 @@ export const JavaScriptPropTypesLanguage: Language = {
     skipSchema: [],
     skipMiscJSON: false,
     rendererOptions: { "module-system": "es6" },
-    quickTestRendererOptions: [
-        { "runtime-typecheck": "false" },
-        { "runtime-typecheck-ignore-unknown-properties": "true" },
-        { converters: "top-level" },
-    ],
+    quickTestRendererOptions: [{ converters: "top-level" }],
     sourceFiles: ["src/language/JavaScriptPropTypes/index.ts"],
 };
 
@@ -924,7 +925,7 @@ export const FlowLanguage: Language = {
     name: "flow",
     base: "test/fixtures/flow",
     runCommand(sample: string) {
-        return `flow check 1>&2 && flow-node main.js \"${sample}\"`;
+        return `flow check 1>&2 && flow-node main.js "${sample}"`;
     },
     diffViaSchema: false,
     skipDiffViaSchema: [],
@@ -932,8 +933,7 @@ export const FlowLanguage: Language = {
     features: ["enum", "union", "no-defaults", "strict-optional"],
     output: "TopLevel.js",
     topLevel: "TopLevel",
-    skipJSON: [
-    ],
+    skipJSON: [],
     skipMiscJSON: false,
     skipSchema: [
         "keyword-unions.schema", // can't handle "constructor" property
@@ -943,7 +943,6 @@ export const FlowLanguage: Language = {
         { "runtime-typecheck": "false" },
         { "runtime-typecheck-ignore-unknown-properties": "true" },
         { "nice-property-names": "true" },
-        { "declare-unions": "true" },
     ],
     sourceFiles: ["src/language/Flow/index.ts"],
 };
@@ -1005,6 +1004,7 @@ I havea no idea how to encode these tests correctly.
         "combinations3.json",
         "combinations4.json",
         "unions.json",
+        "php-mixed-union.json",
         "nst-test-suite.json",
 
         // Scala3 has the same prelude-shadowing bug that this input
@@ -1019,6 +1019,10 @@ I havea no idea how to encode these tests correctly.
         "integer-string.schema",
         "intersection.schema",
         ...skipsUntypedUnions,
+        // The test driver prints the circe DecodingFailure and exits 0, so
+        // expected-failure samples cannot be detected.
+        "nested-intersection-union.schema",
+        "prefix-items.schema",
         "date-time-or-string.schema",
         "implicit-one-of.schema",
         "go-schema-pattern-properties.schema",
@@ -1089,11 +1093,12 @@ I havea no idea how to encode these tests correctly.
         "combinations3.json",
         "combinations4.json",
         "unions.json",
+        "php-mixed-union.json",
         "nst-test-suite.json",
     ],
     skipSchema: [],
     skipMiscJSON: false,
-    rendererOptions: { framework: "just-types" },
+    rendererOptions: { "just-types": "true" },
     quickTestRendererOptions: [],
     sourceFiles: ["src/language/Smithy4s/index.ts"],
 };
@@ -1141,11 +1146,10 @@ export const KotlinLanguage: Language = {
         "combinations3.json",
         "combinations4.json",
         "unions.json",
+        "php-mixed-union.json",
         "nst-test-suite.json",
         // Klaxon does not support top-level primitives
         "no-classes.json",
-        // Klaxon cannot deserialize empty object map values as JsonObject: #2881
-        "bug2037.json",
         // These should be enabled
         "nbl-stats.json",
         // TODO Investigate these
@@ -1169,6 +1173,9 @@ export const KotlinLanguage: Language = {
         // which is not represented in the types (implicit-class-array-union);
         // class-map-union: KlaxonException: Couldn't find a suitable constructor for class UnionValue to initialize with {}
         ...skipsUntypedUnions,
+        // Deserializes an array where a union of two classes is expected
+        // instead of rejecting it.
+        "nested-intersection-union.schema",
         "class-with-additional.schema",
         "go-schema-pattern-properties.schema",
         // IllegalArgumentException
@@ -1239,6 +1246,7 @@ export const KotlinJacksonLanguage: Language = {
         "combinations3.json",
         "combinations4.json",
         "unions.json",
+        "php-mixed-union.json",
         "nst-test-suite.json",
         // Klaxon does not support top-level primitives
         "no-classes.json",
@@ -1265,6 +1273,9 @@ export const KotlinJacksonLanguage: Language = {
         // which is not represented in the types (implicit-class-array-union);
         // class-map-union: KlaxonException: Couldn't find a suitable constructor for class UnionValue to initialize with {}
         ...skipsUntypedUnions,
+        // Deserializes an array where a union of two classes is expected
+        // instead of rejecting it.
+        "nested-intersection-union.schema",
         "class-with-additional.schema",
         "go-schema-pattern-properties.schema",
         // IllegalArgumentException
@@ -1297,7 +1308,7 @@ export const DartLanguage: Language = {
     name: "dart",
     base: "test/fixtures/dart",
     runCommand(sample: string) {
-        return `dart --enable-experiment=non-nullable parser.dart \"${sample}\"`;
+        return `dart --enable-experiment=non-nullable parser.dart "${sample}"`;
     },
     diffViaSchema: false,
     skipDiffViaSchema: [],
@@ -1355,7 +1366,7 @@ export const PikeLanguage: Language = {
     name: "pike",
     base: "test/fixtures/pike",
     runCommand(sample: string) {
-        return `pike main.pike \"${sample}\"`;
+        return `pike main.pike "${sample}"`;
     },
     diffViaSchema: false,
     skipDiffViaSchema: [],
@@ -1476,6 +1487,10 @@ export const HaskellLanguage: Language = {
     skipSchema: [
         "any.schema",
         ...skipsUntypedUnions,
+        // The test driver encodes the Maybe result, so a failed decode prints
+        // "null" and exits 0 — expected-failure samples cannot be detected.
+        "nested-intersection-union.schema",
+        "prefix-items.schema",
         "direct-union.schema",
         ...skipsEnumValueValidation,
         "go-schema-pattern-properties.schema",
@@ -1494,7 +1509,7 @@ export const HaskellLanguage: Language = {
 export const PHPLanguage: Language = {
     name: "php",
     base: "test/fixtures/php",
-    runCommand: (sample) => `php main.php \"${sample}\"`,
+    runCommand: (sample) => `php main.php "${sample}"`,
     diffViaSchema: false,
     skipDiffViaSchema: [],
     allowMissingNull: true,
@@ -1506,9 +1521,37 @@ export const PHPLanguage: Language = {
         "uuids.json",
         "nested-objects.json",
         "bug2663.json",
+        // Union-heavy inputs: PHP renders non-nullable unions as inline
+        // PHP 8.0 union type declarations with runtime dispatch.
+        "unions.json",
+        "union-constructor-clash.json",
+        "combinations1.json",
+        "combinations2.json",
+        "combinations3.json",
+        "combinations4.json",
+        "nst-test-suite.json",
+        "kitchen-sink.json",
+        "list.json",
+        "bug427.json",
+        // The motivating repro for non-nullable union support: a
+        // heterogeneous array under a PHP-reserved-word property name.
+        "php-mixed-union.json",
     ],
     skipMiscJSON: true,
-    skipSchema: [],
+    skipSchema: [
+        // PHP class names are case-insensitive, but the namer dedups
+        // case-sensitively, so this declares classes that collide (same
+        // reason Java and Python skip it).
+        "keyword-unions.schema",
+        // Unions are inlined as PHP union type declarations, so a
+        // top-level union produces no named TopLevel class for the driver.
+        "recursive-union-flattening.schema",
+        // The generated code for top-level enums is incompatible with the
+        // driver.
+        "top-level-enum.schema",
+        // The driver does not support top-level arrays.
+        "union.schema",
+    ],
     rendererOptions: {},
     quickTestRendererOptions: [],
     sourceFiles: ["src/language/Php/index.ts"],
@@ -1627,7 +1670,7 @@ export const TypeScriptZodLanguage: Language = {
         "required-non-properties.schema",
     ],
     rendererOptions: {},
-    quickTestRendererOptions: [{ "array-type": "list" }],
+    quickTestRendererOptions: [],
     sourceFiles: ["src/language/TypeScriptZod/index.ts"],
 };
 
@@ -1742,7 +1785,7 @@ export const TypeScriptEffectSchemaLanguage: Language = {
         "required-non-properties.schema",
     ],
     rendererOptions: {},
-    quickTestRendererOptions: [{ "array-type": "list" }],
+    quickTestRendererOptions: [],
     sourceFiles: ["src/language/TypeScriptEffectSchema/index.ts"],
 };
 

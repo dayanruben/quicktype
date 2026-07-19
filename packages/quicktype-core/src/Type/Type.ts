@@ -782,9 +782,7 @@ export function setOperationCasesEqual(
     if (ma.size !== mb.size) return false;
     return iterableEvery(ma, (ta) => {
         const tb = iterableFind(mb, (t) => t.kind === ta.kind);
-        if (tb !== undefined) {
-            if (membersEqual(ta, tb)) return true;
-        }
+        if (tb !== undefined && membersEqual(ta, tb)) return true;
 
         if (conflateNumbers) {
             if (

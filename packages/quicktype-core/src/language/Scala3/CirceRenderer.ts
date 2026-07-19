@@ -18,7 +18,7 @@ import { Scala3Renderer } from "./Scala3Renderer.js";
 import { wrapOption } from "./utils.js";
 
 export class CirceRenderer extends Scala3Renderer {
-    private seenUnionTypes: string[] = [];
+    private readonly seenUnionTypes: string[] = [];
 
     protected circeEncoderForType(
         t: Type,
@@ -180,7 +180,7 @@ export class CirceRenderer extends Scala3Renderer {
         function sortBy(t: Type): string {
             const kind = t.kind;
             if (kind === "class") return kind;
-            return "_" + kind;
+            return `_${kind}`;
         }
 
         this.emitDescription(this.descriptionForType(u));

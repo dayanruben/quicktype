@@ -1,5 +1,9 @@
 import type { RenderContext } from "../../Renderer.js";
 import { BooleanOption, getOptionValues } from "../../RendererOptions/index.js";
+import {
+    JS_SAFE_INTEGER_RANGE,
+    type IntegerRange,
+} from "../../support/IntegerRange.js";
 import { TargetLanguage } from "../../TargetLanguage.js";
 import type { LanguageName, RendererOptions } from "../../types.js";
 
@@ -18,11 +22,15 @@ export const typeScriptEffectSchemaLanguageConfig = {
 export class TypeScriptEffectSchemaTargetLanguage extends TargetLanguage<
     typeof typeScriptEffectSchemaLanguageConfig
 > {
+    public getSupportedIntegerRange(): IntegerRange | null {
+        return JS_SAFE_INTEGER_RANGE;
+    }
+
     public constructor() {
         super(typeScriptEffectSchemaLanguageConfig);
     }
 
-    public getOptions(): {} {
+    public getOptions(): Record<string, never> {
         return {};
     }
 

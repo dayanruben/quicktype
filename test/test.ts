@@ -6,6 +6,7 @@ import { type Fixture, allFixtures } from "./fixtures";
 import { inParallel } from "./lib/multicore";
 import { type Sample, execAsync } from "./utils";
 
+// biome-ignore lint/style/useExplicitLengthCheck: length is used as a value here, not a boolean
 const CPUs = Number.parseInt(process.env.CPUs || "0", 10) || os.cpus().length;
 
 //////////////////////////////////////

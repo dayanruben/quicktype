@@ -10,6 +10,7 @@ set -e
 
 : "${RELEASE_VERSION:?RELEASE_VERSION must be set from the GitHub release tag}"
 ./script/release-version.ts stamp "$RELEASE_VERSION"
+NPM_TAG=$(./script/release-version.ts npm-tag "$RELEASE_VERSION")
 
 publish_package() {
     local directory=$1
@@ -23,7 +24,7 @@ publish_package() {
     fi
 
     pushd "$directory"
-    npm publish
+    npm publish --tag "$NPM_TAG"
     popd
 }
 

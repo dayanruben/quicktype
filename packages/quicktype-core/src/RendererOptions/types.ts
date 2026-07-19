@@ -42,26 +42,25 @@ export interface OptionDefinition<Name extends string = string, T = unknown> {
     typeLabel?: string;
 }
 
-export type OptionName<O> = O extends Option<infer Name, unknown>
-    ? Name
-    : never;
-export type OptionValue<O> = O extends EnumOption<
-    string,
-    infer EnumMap,
-    infer EnumKey
->
-    ? EnumMap[EnumKey]
-    : O extends Option<string, infer Value>
-      ? Value
-      : never;
+export type OptionName<O> =
+    O extends Option<infer Name, unknown> ? Name : never;
+export type OptionValue<O> =
+    O extends EnumOption<string, infer EnumMap, infer EnumKey>
+        ? EnumMap[EnumKey]
+        : O extends Option<string, infer Value>
+          ? Value
+          : never;
 
-export type OptionKey<O> = O extends EnumOption<
-    string,
-    Record<string, unknown>,
-    infer EnumKey
->
-    ? EnumKey
-    : O;
+export type OptionKey<O> =
+    O extends EnumOption<string, Record<string, unknown>, infer EnumKey>
+        ? EnumKey
+        : O extends Option<string, infer Value>
+          ? Value extends boolean
+              ? // `BooleanOption.getValue` also accepts the strings
+                // "true" and "false", which is what the CLI passes.
+                boolean | `${boolean}`
+              : Value
+          : never;
 
 // FIXME: Merge these and use camelCase user-facing keys (v24)
 export type OptionMap<T> = {

@@ -195,8 +195,6 @@ export function declarationsForGraph(
             for (const t of forwardDeclarable) {
                 declarations.push({ kind: "define", type: t });
             }
-
-            return;
         }
 
         /*

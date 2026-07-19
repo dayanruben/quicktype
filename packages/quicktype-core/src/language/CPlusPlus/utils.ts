@@ -182,7 +182,7 @@ export class BaseString {
         smatch: string,
         regex: string,
         stringLiteralPrefix: string,
-        toString: WrappingCode,
+        toStringCode: WrappingCode,
         encodingClass: string,
         encodingFunction: string,
     ) {
@@ -191,7 +191,7 @@ export class BaseString {
         this._smatch = smatch;
         this._regex = regex;
         this._stringLiteralPrefix = stringLiteralPrefix;
-        this._toString = toString;
+        this._toString = toStringCode;
         this._encodingClass = encodingClass;
         this._encodingFunction = encodingFunction;
     }

@@ -18,11 +18,15 @@
         "test:unit:watch": "vitest",
         "test:fixtures": "script/test",
         "test:release": "tsx test/release-version.ts",
+        "benchmark:markov-chain": "npm run build --workspace quicktype-core && node --expose-gc script/benchmark-markov-chain.mjs",
+        "benchmark:markov-chain:fidelity": "npm run build --workspace quicktype-core && node script/benchmark-markov-fidelity.mjs",
+        "benchmark:pipeline": "npm run build --workspace quicktype-core && node script/benchmark-pipeline.mjs",
+        "benchmark:canonical": "npm run build --workspace quicktype-core && node --expose-gc --max-old-space-size=8192 script/benchmark-pipeline.mjs --canonical --iterations 3",
         "start": "script/watch",
         "clean": "rm -rf dist *~ packages/*/{dist,out}",
         "debug": "node --inspect-brk --max-old-space-size=4096 ./dist/index.js",
-        "lint": "eslint src/** packages/*/src/**",
-        "lint:fix": "eslint --fix src/** packages/*/src/**"
+        "lint": "biome check .",
+        "lint:fix": "biome check --write ."
     },
     "workspaces": [
         "./packages/quicktype-core",
@@ -45,10 +49,11 @@
         "quicktype-typescript-input": "24.0.0",
         "readable-stream": "^4.5.2",
         "stream-json": "1.8.0",
-        "string-to-stream": "^3.0.1"
+        "string-to-stream": "^3.0.1",
+        "wordwrap": "^1.0.0"
     },
     "devDependencies": {
-        "@biomejs/biome": "^1.9.4",
+        "@biomejs/biome": "^2.5.3",
         "@tsconfig/node20": "^20.1.6",
         "@types/command-line-args": "^5.2.0",
         "@types/command-line-usage": "^5.0.4",
@@ -59,8 +64,6 @@
         "@types/stream-json": "^1.7.3",
         "@types/urijs": "^1.19.25",
         "@types/wordwrap": "^1.0.3",
-        "@typescript-eslint/eslint-plugin": "^6.3.0",
-        "@typescript-eslint/parser": "^6.3.0",
         "ajv": "^5.5.2",
         "deep-equal": "^2.2.3",
         "esbuild": "^0.28.1",
@@ -79,12 +82,14 @@
         "tree-sitter-rust": "^0.24.0",
         "tree-sitter-scala": "^0.24.0",
         "tree-sitter-typescript": "^0.23.2",
-        "tsx": "^4.23.0",
+        "tsx": "^4.23.1",
         "typescript": "~7.0.2",
         "vitest": "^4.1.10",
         "watch": "^1.0.2",
         "web-tree-sitter": "^0.26.9"
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "bin": "dist/index.js"
 }

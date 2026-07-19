@@ -11,12 +11,15 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node-version: ["20", "24"]
+                node-version: ["20", "22", "24"]
         steps:
             - uses: actions/checkout@v3
             - uses: ./.github/workflows/setup
               with:
                   node-version: ${{ matrix.node-version }}
+            - name: Check formatting (Biome)
+              if: ${{ matrix.node-version == '24' }}
+              run: npm run lint
             - run: npm run test:unit
             - run: node dist/index.js --version
             - name: Run representative fixtures on the minimum Node version
@@ -47,7 +50,7 @@ jobs:
                     # - swift,schema-swift # pgp issue
                     - javascript-prop-types
                     - ruby
-                    - php
+                    - php,schema-php
                     - scala3,schema-scala3
                     - elixir,schema-elixir,graphql-elixir
                     - comment-injection-treesitter,comment-injection-typescript,comment-injection-typescript-zod,comment-injection-typescript-effect-schema

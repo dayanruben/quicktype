@@ -54,17 +54,20 @@ async function javaEnumConstantIdentifier(
         new RegExp(`case (\\w+): return "${enumValue}";`),
     );
 
+    // biome-ignore lint/suspicious/noMisplacedAssertion: helper is only called from within tests
     expect(match, `generated Java output:\n${output}`).not.toBeNull();
     return match?.[1] ?? "";
 }
 
 describe("Java enum acronym casing", () => {
-    test.each(["original", "pascal", "camel", "lowerCase"])(
-        "keeps acronyms uppercase with acronym-style=%s",
-        async (acronymStyle) => {
-            await expect(
-                javaEnumConstantIdentifier(acronymStyle),
-            ).resolves.toBe(enumValue);
-        },
-    );
+    test.each([
+        "original",
+        "pascal",
+        "camel",
+        "lowerCase",
+    ])("keeps acronyms uppercase with acronym-style=%s", async (acronymStyle) => {
+        await expect(javaEnumConstantIdentifier(acronymStyle)).resolves.toBe(
+            enumValue,
+        );
+    });
 });

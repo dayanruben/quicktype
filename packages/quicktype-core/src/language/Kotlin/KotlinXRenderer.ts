@@ -1,18 +1,9 @@
 import type { Name } from "../../Naming.js";
-import type { RenderContext } from "../../Renderer.js";
-import type { OptionValues } from "../../RendererOptions/index.js";
 import { type Sourcelike, modifySource } from "../../Source.js";
 import { camelCase } from "../../support/Strings.js";
-import type { TargetLanguage } from "../../TargetLanguage.js";
-import type {
-    ArrayType,
-    EnumType,
-    MapType,
-    Type,
-} from "../../Type/index.js";
+import type { ArrayType, EnumType, MapType, Type } from "../../Type/index.js";
 
 import { KotlinRenderer } from "./KotlinRenderer.js";
-import type { kotlinOptions } from "./language.js";
 import { stringEscape } from "./utils.js";
 
 // kotlinx.serialization has no built-in serializers for java.time, so we
@@ -45,14 +36,6 @@ const dateTimeSerializers = [
  * TODO: Union, Any, Top Level Array, Top Level Map
  */
 export class KotlinXRenderer extends KotlinRenderer {
-    public constructor(
-        targetLanguage: TargetLanguage,
-        renderContext: RenderContext,
-        _kotlinOptions: OptionValues<typeof kotlinOptions>,
-    ) {
-        super(targetLanguage, renderContext, _kotlinOptions);
-    }
-
     protected forbiddenNamesForGlobalNamespace(): readonly string[] {
         return [
             ...super.forbiddenNamesForGlobalNamespace(),

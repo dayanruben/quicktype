@@ -39,7 +39,6 @@ import {
 import {
     type BlankLineConfig,
     type ForEachPosition,
-    type RenderContext,
     Renderer,
 } from "./Renderer.js";
 import {
@@ -54,7 +53,6 @@ import {
 } from "./support/Comments.js";
 import { trimEnd } from "./support/Strings.js";
 import { assert, defined, nonNull, panic } from "./support/Support.js";
-import type { TargetLanguage } from "./TargetLanguage.js";
 import {
     type Transformation,
     followTargetType,
@@ -176,13 +174,6 @@ export abstract class ConvenienceRenderer extends Renderer {
     private _cycleBreakerTypes?: Set<Type> | undefined;
 
     private _alphabetizeProperties = false;
-
-    public constructor(
-        targetLanguage: TargetLanguage,
-        renderContext: RenderContext,
-    ) {
-        super(targetLanguage, renderContext);
-    }
 
     public get topLevels(): ReadonlyMap<string, Type> {
         return this.typeGraph.topLevels;
@@ -834,9 +825,9 @@ export abstract class ConvenienceRenderer extends Renderer {
                 (_doubleType) => "double",
                 (_stringType) => "string",
                 (arrayType) =>
-                    typeNameForUnionMember(arrayType.items) + "_array",
+                    `${typeNameForUnionMember(arrayType.items)}_array`,
                 (classType) => lookup(this.nameForNamedType(classType)),
-                (mapType) => typeNameForUnionMember(mapType.values) + "_map",
+                (mapType) => `${typeNameForUnionMember(mapType.values)}_map`,
                 (objectType) => {
                     assert(
                         this.targetLanguage.supportsFullObjectType,
@@ -1217,7 +1208,9 @@ export abstract class ConvenienceRenderer extends Renderer {
     }
 
     private commentLineEscapes(
-        options: Required<Pick<CommentOptions, "lineStart" | "firstLineStart">> &
+        options: Required<
+            Pick<CommentOptions, "lineStart" | "firstLineStart">
+        > &
             Pick<CommentOptions, "lineEnd" | "beforeComment" | "afterComment">,
     ): ReadonlyArray<readonly [string, string]> {
         const delimiters = [
@@ -1273,7 +1266,7 @@ export abstract class ConvenienceRenderer extends Renderer {
         // A quote at the end of the line would merge with a closing
         // `"""` emitted right after it.  The quote needs escaping iff
         // it's preceded by an even number of backslashes.
-        if (lineEnd !== undefined && lineEnd.startsWith('"')) {
+        if (lineEnd?.startsWith('"')) {
             const trailing = /(\\*)"$/.exec(escaped);
             if (trailing !== null && trailing[1].length % 2 === 0) {
                 escaped = `${escaped.slice(0, -1)}\\"`;

@@ -32,7 +32,7 @@ import {
 //   Value[] | NestedValueArray[]
 // but TypeScript doesn't support that.
 // FIXME: reactor this
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: TypeScript cannot express this recursive type
 export type NestedValueArray = any;
 
 function forEachArrayInNestedValueArray(
@@ -363,6 +363,7 @@ export class TypeInference {
                 const key = this._cjson.getStringForValue(arr[i]);
                 const value = arr[i + 1];
                 if (
+                    // biome-ignore lint/suspicious/noPrototypeBuiltins: Object.hasOwn is not in quicktype-core's es6 lib
                     !Object.prototype.hasOwnProperty.call(propertyValues, key)
                 ) {
                     propertyNames.push(key);

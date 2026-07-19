@@ -1,4 +1,4 @@
-import { parseJSON } from "../support/Support.js";
+import { parseJSON } from "../support/ParseJSON.js";
 
 import { readFromFileOrURL } from "./io/NodeIO.js";
 import { type JSONSchema, JSONSchemaStore } from "./JSONSchemaStore.js";

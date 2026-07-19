@@ -51,7 +51,7 @@ function lineIndentation(line: string): {
         } else if (c === "\t") {
             indent = (indent / 4 + 1) * 4;
         } else {
-            return { indent, text: line.substring(i) };
+            return { indent, text: line.slice(i) };
         }
     }
 
@@ -77,7 +77,8 @@ class EmitContext {
     private _preventBlankLine: boolean;
 
     public constructor() {
-        this._currentEmitTarget = this._emitted = [];
+        this._emitted = [];
+        this._currentEmitTarget = this._emitted;
         this._numBlankLinesNeeded = 0;
         this._preventBlankLine = true; // no blank lines at start of file
     }

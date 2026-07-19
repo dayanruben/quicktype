@@ -1,5 +1,6 @@
 export {
     type Options,
+    type QuicktypeTiming,
     getTargetLanguage,
     quicktypeMultiFile,
     quicktypeMultiFileSync,
@@ -16,6 +17,15 @@ export {
     type InferenceFlagName,
 } from "./Inference.js";
 export { CompressedJSON, type Value } from "./input/CompressedJSON.js";
+export {
+    INT8_RANGE,
+    INT16_RANGE,
+    INT32_RANGE,
+    INT64_RANGE,
+    type IntegerRange,
+    JS_SAFE_INTEGER_RANGE,
+    integerStringInRange,
+} from "./support/IntegerRange.js";
 export {
     type Input,
     InputData,
@@ -60,11 +70,10 @@ export {
     assert,
     defined,
     assertNever,
-    parseJSON,
     checkStringMap,
     checkArray,
-    inflateBase64,
 } from "./support/Support.js";
+export { parseJSON } from "./support/ParseJSON.js";
 export {
     splitIntoWords,
     capitalize,

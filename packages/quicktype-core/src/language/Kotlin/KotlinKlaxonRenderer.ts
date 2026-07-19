@@ -1,17 +1,15 @@
 import { arrayIntercalate, iterableSome } from "collection-utils";
 
 import type { Name } from "../../Naming.js";
-import type { RenderContext } from "../../Renderer.js";
-import type { OptionValues } from "../../RendererOptions/index.js";
 import { type Sourcelike, modifySource } from "../../Source.js";
 import { camelCase } from "../../support/Strings.js";
 import { mustNotHappen } from "../../support/Support.js";
-import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     type ArrayType,
+    type ClassProperty,
     ClassType,
     type EnumType,
-    type MapType,
+    MapType,
     type PrimitiveType,
     type Type,
     UnionType,
@@ -19,18 +17,9 @@ import {
 import { matchType, nullableFromUnion } from "../../Type/TypeUtils.js";
 
 import { KotlinRenderer } from "./KotlinRenderer.js";
-import type { kotlinOptions } from "./language.js";
 import { stringEscape, unionMemberMatchPriority } from "./utils.js";
 
 export class KotlinKlaxonRenderer extends KotlinRenderer {
-    public constructor(
-        targetLanguage: TargetLanguage,
-        renderContext: RenderContext,
-        _kotlinOptions: OptionValues<typeof kotlinOptions>,
-    ) {
-        super(targetLanguage, renderContext, _kotlinOptions);
-    }
-
     private unionMemberFromJsonValue(t: Type, e: Sourcelike): Sourcelike {
         return matchType<Sourcelike>(
             t,
@@ -105,6 +94,51 @@ export class KotlinKlaxonRenderer extends KotlinRenderer {
         );
     }
 
+    // Empty object types render as a typealias for JsonObject.  Klaxon's
+    // reflective deserializer never consults custom converters for map
+    // values, so a `Map<String, JsonObject>` property fails to parse:
+    // https://github.com/glideapps/quicktype/issues/2881
+    // Properties holding such maps (directly or nested inside other maps)
+    // are annotated so that a field-level converter — which Klaxon does
+    // consult — handles them instead.
+    private isEmptyObjectType(t: Type): boolean {
+        if (t instanceof UnionType) {
+            const nullable = nullableFromUnion(t);
+            return nullable !== null && this.isEmptyObjectType(nullable);
+        }
+
+        return t instanceof ClassType && t.getProperties().size === 0;
+    }
+
+    private needsJsonObjectMapAnnotation(t: Type): boolean {
+        if (t instanceof UnionType) {
+            const nullable = nullableFromUnion(t);
+            return (
+                nullable !== null && this.needsJsonObjectMapAnnotation(nullable)
+            );
+        }
+
+        if (!(t instanceof MapType)) {
+            return false;
+        }
+
+        return (
+            this.isEmptyObjectType(t.values) ||
+            this.needsJsonObjectMapAnnotation(t.values)
+        );
+    }
+
+    private hasJsonObjectMaps(): boolean {
+        return iterableSome(
+            this.typeGraph.allNamedTypes(),
+            (t) =>
+                t instanceof ClassType &&
+                iterableSome(t.getProperties().values(), (p) =>
+                    this.needsJsonObjectMapAnnotation(p.type),
+                ),
+        );
+    }
+
     protected emitUsageHeader(): void {
         this.emitLine("// To parse the JSON, install Klaxon and do:");
         this.emitLine("//");
@@ -144,6 +178,11 @@ export class KotlinKlaxonRenderer extends KotlinRenderer {
             usesTime
         ) {
             this.emitGenericConverter();
+        }
+
+        const hasJsonObjectMaps = this.hasJsonObjectMaps();
+        if (hasJsonObjectMaps) {
+            this.emitJsonObjectMapConverter();
         }
 
         const converters: Sourcelike[][] = [];
@@ -204,6 +243,14 @@ export class KotlinKlaxonRenderer extends KotlinRenderer {
         this.emitLine("private val klaxon = Klaxon()");
         if (converters.length > 0) {
             this.indent(() => this.emitTable(converters));
+        }
+
+        if (hasJsonObjectMaps) {
+            this.indent(() =>
+                this.emitLine(
+                    ".fieldConverter(KlaxonJsonObjectMap::class, jsonObjectMapConverter)",
+                ),
+            );
         }
     }
 
@@ -327,7 +374,12 @@ export class KotlinKlaxonRenderer extends KotlinRenderer {
         jsonName: string,
         _required: boolean,
         meta: Array<() => void>,
+        p: ClassProperty,
     ): void {
+        if (this.needsJsonObjectMapAnnotation(p.type)) {
+            meta.push(() => this.emitLine("@KlaxonJsonObjectMap"));
+        }
+
         const rename = this.klaxonRenameAttribute(name, jsonName);
         if (rename !== undefined) {
             meta.push(() => this.emitLine(rename));
@@ -399,6 +451,33 @@ export class KotlinKlaxonRenderer extends KotlinRenderer {
             });
             this.emitLine("})");
         });
+    }
+
+    private emitJsonObjectMapConverter(): void {
+        this.ensureBlankLine();
+        this.emitLine(
+            "// Klaxon cannot deserialize map values typed as JsonObject, so fields",
+        );
+        this.emitLine(
+            "// holding such maps are converted at the field level instead.",
+        );
+        this.emitLine("@Target(AnnotationTarget.FIELD)");
+        this.emitLine("private annotation class KlaxonJsonObjectMap");
+        this.ensureBlankLine();
+        this.emitLine(
+            "private val jsonObjectMapConverter: Converter = object : Converter {",
+        );
+        this.indent(() => {
+            this.emitTable([
+                ["override fun canConvert(cls: Class<*>)", " = true"],
+                ["override fun fromJson(jv: JsonValue)", " = jv.obj!!"],
+                [
+                    "override fun toJson(value: Any)",
+                    " = klaxon.toJsonString(value)",
+                ],
+            ]);
+        });
+        this.emitLine("}");
     }
 
     protected emitUnionDefinitionMethods(

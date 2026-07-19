@@ -1,4 +1,5 @@
 import type { RenderContext } from "../../Renderer.js";
+import type { IntegerRange } from "../../support/IntegerRange.js";
 import { TargetLanguage } from "../../TargetLanguage.js";
 import {
     type StringTypeMapping,
@@ -17,11 +18,16 @@ export const JSONSchemaLanguageConfig = {
 export class JSONSchemaTargetLanguage extends TargetLanguage<
     typeof JSONSchemaLanguageConfig
 > {
+    // JSON Schema's `integer` type is unbounded.
+    public getSupportedIntegerRange(): IntegerRange | null {
+        return null;
+    }
+
     public constructor() {
         super(JSONSchemaLanguageConfig);
     }
 
-    public getOptions(): {} {
+    public getOptions(): Record<string, never> {
         return {};
     }
 

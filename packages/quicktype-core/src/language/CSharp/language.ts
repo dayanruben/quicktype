@@ -104,19 +104,10 @@ export const cSharpOptions = {
                 helpers: false,
                 attributes: true,
             },
-            "just-types-and-namespace": {
-                namespaces: true,
-                helpers: false,
-                attributes: false,
-            },
-            "just-types": {
-                namespaces: true,
-                helpers: false,
-                attributes: false,
-            },
         } as const,
         "complete",
     ),
+    justTypes: new BooleanOption("just-types", "Plain types only", false),
     baseclass: new EnumOption(
         "base-class",
         "Base class",
@@ -139,9 +130,9 @@ export const cSharpOptions = {
     ),
 } as const;
 
-export const newtonsoftCSharpOptions = Object.assign({}, cSharpOptions, {});
+export const newtonsoftCSharpOptions = { ...cSharpOptions };
 
-export const systemTextJsonCSharpOptions = Object.assign({}, cSharpOptions, {});
+export const systemTextJsonCSharpOptions = { ...cSharpOptions };
 
 export const cSharpLanguageConfig = {
     displayName: "C#",

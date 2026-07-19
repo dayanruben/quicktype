@@ -181,13 +181,11 @@ function expandSelectionSet(
     inType: GQLType,
     optional: boolean,
 ): Selection[] {
-    return [...selectionSet.selections]
-        .reverse()
-        .map((s) => ({
-            selection: s,
-            inType,
-            optional: optional || hasOptionalDirectives(s.directives),
-        }));
+    return [...selectionSet.selections].reverse().map((s) => ({
+        selection: s,
+        inType,
+        optional: optional || hasOptionalDirectives(s.directives),
+    }));
 }
 
 interface GQLSchema {
@@ -219,7 +217,7 @@ class GQLQuery {
             }
         }
 
-        messageAssert(queries.length >= 1, "GraphQLNoQueriesDefined", {});
+        messageAssert(queries.length > 0, "GraphQLNoQueriesDefined", {});
         this.queries = queries;
     }
 
@@ -256,7 +254,7 @@ class GQLQuery {
                     null,
                     containingTypeName,
                 );
-            case TypeKind.ENUM:
+            case TypeKind.ENUM: {
                 if (!fieldType.enumValues) {
                     return panic("Enum type doesn't have values");
                 }
@@ -278,6 +276,7 @@ class GQLQuery {
                     new Set(values),
                 );
                 break;
+            }
             case TypeKind.INPUT_OBJECT:
                 // FIXME: Support input objects
                 return panic("Input objects not supported");
@@ -367,7 +366,7 @@ class GQLQuery {
             if (!nextItem) break;
             const { selection, optional, inType } = nextItem;
             switch (selection.kind) {
-                case Kind.FIELD:
+                case Kind.FIELD: {
                     const fieldName = selection.name.value;
                     const givenName = selection.alias
                         ? selection.alias.value
@@ -384,6 +383,7 @@ class GQLQuery {
                         builder.makeClassProperty(fieldType, optional),
                     );
                     break;
+                }
                 case Kind.FRAGMENT_SPREAD: {
                     const fragment = this.getFragment(selection.name.value);
                     const fragmentType =
@@ -649,13 +649,13 @@ function makeGraphQLQueryTypes(
 export interface GraphQLSourceData {
     name: string;
     query: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: raw GraphQL introspection JSON
     schema: any;
 }
 
 interface GraphQLTopLevel {
     query: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: raw GraphQL introspection JSON
     schema: any;
 }
 

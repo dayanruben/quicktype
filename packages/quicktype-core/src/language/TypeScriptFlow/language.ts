@@ -1,5 +1,9 @@
 import type { RenderContext } from "../../Renderer.js";
 import { BooleanOption, getOptionValues } from "../../RendererOptions/index.js";
+import {
+    JS_SAFE_INTEGER_RANGE,
+    type IntegerRange,
+} from "../../support/IntegerRange.js";
 import { TargetLanguage } from "../../TargetLanguage.js";
 import type { StringTypeMapping } from "../../Type/TypeBuilderUtils.js";
 import type {
@@ -12,7 +16,8 @@ import { javaScriptOptions } from "../JavaScript/index.js";
 import { FlowRenderer } from "./FlowRenderer.js";
 import { TypeScriptRenderer } from "./TypeScriptRenderer.js";
 
-export const tsFlowOptions = Object.assign({}, javaScriptOptions, {
+export const tsFlowOptions = {
+    ...javaScriptOptions,
     justTypes: new BooleanOption("just-types", "Interfaces only", false),
     nicePropertyNames: new BooleanOption(
         "nice-property-names",
@@ -40,7 +45,7 @@ export const tsFlowOptions = Object.assign({}, javaScriptOptions, {
         false,
     ),
     readonly: new BooleanOption("readonly", "Use readonly type members", false),
-});
+};
 
 export const typeScriptLanguageConfig = {
     displayName: "TypeScript",
@@ -51,6 +56,10 @@ export const typeScriptLanguageConfig = {
 export class TypeScriptTargetLanguage extends TargetLanguage<
     typeof typeScriptLanguageConfig
 > {
+    public getSupportedIntegerRange(): IntegerRange | null {
+        return JS_SAFE_INTEGER_RANGE;
+    }
+
     public constructor() {
         super(typeScriptLanguageConfig);
     }
@@ -97,6 +106,10 @@ export const flowLanguageConfig = {
 export class FlowTargetLanguage extends TargetLanguage<
     typeof flowLanguageConfig
 > {
+    public getSupportedIntegerRange(): IntegerRange | null {
+        return JS_SAFE_INTEGER_RANGE;
+    }
+
     public constructor() {
         super(flowLanguageConfig);
     }
