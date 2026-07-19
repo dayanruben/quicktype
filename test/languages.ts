@@ -200,7 +200,9 @@ export const JavaLanguage: Language = {
     skipMiscJSON: false,
     skipSchema: ["keyword-unions.schema"], // generates classes with names that are case-insensitively equal
     rendererOptions: {},
-    quickTestRendererOptions: [{ "array-type": "list" }],
+    // The default is array-type=list; this keeps the T[] code path
+    // covered.
+    quickTestRendererOptions: [{ "array-type": "array" }],
     sourceFiles: ["src/language/Java/index.ts"],
 };
 
@@ -217,13 +219,13 @@ export const JavaLanguageWithLegacyDateTime: Language = {
     ],
     skipMiscJSON: true, // Handles edge cases differently and does not allow optional milliseconds.
     rendererOptions: { "datetime-provider": "legacy" },
-    quickTestRendererOptions: [{ "array-type": "list" }],
+    quickTestRendererOptions: [{ "array-type": "array" }],
 };
 
 export const JavaLanguageWithLombok: Language = {
     ...JavaLanguage,
     base: "test/fixtures/java-lombok",
-    quickTestRendererOptions: [{ "array-type": "list", lombok: "true" }],
+    quickTestRendererOptions: [{ "array-type": "array", lombok: "true" }],
 };
 
 export const PythonLanguage: Language = {
