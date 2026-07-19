@@ -1,12 +1,9 @@
 import { arrayIntercalate, iterableSome } from "collection-utils";
 
-import type { Name } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, modifySource } from "../../Source";
-import { camelCase } from "../../support/Strings";
-import { mustNotHappen } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+import type { Name } from "../../Naming.js";
+import { type Sourcelike, modifySource } from "../../Source.js";
+import { camelCase } from "../../support/Strings.js";
+import { mustNotHappen } from "../../support/Support.js";
 import {
     type ArrayType,
     ClassType,
@@ -15,22 +12,13 @@ import {
     type PrimitiveType,
     type Type,
     UnionType,
-} from "../../Type";
-import { matchType, nullableFromUnion } from "../../Type/TypeUtils";
+} from "../../Type/index.js";
+import { matchType, nullableFromUnion } from "../../Type/TypeUtils.js";
 
-import { KotlinRenderer } from "./KotlinRenderer";
-import type { kotlinOptions } from "./language";
-import { stringEscape } from "./utils";
+import { KotlinRenderer } from "./KotlinRenderer.js";
+import { stringEscape } from "./utils.js";
 
 export class KotlinJacksonRenderer extends KotlinRenderer {
-    public constructor(
-        targetLanguage: TargetLanguage,
-        renderContext: RenderContext,
-        _kotlinOptions: OptionValues<typeof kotlinOptions>,
-    ) {
-        super(targetLanguage, renderContext, _kotlinOptions);
-    }
-
     private unionMemberJsonValueGuard(t: Type, _e: Sourcelike): Sourcelike {
         return matchType<Sourcelike>(
             t,

@@ -100,10 +100,10 @@ function additionalTestFiles(
 function runEnvForLanguage(
     additionalRendererOptions: RendererOptions,
 ): NodeJS.ProcessEnv {
-    const newEnv = Object.assign({}, process.env);
+    const newEnv = { ...process.env };
 
     for (const option of Object.keys(additionalRendererOptions)) {
-        newEnv["QUICKTYPE_" + option.toUpperCase().replace("-", "_")] = (
+        newEnv[`QUICKTYPE_${option.toUpperCase().replace("-", "_")}`] = (
             additionalRendererOptions[
                 option as keyof typeof additionalRendererOptions
             ] as Option<string, unknown>
@@ -159,9 +159,7 @@ export abstract class Fixture {
         return this.name === name;
     }
 
-    async setup(): Promise<void> {
-        return;
-    }
+    async setup(): Promise<void> {}
 
     abstract getSamples(sources: string[]): {
         priority: Sample[];
@@ -216,10 +214,6 @@ export abstract class Fixture {
 }
 
 abstract class LanguageFixture extends Fixture {
-    constructor(language: languages.Language) {
-        super(language);
-    }
-
     async setup() {
         const setupCommand = this.language.setupCommand;
         if (!setupCommand || ONLY_OUTPUT) {
@@ -873,6 +867,7 @@ const commentInjectionNestedCommentSchema =
 const commentInjectionEnumNestedCommentSchema =
     "test/inputs/schema/comment-injection-enum-nested-comment.schema";
 const treeSitterWasm = (filename: string): string =>
+    // biome-ignore lint/correctness/noGlobalDirnameFilename: the test harness runs as CommonJS
     path.join(__dirname, "tree-sitter-wasms", filename);
 
 const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
@@ -1116,9 +1111,7 @@ class CommentInjectionTreeSitterFixture extends Fixture {
         return this.name === name;
     }
 
-    async setup(): Promise<void> {
-        return;
-    }
+    async setup(): Promise<void> {}
 
     getSamples(sources: string[]): { priority: Sample[]; others: Sample[] } {
         const commentInjectionSamples = [
@@ -1153,6 +1146,7 @@ class CommentInjectionTreeSitterFixture extends Fixture {
     private readonly _treeSitterLanguages = new Map<string, unknown>();
 
     private async loadTreeSitterLanguage(
+        // biome-ignore lint/suspicious/noExplicitAny: web-tree-sitter is loaded dynamically without types
         TreeSitter: any,
         wasmModule: string,
     ): Promise<unknown> {
@@ -1167,6 +1161,7 @@ class CommentInjectionTreeSitterFixture extends Fixture {
     }
 
     private async parseGeneratedFiles(
+        // biome-ignore lint/suspicious/noExplicitAny: web-tree-sitter is loaded dynamically without types
         TreeSitter: any,
         target: TreeSitterTarget,
         generatedFiles: string[],
@@ -1189,6 +1184,7 @@ class CommentInjectionTreeSitterFixture extends Fixture {
             const tree = parser.parse(source);
             const problems: TreeSitterParseProblem[] = [];
 
+            // biome-ignore lint/suspicious/noExplicitAny: web-tree-sitter is loaded dynamically without types
             function visit(node: any): void {
                 if (
                     node.type === "ERROR" ||
@@ -1571,6 +1567,7 @@ export const allFixtures: Fixture[] = [
     new JSONFixture(languages.KotlinLanguage),
     new JSONFixture(languages.Scala3Language),
     new JSONFixture(languages.KotlinJacksonLanguage, "kotlin-jackson"),
+    new JSONFixture(languages.KotlinXLanguage, "kotlinx"),
     new JSONFixture(languages.DartLanguage),
     new JSONFixture(languages.PikeLanguage),
     new JSONFixture(languages.HaskellLanguage),
@@ -1598,6 +1595,7 @@ export const allFixtures: Fixture[] = [
     new JSONSchemaFixture(languages.RustLanguage),
     new JSONSchemaFixture(languages.RubyLanguage),
     new JSONSchemaFixture(languages.PythonLanguage),
+    new JSONSchemaFixture(languages.PHPLanguage),
     new JSONSchemaFixture(languages.ElmLanguage),
     new JSONSchemaFixture(languages.SwiftLanguage),
     new JSONSchemaFixture(languages.TypeScriptLanguage),
@@ -1609,6 +1607,7 @@ export const allFixtures: Fixture[] = [
         languages.KotlinJacksonLanguage,
         "schema-kotlin-jackson",
     ),
+    new JSONSchemaFixture(languages.KotlinXLanguage, "schema-kotlinx"),
     new JSONSchemaFixture(languages.Scala3Language),
     new JSONSchemaFixture(languages.DartLanguage),
     new JSONSchemaFixture(languages.PikeLanguage),

@@ -3,34 +3,34 @@ import { arrayIntercalate } from "collection-utils";
 import {
     anyTypeIssueAnnotation,
     nullTypeIssueAnnotation,
-} from "../../Annotation";
+} from "../../Annotation.js";
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import type { Name, Namer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, maybeAnnotated } from "../../Source";
-import { assert } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
-import { followTargetType } from "../../Transformers";
+} from "../../ConvenienceRenderer.js";
+import type { Name, Namer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, maybeAnnotated } from "../../Source.js";
+import { assert } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
+import { followTargetType } from "../../Transformers.js";
 import type {
     ClassProperty,
     ClassType,
     EnumType,
     Type,
     UnionType,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     directlyReachableSingleNamedType,
     matchCompoundType,
     matchType,
     nullableFromUnion,
     removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import type { cSharpOptions } from "./language";
+import type { cSharpOptions } from "./language.js";
 import {
     AccessModifier,
     csTypeForTransformedStringType,
@@ -38,7 +38,7 @@ import {
     namingFunction,
     namingFunctionKeep,
     noFollow,
-} from "./utils";
+} from "./utils.js";
 
 export class CSharpRenderer extends ConvenienceRenderer {
     public constructor(
@@ -294,7 +294,7 @@ export class CSharpRenderer extends ConvenienceRenderer {
                     : "none";
                 const columns: Sourcelike[][] = [];
                 let isFirstProperty = true;
-                let previousDescription: string[] | undefined = undefined;
+                let previousDescription: string[] | undefined;
                 this.forEachClassProperty(
                     c,
                     blankLines,
@@ -484,9 +484,7 @@ export class CSharpRenderer extends ConvenienceRenderer {
         }
     }
 
-    protected emitRequiredHelpers(): void {
-        return;
-    }
+    protected emitRequiredHelpers(): void {}
 
     private emitTypesAndSupport(): void {
         this.forEachObject(
@@ -502,13 +500,9 @@ export class CSharpRenderer extends ConvenienceRenderer {
         this.emitRequiredHelpers();
     }
 
-    protected emitDefaultLeadingComments(): void {
-        return;
-    }
+    protected emitDefaultLeadingComments(): void {}
 
-    protected emitDefaultFollowingComments(): void {
-        return;
-    }
+    protected emitDefaultFollowingComments(): void {}
 
     protected needNamespace(): boolean {
         return true;
@@ -537,23 +531,23 @@ export class CSharpRenderer extends ConvenienceRenderer {
     }
 
     protected emitDependencyUsings(): void {
-        let genericEmited: boolean = false;
-        let ensureGenericOnce = () => {
+        let genericEmited = false;
+        const ensureGenericOnce = () => {
             if (!genericEmited) {
                 this.emitUsing("System.Collections.Generic");
                 genericEmited = true;
             }
-        }
-        this.typeGraph.allTypesUnordered().forEach(_ => {
+        };
+        this.typeGraph.allTypesUnordered().forEach((_) => {
             matchCompoundType(
                 _,
-                _arrayType => this._csOptions.useList ? ensureGenericOnce() : undefined,
-                _classType => { },
-                _mapType => ensureGenericOnce(),
-                _objectType => { },
-                _unionType => { }
-            )
+                (_arrayType) =>
+                    this._csOptions.useList ? ensureGenericOnce() : undefined,
+                (_classType) => {},
+                (_mapType) => ensureGenericOnce(),
+                (_objectType) => {},
+                (_unionType) => {},
+            );
         });
     }
-
 }

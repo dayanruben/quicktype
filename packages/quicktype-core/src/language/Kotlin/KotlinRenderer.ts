@@ -1,17 +1,17 @@
 import {
     anyTypeIssueAnnotation,
     nullTypeIssueAnnotation,
-} from "../../Annotation";
+} from "../../Annotation.js";
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import { type Name, type Namer, funPrefixNamer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, maybeAnnotated } from "../../Source";
-import { acronymStyle } from "../../support/Acronyms";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../ConvenienceRenderer.js";
+import { type Name, type Namer, funPrefixNamer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, maybeAnnotated } from "../../Source.js";
+import { acronymStyle } from "../../support/Acronyms.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -22,16 +22,16 @@ import {
     type PrimitiveType,
     type Type,
     type UnionType,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     matchType,
     nullableFromUnion,
     removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import { keywords } from "./constants";
-import type { kotlinOptions } from "./language";
-import { kotlinNameStyle } from "./utils";
+import { keywords } from "./constants.js";
+import type { kotlinOptions } from "./language.js";
+import { kotlinNameStyle } from "./utils.js";
 
 export class KotlinRenderer extends ConvenienceRenderer {
     public constructor(
@@ -277,7 +277,13 @@ export class KotlinRenderer extends ConvenienceRenderer {
                     meta.push(() => this.emitDescription(description));
                 }
 
-                this.renameAttribute(name, jsonName, !nullableOrOptional, meta);
+                this.renameAttribute(
+                    name,
+                    jsonName,
+                    !nullableOrOptional,
+                    meta,
+                    p,
+                );
 
                 if (meta.length > 0 && !first) {
                     this.ensureBlankLine();
@@ -323,6 +329,7 @@ export class KotlinRenderer extends ConvenienceRenderer {
         _jsonName: string,
         _required: boolean,
         _meta: Array<() => void>,
+        _p: ClassProperty,
     ): void {
         // to be overridden
     }

@@ -1,4 +1,4 @@
-import { funPrefixNamer } from "../../Naming";
+import { funPrefixNamer } from "../../Naming.js";
 import {
     allUpperWordStyle,
     combineWords,
@@ -7,8 +7,8 @@ import {
     isLetterOrUnderscoreOrDigit,
     legalizeCharacters,
     splitIntoWords,
-} from "../../support/Strings";
-import type { ClassProperty, Type, TypeKind } from "../../Type";
+} from "../../support/Strings.js";
+import type { ClassProperty, Type, TypeKind } from "../../Type/index.js";
 
 export const namingFunction = funPrefixNamer("namer", goNameStyle);
 

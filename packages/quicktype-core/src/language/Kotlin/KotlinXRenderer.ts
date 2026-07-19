@@ -1,33 +1,16 @@
-import type { Name } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, modifySource } from "../../Source";
-import { camelCase } from "../../support/Strings";
-import type { TargetLanguage } from "../../TargetLanguage";
-import type {
-    ArrayType,
-    EnumType,
-    MapType,
-    Type,
-} from "../../Type";
+import type { Name } from "../../Naming.js";
+import { type Sourcelike, modifySource } from "../../Source.js";
+import { camelCase } from "../../support/Strings.js";
+import type { ArrayType, EnumType, MapType, Type } from "../../Type/index.js";
 
-import { KotlinRenderer } from "./KotlinRenderer";
-import type { kotlinOptions } from "./language";
-import { stringEscape } from "./utils";
+import { KotlinRenderer } from "./KotlinRenderer.js";
+import { stringEscape } from "./utils.js";
 
 /**
  * Currently supports simple classes, enums, and TS string unions (which are also enums).
  * TODO: Union, Any, Top Level Array, Top Level Map
  */
 export class KotlinXRenderer extends KotlinRenderer {
-    public constructor(
-        targetLanguage: TargetLanguage,
-        renderContext: RenderContext,
-        _kotlinOptions: OptionValues<typeof kotlinOptions>,
-    ) {
-        super(targetLanguage, renderContext, _kotlinOptions);
-    }
-
     protected anySourceType(optional: string): Sourcelike {
         return ["JsonElement", optional];
     }

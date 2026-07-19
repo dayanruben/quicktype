@@ -3,14 +3,14 @@ import { arrayIntercalate } from "collection-utils";
 import {
     type ForbiddenWordsInfo,
     inferredNameOrder,
-} from "../../ConvenienceRenderer";
-import { DependencyName, type Name, SimpleName } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, modifySource } from "../../Source";
-import { camelCase, utf16StringEscape } from "../../support/Strings";
-import { defined, panic } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../ConvenienceRenderer.js";
+import { DependencyName, type Name, SimpleName } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, modifySource } from "../../Source.js";
+import { camelCase, utf16StringEscape } from "../../support/Strings.js";
+import { defined, panic } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayDecodingTransformer,
     ArrayEncodingTransformer,
@@ -30,7 +30,7 @@ import {
     UnionMemberMatchTransformer,
     followTargetType,
     transformationForType,
-} from "../../Transformers";
+} from "../../Transformers.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -38,11 +38,11 @@ import {
     EnumType,
     type Type,
     UnionType,
-} from "../../Type";
-import { nullableFromUnion } from "../../Type/TypeUtils";
+} from "../../Type/index.js";
+import { nullableFromUnion } from "../../Type/TypeUtils.js";
 
-import { CSharpRenderer } from "./CSharpRenderer";
-import type { newtonsoftCSharpOptions } from "./language";
+import { CSharpRenderer } from "./CSharpRenderer.js";
+import type { newtonsoftCSharpOptions } from "./language.js";
 import {
     AccessModifier,
     alwaysApplyTransformation,
@@ -51,7 +51,7 @@ import {
     denseRequiredEnumName,
     isValueType,
     namingFunction,
-} from "./utils";
+} from "./utils.js";
 
 export class NewtonsoftCSharpRenderer extends CSharpRenderer {
     private readonly _enumExtensionsNames = new Map<Name, Name>();
@@ -68,8 +68,10 @@ export class NewtonsoftCSharpRenderer extends CSharpRenderer {
         private readonly _options: OptionValues<typeof newtonsoftCSharpOptions>,
     ) {
         super(targetLanguage, renderContext, _options);
-        this._needHelpers = _options.features.helpers;
-        this._needAttributes = _options.features.attributes;
+        // `--just-types` wins over whatever `--features` says.
+        this._needHelpers = _options.features.helpers && !_options.justTypes;
+        this._needAttributes =
+            _options.features.attributes && !_options.justTypes;
         this._needNamespaces = _options.features.namespaces;
     }
 
@@ -824,9 +826,7 @@ export class NewtonsoftCSharpRenderer extends CSharpRenderer {
                     itemVariable,
                     xfer.itemTransformer,
                     xfer.itemTargetType,
-                    () => {
-                        return;
-                    },
+                    () => {},
                 );
             });
             this.emitLine("writer.WriteEndArray();");
