@@ -1184,13 +1184,8 @@ encoder.dateEncodingStrategy = .formatted(formatter)`);
 
             if (this._options.objcSupport === false) {
                 this.ensureBlankLine();
-                this.emitMultiline(`    public var hashValue: Int {
-		return 0
-	}`);
-
-                this.ensureBlankLine();
                 this.emitMultiline(`    public func hash(into hasher: inout Hasher) {
-		// No-op
+		hasher.combine(0)
 	}`);
             }
 
