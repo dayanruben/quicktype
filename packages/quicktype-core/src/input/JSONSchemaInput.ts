@@ -1129,6 +1129,10 @@ async function addTypesInSchema(
             }
 
             let additionalProperties = schema.additionalProperties;
+            if (additionalProperties === undefined) {
+                additionalProperties = schema.unevaluatedProperties;
+            }
+
             // This is an incorrect hack to fix an issue with a Go->Schema generator:
             // https://github.com/quicktype/quicktype/issues/976
             if (
@@ -1259,6 +1263,7 @@ async function addTypesInSchema(
             typeSet !== undefined ||
             schema.properties !== undefined ||
             schema.additionalProperties !== undefined ||
+            schema.unevaluatedProperties !== undefined ||
             schema.items !== undefined ||
             schema.prefixItems !== undefined ||
             schema.required !== undefined ||
