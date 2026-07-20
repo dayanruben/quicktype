@@ -5,6 +5,8 @@ import { randomBytes } from "node:crypto";
 import * as shell from "shelljs";
 
 const Ajv = require("ajv");
+const addFormats = require("ajv-formats");
+const draft06MetaSchema = require("ajv/dist/refs/json-schema-draft-06.json");
 
 import {
     compareJsonFileToJson,
@@ -600,17 +602,26 @@ class JSONSchemaJSONFixture extends JSONToXToYFixture {
             fs.readFileSync(this.language.output, "utf8"),
         );
 
-        const ajv = new Ajv({
-            format: "full",
-            unknownFormats: ["integer", "boolean"],
-        });
+        const ajv = new Ajv();
+        // We generate draft-06 schemas, which Ajv 8 doesn't support out of
+        // the box anymore.
+        ajv.addMetaSchema(draft06MetaSchema);
+        // Ajv 8 moved the format validators into the ajv-formats package;
+        // its default mode is "full", like the old `format: "full"` option.
+        addFormats(ajv);
+        // Our custom schema keywords, which strict mode would reject.
+        ajv.addVocabulary(["qt-uri-protocols", "qt-uri-extensions"]);
         // Make Ajv's date-time compatible with what we recognize.  All non-standard
         // JSON formats that we use for transformed type kinds must be registered here
-        // with a validation function.
+        // with a validation function.  Formats registered with `true` are
+        // accepted without validating the string.  This replaces the old
+        // `unknownFormats: ["integer", "boolean"]` option.
         // FIXME: Unify this with what's in StringTypes.ts.
         ajv.addFormat("date-time", (s: string) =>
             dateTimeRecognizer.isDateTime(s),
         );
+        ajv.addFormat("integer", true);
+        ajv.addFormat("boolean", true);
         const valid = ajv.validate(schema, input);
         if (!valid) {
             failWith("Generated schema does not validate input JSON.", {
