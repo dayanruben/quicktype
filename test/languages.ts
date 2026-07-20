@@ -57,6 +57,7 @@ export type LanguageFeature =
     | "uuid"
     | "minmax"
     | "minmaxlength"
+    | "minmaxitems"
     | "pattern";
 
 export interface Language {
@@ -1864,7 +1865,7 @@ export const TypeScriptZodLanguage: Language = {
         "e8b04.json",
     ],
     allowMissingNull: false,
-    features: ["enum", "union", "no-defaults", "date-time"],
+    features: ["enum", "union", "no-defaults", "date-time", "minmaxitems"],
     output: "TopLevel.ts",
     topLevel: "TopLevel",
     skipJSON: [
