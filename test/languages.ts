@@ -1628,8 +1628,12 @@ export const DartLanguage: Language = {
     skipMiscJSON: true,
     rendererOptions: {},
     // The default is final-props=true; this keeps the mutable-property
-    // code path covered.
-    quickTestRendererOptions: [{ "final-props": "false" }],
+    // code path covered.  The targeted from-map sample also verifies that
+    // the fixture driver can keep calling the top-level JSON string helpers.
+    quickTestRendererOptions: [
+        { "final-props": "false" },
+        ["simple-object.json", { "from-map": "true" }],
+    ],
     sourceFiles: ["src/language/Dart/index.ts"],
 };
 

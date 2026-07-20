@@ -117,12 +117,12 @@ export class DartRenderer extends ConvenienceRenderer {
         const encoder = new DependencyName(
             propertyNamingFunction,
             name.order,
-            (lookup) => `${lookup(name)}_${this.toJson}`,
+            (lookup) => `${lookup(name)}_toJson`,
         );
         const decoder = new DependencyName(
             propertyNamingFunction,
             name.order,
-            (lookup) => `${lookup(name)}_${this.fromJson}`,
+            (lookup) => `${lookup(name)}_fromJson`,
         );
         this._topLevelDependents.set(name, { encoder, decoder });
         return [encoder, decoder];
