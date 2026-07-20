@@ -9,13 +9,31 @@ import { TypeScriptFlowBaseRenderer } from "./TypeScriptFlowBaseRenderer.js";
 import { tsFlowTypeAnnotations } from "./utils.js";
 
 export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
+    protected anyType(): string {
+        return this._tsFlowOptions.preferUnknown ? "unknown" : "any";
+    }
+
     protected forbiddenNamesForGlobalNamespace(): string[] {
         return ["Array", "Date"];
     }
 
+    protected uncheckedParsedJson(t: Type, parsedJson: Sourcelike): Sourcelike {
+        // With `raw-type any` and `prefer-unknown` the deserializer's
+        // parameter is `unknown`, which can't be returned as the target
+        // type without a cast.
+        if (
+            this._tsFlowOptions.rawType !== "json" &&
+            this._tsFlowOptions.preferUnknown
+        ) {
+            return [parsedJson, " as ", this.sourceFor(t).source];
+        }
+
+        return parsedJson;
+    }
+
     protected deserializerFunctionLine(t: Type, name: Name): Sourcelike {
         const jsonType =
-            this._tsFlowOptions.rawType === "json" ? "string" : "any";
+            this._tsFlowOptions.rawType === "json" ? "string" : this.anyType();
         return [
             "public static to",
             name,
@@ -29,7 +47,7 @@ export class TypeScriptRenderer extends TypeScriptFlowBaseRenderer {
     protected serializerFunctionLine(t: Type, name: Name): Sourcelike {
         const camelCaseName = modifySource(camelCase, name);
         const returnType =
-            this._tsFlowOptions.rawType === "json" ? "string" : "any";
+            this._tsFlowOptions.rawType === "json" ? "string" : this.anyType();
         return [
             "public static ",
             camelCaseName,

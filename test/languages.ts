@@ -959,6 +959,7 @@ export const TypeScriptLanguage: Language = {
         { "acronym-style": "pascal" },
         { converters: "all-objects" },
         { readonly: "true" },
+        { "prefer-unknown": "false" },
     ],
     sourceFiles: ["src/language/TypeScript/index.ts"],
 };
@@ -1038,6 +1039,7 @@ export const FlowLanguage: Language = {
         { "runtime-typecheck": "false" },
         { "runtime-typecheck-ignore-unknown-properties": "true" },
         { "nice-property-names": "true" },
+        { "prefer-unknown": "false" },
     ],
     sourceFiles: ["src/language/Flow/index.ts"],
 };

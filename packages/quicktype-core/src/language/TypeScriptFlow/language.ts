@@ -45,6 +45,11 @@ export const tsFlowOptions = {
         false,
     ),
     readonly: new BooleanOption("readonly", "Use readonly type members", false),
+    preferUnknown: new BooleanOption(
+        "prefer-unknown",
+        "Use unknown (TypeScript) or mixed (Flow) instead of any",
+        true,
+    ),
 };
 
 export const typeScriptLanguageConfig = {
