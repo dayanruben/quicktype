@@ -69,6 +69,7 @@ export const cSharpOptions = {
         {
             "5": 5,
             "6": 6,
+            "8": 8,
         } as const,
         "6",
         "secondary",
