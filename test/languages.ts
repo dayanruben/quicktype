@@ -729,8 +729,13 @@ export const CPlusPlusLanguage: Language = {
         { wstring: "use-wstring" },
         { "const-style": "east-const" },
         // The default is boost=false (C++17); this keeps the boost code
-        // path covered.
-        { boost: "true" },
+        // path covered.  Pinned to specific inputs because the default
+        // quicktest inputs (combinations[1-4].json) are all in this
+        // fixture's skipJSON, so plain-options quicktests never run for
+        // C++.  unions.json exercises nulls inside unions, where the
+        // boost and std optional/variant code paths differ.
+        ["unions.json", { boost: "true" }],
+        ["pokedex.json", { boost: "true" }],
     ],
     sourceFiles: ["src/language/CPlusPlus/index.ts"],
 };
