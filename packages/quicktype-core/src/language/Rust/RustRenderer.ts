@@ -5,6 +5,7 @@ import {
     anyTypeIssueAnnotation,
     nullTypeIssueAnnotation,
 } from "../../Annotation.js";
+import { minMaxValueForType } from "../../attributes/Constraints.js";
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
@@ -27,7 +28,6 @@ import {
     removeNullFromUnion,
 } from "../../Type/TypeUtils.js";
 
-import { minMaxValueForType } from "../../attributes/Constraints.js";
 import { keywords } from "./constants.js";
 import { IntegerType, type rustOptions } from "./language.js";
 import {
@@ -103,23 +103,18 @@ export class RustRenderer extends ConvenienceRenderer {
                 return "i32";
             case IntegerType.ForceI64:
                 return "i64";
-            case IntegerType.Conservative:
             default: {
+                // Conservative: use i32 only when the schema bounds the
+                // integer on *both* sides and both bounds fit in i32.  A
+                // one-sided bound (e.g. only `"minimum": 0`) leaves the
+                // other side unbounded, so it must stay i64.
                 const minMax = minMaxValueForType(integerType);
-                if (minMax !== undefined) {
-                    const [min, max] = minMax;
-                    // Check if values fit in i32 range: [-2147483648, 2147483647]
-                    const i32Min = -2147483648;
-                    const i32Max = 2147483647;
-                    
-                    if (
-                        (min === undefined || min >= i32Min) &&
-                        (max === undefined || max <= i32Max)
-                    ) {
-                        return "i32";
-                    }
-                }
-                return "i64";
+                if (minMax === undefined) return "i64";
+                const [min, max] = minMax;
+                if (min === undefined || max === undefined) return "i64";
+                const i32Min = -2147483648;
+                const i32Max = 2147483647;
+                return min >= i32Min && max <= i32Max ? "i32" : "i64";
             }
         }
     }
