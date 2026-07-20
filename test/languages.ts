@@ -775,6 +775,7 @@ export const CPlusPlusLanguage: Language = {
         // boost and std optional/variant code paths differ.
         ["unions.json", { boost: "true" }],
         ["pokedex.json", { boost: "true" }],
+        ["optional-any.schema", { "hide-null-optional": "true" }],
     ],
     sourceFiles: ["src/language/CPlusPlus/index.ts"],
 };
