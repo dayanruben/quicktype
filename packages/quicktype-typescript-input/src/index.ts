@@ -125,6 +125,55 @@ function patchGeneratorForBuiltinTypes(
     };
 }
 
+function addEnumAccessorNames(schema: Definition, program: ts.Program): void {
+    const definitions = schema.definitions;
+    if (definitions === undefined) return;
+
+    const checker = program.getTypeChecker();
+    const visit = (node: ts.Node): void => {
+        if (ts.isEnumDeclaration(node)) {
+            const symbol = checker.getSymbolAtLocation(node.name);
+            if (
+                symbol !== undefined &&
+                !isDeclaredInDefaultLib(program, symbol)
+            ) {
+                const accessorNames: Record<string, string> =
+                    Object.create(null);
+                for (const member of node.members) {
+                    const value = checker.getConstantValue(member);
+                    const name = member.name;
+                    if (
+                        typeof value !== "string" ||
+                        (!ts.isIdentifier(name) &&
+                            !ts.isStringLiteral(name) &&
+                            !ts.isNumericLiteral(name))
+                    ) {
+                        return;
+                    }
+
+                    accessorNames[value] = name.text;
+                }
+
+                const definitionName = checker
+                    .getFullyQualifiedName(symbol)
+                    .replace(/(\bimport\(".*?"\)|".*?")\.| /g, "");
+                const definition = definitions[definitionName];
+                if (typeof definition === "object") {
+                    (definition as unknown as Record<string, unknown>)[
+                        "qt-accessors"
+                    ] = accessorNames;
+                }
+            }
+        }
+
+        ts.forEachChild(node, visit);
+    };
+
+    for (const sourceFile of program.getSourceFiles()) {
+        visit(sourceFile);
+    }
+}
+
 // FIXME: We're stringifying and then parsing this schema again. Just pass around
 // the schema directly.
 export function schemaForTypeScriptSources(
@@ -151,6 +200,10 @@ export function schemaForTypeScriptSources(
     patchGeneratorForBuiltinTypes(generator, program);
 
     const schema = generateSchema(program, "*", settings, undefined, generator);
+    if (schema !== null) {
+        addEnumAccessorNames(schema, program);
+    }
+
     const uris: string[] = [];
     let topLevelName = "";
 

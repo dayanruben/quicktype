@@ -1,6 +1,12 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
+import {
+    FetchingJSONSchemaStore,
+    InputData,
+    JSONSchemaInput,
+    quicktype,
+} from "quicktype-core";
 import { schemaForTypeScriptSources } from "quicktype-typescript-input";
 import { afterAll, describe, expect, test } from "vitest";
 
@@ -18,18 +24,36 @@ afterAll(() => {
 
 let uniqueFileIndex = 0;
 
-function schemaForSource(source: string) {
+function schemaSourceDataForSource(source: string) {
     const fileName = path.join(
         path.relative(process.cwd(), temporaryDirectory),
         `input-${uniqueFileIndex++}.ts`,
     );
     fs.writeFileSync(fileName, source);
-    const result = schemaForTypeScriptSources([fileName]);
+    return schemaForTypeScriptSources([fileName]);
+}
+
+function schemaForSource(source: string) {
+    const result = schemaSourceDataForSource(source);
     return {
         name: result.name ?? "",
         schema: JSON.parse(result.schema),
         uris: result.uris,
     };
+}
+
+async function generateTypeScriptForSource(source: string): Promise<string> {
+    const schemaInput = new JSONSchemaInput(new FetchingJSONSchemaStore());
+    await schemaInput.addSource(schemaSourceDataForSource(source));
+    const inputData = new InputData();
+    inputData.addInput(schemaInput);
+
+    const result = await quicktype({
+        inputData,
+        lang: "typescript",
+        rendererOptions: { "just-types": true, "prefer-unions": false },
+    });
+    return result.lines.join("\n");
 }
 
 describe("schemaForTypeScriptSources", () => {
@@ -96,6 +120,37 @@ describe("schemaForTypeScriptSources", () => {
         const config = schema.definitions.Config;
         expect(config.properties.name.default).toBe("default-name");
         expect(config.properties.count.default).toBe(42);
+    });
+
+    test("string enums preserve their member names in the schema", () => {
+        const { schema } = schemaForSource(`
+            export enum TestEnum {
+                Foo = "000",
+                Bar = "001",
+                Baz = "002",
+            }
+        `);
+
+        expect(schema.definitions.TestEnum["qt-accessors"]).toEqual({
+            "000": "Foo",
+            "001": "Bar",
+            "002": "Baz",
+        });
+    });
+
+    test("string enum member names survive through TypeScript output", async () => {
+        const output = await generateTypeScriptForSource(`
+            export enum TestEnum {
+                Foo = "000",
+                Bar = "001",
+                Baz = "002",
+            }
+        `);
+
+        expect(output).toContain('Foo = "000"');
+        expect(output).toContain('Bar = "001"');
+        expect(output).toContain('Baz = "002"');
+        expect(output).not.toMatch(/The00[0-2]/);
     });
 
     // The previously used fork of typescript-json-schema threw
