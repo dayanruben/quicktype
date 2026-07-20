@@ -327,9 +327,12 @@ export const RustLanguage: Language = {
             "derive-debug": "false",
             "derive-clone": "false",
         },
-        { "integer-type": "conservative" },
-        { "integer-type": "force-i32" },
-        { "integer-type": "force-i64" },
+        // Exercise the integer-type option against schemas with integer
+        // bounds.  force-i32 is pinned to a schema whose sample values
+        // all fit in i32 so the round-trip still succeeds.
+        ["integer-type.schema", { "integer-type": "conservative" }],
+        ["integer-type.schema", { "integer-type": "force-i64" }],
+        ["minmax-integer.schema", { "integer-type": "force-i32" }],
     ],
     sourceFiles: ["src/language/Rust/index.ts"],
 };
@@ -733,8 +736,6 @@ export const CPlusPlusLanguage: Language = {
     skipSchema: [
         // uses too much memory
         "keyword-unions.schema",
-        // seems like a problem with integer range check
-        "integer-type.schema",
         // The generated deserializer accepts non-object values when all class properties are optional.
         "nested-intersection-union.schema",
         // Recursive top-level unions produce aliases that can refer to later aliases.
