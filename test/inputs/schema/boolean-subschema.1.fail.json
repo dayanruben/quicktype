@@ -1,0 +1,4 @@
+{
+  "foo": { "not": "a string" },
+  "empty": []
+}
