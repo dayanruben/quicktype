@@ -512,8 +512,11 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                             }
                         }
 
-                        this.emitLine("new DateOnlyConverter(),");
-                        this.emitLine("new TimeOnlyConverter(),");
+                        if (this._options.dateTimeOnlyConverters) {
+                            this.emitLine("new DateOnlyConverter(),");
+                            this.emitLine("new TimeOnlyConverter(),");
+                        }
+
                         this.emitLine("IsoDateTimeOffsetConverter.Singleton");
                         // this.emitLine("new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }");
                     });
@@ -1305,7 +1308,16 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
             this.forEachTransformation("leading-and-interposing", (n, t) =>
                 this.emitTransformation(n, t),
             );
-            this.emitMultiline(`
+            if (this._options.dateTimeOnlyConverters) {
+                this.emitDateTimeOnlyConverters();
+            }
+
+            this.emitIsoDateTimeOffsetConverter();
+        }
+    }
+
+    private emitDateTimeOnlyConverters(): void {
+        this.emitMultiline(`
 public class DateOnlyConverter : JsonConverter<DateOnly>
 {
 	private readonly string serializationFormat;
@@ -1345,9 +1357,12 @@ public class TimeOnlyConverter : JsonConverter<TimeOnly>
 
 	public override void Write(Utf8JsonWriter writer, TimeOnly value, JsonSerializerOptions options)
 			=> writer.WriteStringValue(value.ToString(serializationFormat));
-}
+}`);
+    }
 
-internal class IsoDateTimeOffsetConverter : JsonConverter<DateTimeOffset>
+    private emitIsoDateTimeOffsetConverter(): void {
+        this.ensureBlankLine();
+        this.emitMultiline(`internal class IsoDateTimeOffsetConverter : JsonConverter<DateTimeOffset>
 {
 	public override bool CanConvert(Type t) => t == typeof(DateTimeOffset);
 
@@ -1415,7 +1430,6 @@ internal class IsoDateTimeOffsetConverter : JsonConverter<DateTimeOffset>
 
 	public static readonly IsoDateTimeOffsetConverter Singleton = new IsoDateTimeOffsetConverter();
 }`);
-        }
     }
 
     protected needNamespace(): boolean {
