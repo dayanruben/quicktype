@@ -1138,9 +1138,12 @@ async function addTypesInSchema(
             ) {
                 additionalProperties = schema.patternProperties[".*"];
             }
-            
+
             // Handle unevaluatedProperties if additionalProperties is not defined
-            if (additionalProperties === undefined && schema.unevaluatedProperties !== undefined) {
+            if (
+                additionalProperties === undefined &&
+                schema.unevaluatedProperties !== undefined
+            ) {
                 additionalProperties = schema.unevaluatedProperties;
             }
 
