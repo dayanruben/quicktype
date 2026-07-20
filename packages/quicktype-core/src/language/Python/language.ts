@@ -25,6 +25,8 @@ export interface PythonFeatures {
     builtinGenerics: boolean;
     dataClasses: boolean;
     typeHints: boolean;
+    /** `typing.Type`, unavailable in Python 3.6.0 */
+    typingType: boolean;
     /** PEP 604 union operators (`str | None`), Python 3.10+ */
     unionOperators: boolean;
 }
@@ -36,30 +38,35 @@ export const pythonOptions = {
         {
             "3.5": {
                 typeHints: false,
+                typingType: false,
                 dataClasses: false,
                 builtinGenerics: false,
                 unionOperators: false,
             },
             "3.6": {
                 typeHints: true,
+                typingType: false,
                 dataClasses: false,
                 builtinGenerics: false,
                 unionOperators: false,
             },
             "3.7": {
                 typeHints: true,
+                typingType: true,
                 dataClasses: true,
                 builtinGenerics: false,
                 unionOperators: false,
             },
             "3.9": {
                 typeHints: true,
+                typingType: true,
                 dataClasses: true,
                 builtinGenerics: true,
                 unionOperators: false,
             },
             "3.10": {
                 typeHints: true,
+                typingType: true,
                 dataClasses: true,
                 builtinGenerics: true,
                 unionOperators: true,

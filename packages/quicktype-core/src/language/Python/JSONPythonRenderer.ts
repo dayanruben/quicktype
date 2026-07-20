@@ -334,12 +334,20 @@ export class JSONPythonRenderer extends PythonRenderer {
         );
     }
 
+    protected typingTypeHint(tvar: Sourcelike): Sourcelike {
+        if (!this.pyOptions.features.typingType) {
+            return [];
+        }
+
+        return this.typeHint(": ", this.withTyping("Type"), "[", tvar, "]");
+    }
+
     protected emitToEnumConverter(): void {
         const tvar = this.enumTypeVar();
         this.emitBlock(
             [
                 "def to_enum(c",
-                this.typeHint(": ", this.withTyping("Type"), "[", tvar, "]"),
+                this.typingTypeHint(tvar),
                 ", ",
                 this.typingDecl("x", "Any"),
                 ")",
@@ -393,7 +401,7 @@ export class JSONPythonRenderer extends PythonRenderer {
         this.emitBlock(
             [
                 "def to_class(c",
-                this.typeHint(": ", this.withTyping("Type"), "[", tvar, "]"),
+                this.typingTypeHint(tvar),
                 ", ",
                 this.typingDecl("x", "Any"),
                 ")",
@@ -500,7 +508,7 @@ export class JSONPythonRenderer extends PythonRenderer {
         this.emitBlock(
             [
                 "def is_type(t",
-                this.typeHint(": ", this.withTyping("Type"), "[", tvar, "]"),
+                this.typingTypeHint(tvar),
                 ", ",
                 this.typingDecl("x", "Any"),
                 ")",
