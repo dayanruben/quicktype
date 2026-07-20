@@ -121,6 +121,7 @@ export const CSharpLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         "top-level-enum.schema", // The code we generate for top-level enums is incompatible with the driver
     ],
     // The default framework is SystemTextJson; this fixture deliberately
@@ -167,6 +168,7 @@ export const CSharpLanguageSystemTextJson: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         "top-level-enum.schema", // The code we generate for top-level enums is incompatible with the driver
         // The following skips are pre-existing System.Text.Json renderer issues,
         // found when first enabling the schema fixture for this language:
@@ -218,7 +220,10 @@ export const JavaLanguage: Language = {
         "nst-test-suite.json",
     ],
     skipMiscJSON: false,
-    skipSchema: ["keyword-unions.schema"], // generates classes with names that are case-insensitively equal
+    skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
+        "keyword-unions.schema", // generates classes with names that are case-insensitively equal
+    ],
     rendererOptions: {},
     // The default is array-type=list; this keeps the T[] code path
     // covered.
@@ -229,6 +234,7 @@ export const JavaLanguage: Language = {
 export const JavaLanguageWithLegacyDateTime: Language = {
     ...JavaLanguage,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         ...JavaLanguage.skipSchema,
         "date-time.schema", // Expects less strict serialization.
     ],
@@ -327,7 +333,7 @@ export const RustLanguage: Language = {
     output: "module_under_test.rs",
     topLevel: "TopLevel",
     skipJSON: [],
-    skipSchema: [],
+    skipSchema: ["integer-before-number.schema"], // Python-specific union-order regression.
     skipMiscJSON: false,
     rendererOptions: {},
     quickTestRendererOptions: [
@@ -377,6 +383,7 @@ export const CrystalLanguage: Language = {
         "e8b04.json",
     ],
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         // Crystal does not handle enum mapping
         ...skipsEnumValueValidation,
         // Crystal does not support top-level primitives
@@ -473,6 +480,7 @@ export const RubyLanguage: Language = {
         "kitchen-sink.json",
     ],
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         // We don't generate a convenience method for top-level enums
         "top-level-enum.schema",
     ],
@@ -514,6 +522,7 @@ export const GoLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         // can't differenciate empty array and nothing for optional empty array
         // (omitempty).
         "postman-collection.schema",
@@ -590,6 +599,7 @@ export const CJSONLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         /* Member names are different when generating with schema */
         "vega-lite.schema",
         /* Enum as TopLevel is not supported */
@@ -650,7 +660,7 @@ export const CJSONDefaultLanguage: Language = {
     topLevel: "TopLevel",
     includeJSON: ["nbl-stats.json"],
     skipMiscJSON: true,
-    skipSchema: [],
+    skipSchema: ["integer-before-number.schema"], // Python-specific union-order regression.
     rendererOptions: {},
     quickTestRendererOptions: [],
     sourceFiles: ["src/language/CJSON/index.ts"],
@@ -674,7 +684,7 @@ export const CJSONMultiHeaderLanguage: Language = {
     topLevel: "TopLevel",
     includeJSON: ["nbl-stats.json"],
     skipMiscJSON: true,
-    skipSchema: [],
+    skipSchema: ["integer-before-number.schema"], // Python-specific union-order regression.
     rendererOptions: { "source-style": "multi-source" },
     quickTestRendererOptions: [],
     sourceFiles: ["src/language/CJSON/index.ts"],
@@ -698,7 +708,7 @@ export const CJSONMultiSplitLanguage: Language = {
     topLevel: "TopLevel",
     includeJSON: ["nbl-stats.json"],
     skipMiscJSON: true,
-    skipSchema: [],
+    skipSchema: ["integer-before-number.schema"], // Python-specific union-order regression.
     rendererOptions: {
         "source-style": "multi-source",
         "header-only": "false",
@@ -752,6 +762,7 @@ export const CPlusPlusLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         // uses too much memory
         "keyword-unions.schema",
         // The generated deserializer accepts non-object values when all class properties are optional.
@@ -838,6 +849,7 @@ export const ElmLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         "union-list.schema", // recursion
         "list.schema", // recursion
         "ref-remote.schema", // recursion
@@ -912,6 +924,7 @@ export const SwiftLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         // The code we generate for top-level enums is incompatible with the driver
         "top-level-enum.schema",
         // This works on macOS, but on Linux one of the failure test cases doesn't fail
@@ -977,7 +990,7 @@ export const ObjectiveCLanguage: Language = {
         "combinations4.json",
     ],
     skipMiscJSON: false,
-    skipSchema: [],
+    skipSchema: ["integer-before-number.schema"], // Python-specific union-order regression.
     rendererOptions: { functions: "true" },
     quickTestRendererOptions: [],
     sourceFiles: ["src/language/Objective-C/index.ts"],
@@ -1016,6 +1029,7 @@ export const TypeScriptLanguage: Language = {
     skipJSON: [],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         "keyword-unions.schema", // can't handle "constructor" property
         // Pre-existing failures (this fixture is not in CI yet, and these
         // fail with unmodified master too): objects with both declared
@@ -1058,7 +1072,10 @@ export const JavaScriptLanguage: Language = {
     topLevel: "TopLevel",
     skipJSON: [],
     skipMiscJSON: false,
-    skipSchema: ["keyword-unions.schema"], // can't handle "constructor" property
+    skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
+        "keyword-unions.schema", // can't handle "constructor" property
+    ],
     rendererOptions: {},
     quickTestRendererOptions: [
         { "runtime-typecheck": "false" },
@@ -1089,7 +1106,7 @@ export const JavaScriptPropTypesLanguage: Language = {
         "spotify-album.json", // renderer does not support recursion
         "76ae1.json", // renderer does not support recursion
     ],
-    skipSchema: [],
+    skipSchema: ["integer-before-number.schema"], // Python-specific union-order regression.
     skipMiscJSON: false,
     rendererOptions: { "module-system": "es6" },
     quickTestRendererOptions: [{ converters: "top-level" }],
@@ -1111,6 +1128,7 @@ export const FlowLanguage: Language = {
     skipJSON: [],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         "keyword-unions.schema", // can't handle "constructor" property
     ],
     rendererOptions: { "explicit-unions": "yes" },
@@ -1167,6 +1185,7 @@ export const Scala3Language: Language = {
         "bug2521.json",
     ],
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         // Same raw-identifier limitation as in skipJSON: a property
         // named "_" and classes shadowing None/Option don't compile.
         "keyword-unions.schema",
@@ -1217,6 +1236,7 @@ export const Scala3UpickleLanguage: Language = {
         "bug2521.json",
     ],
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         // Same raw-identifier limitation as in skipJSON: a property
         // named "_" and classes shadowing None/Option don't compile.
         "keyword-unions.schema",
@@ -1287,7 +1307,7 @@ I havea no idea how to encode these tests correctly.
         "php-mixed-union.json",
         "nst-test-suite.json",
     ],
-    skipSchema: [],
+    skipSchema: ["integer-before-number.schema"], // Python-specific union-order regression.
     skipMiscJSON: false,
     rendererOptions: { "just-types": "true" },
     quickTestRendererOptions: [],
@@ -1349,6 +1369,7 @@ export const KotlinLanguage: Language = {
         "bug427.json",
     ],
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         // Very weird - the types are correct, but it can (de)serialize the string,
         // which is not represented in the types (implicit-class-array-union);
         // class-map-union: KlaxonException: Couldn't find a suitable constructor for class UnionValue to initialize with {}
@@ -1440,6 +1461,7 @@ export const KotlinJacksonLanguage: Language = {
         "bug427.json",
     ],
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         // Very weird - the types are correct, but it can (de)serialize the string,
         // which is not represented in the types (implicit-class-array-union);
         // class-map-union: KlaxonException: Couldn't find a suitable constructor for class UnionValue to initialize with {}
@@ -1575,6 +1597,7 @@ export const KotlinXLanguage: Language = {
         "identifiers.json",
     ],
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         // Unions render as sealed classes without serializer wiring, so
         // deserialization fails at runtime (documented TODO in
         // KotlinXRenderer.ts).
@@ -1644,6 +1667,7 @@ export const DartLanguage: Language = {
         "keywords.json",
     ],
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         "enum-with-null.schema",
         // Deliberately NOT ...skipsEnumValueValidation: Dart runs
         // optional-enum.schema as its own regression test (see PR #2720),
@@ -1712,6 +1736,7 @@ export const PikeLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         "top-level-enum.schema", // output generated properly, but not a class
         "keyword-unions.schema", // seems like a problem with deserializing
         // no implicit cast int <-> float in Pike
@@ -1798,6 +1823,7 @@ export const HaskellLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         "any.schema",
         ...skipsUntypedUnions,
         // The test driver encodes the Maybe result, so a failed decode prints
@@ -1854,6 +1880,7 @@ export const PHPLanguage: Language = {
     ],
     skipMiscJSON: true,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         // PHP class names are case-insensitive, but the namer dedups
         // case-sensitively, so this declares classes that collide (same
         // reason Java and Python skip it).
@@ -1963,6 +1990,7 @@ export const TypeScriptZodLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         "any.schema",
         ...skipsUntypedUnions,
         "direct-union.schema",
@@ -2084,6 +2112,7 @@ export const TypeScriptEffectSchemaLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         "any.schema",
         ...skipsUntypedUnions,
         "direct-union.schema",
@@ -2144,6 +2173,7 @@ export const ElixirLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        "integer-before-number.schema", // Python-specific union-order regression.
         // The error occurs because a guard clause that references TopLevel is compiled before TopLevel itself. To fix this, put
         // TopLevel before Bar, but this doesn't address the actual problem if for example a pattern match to Bar was in TopLevel.
         "mutually-recursive.schema",
