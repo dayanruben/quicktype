@@ -145,16 +145,16 @@ jobs:
                   if ! command -v stack > /dev/null 2>&1; then
                     curl -sL "https://get.haskellstack.org/" | sh
                   fi
-            - name: Install Python 3.7
+            - name: Install Python 3.12
               if: ${{ contains(matrix.fixture, 'python') }}
               uses: actions/setup-python@v4
               with:
-                  python-version: 3.7
+                  python-version: "3.12"
 
             - name: Install Python Dependencies
               if: ${{ contains(matrix.fixture, 'python') }}
               run: |
-                  pip3.7 install mypy python-dateutil types-python-dateutil
+                  pip3.12 install mypy python-dateutil types-python-dateutil
             - name: Install flow
               if: ${{ contains(matrix.fixture, 'flow') }}
               run: |

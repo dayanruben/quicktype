@@ -263,7 +263,13 @@ export const PythonLanguage: Language = {
         "keyword-unions.schema", // Requires more than 255 arguments
     ],
     rendererOptions: {},
-    quickTestRendererOptions: [{ "python-version": "3.5" }],
+    quickTestRendererOptions: [
+        // The default is "3.10"; keep the older feature sets covered.
+        { "python-version": "3.5" },
+        { "python-version": "3.6" },
+        { "python-version": "3.7" },
+        { "python-version": "3.9" },
+    ],
     sourceFiles: ["src/language/Python/index.ts"],
 };
 
