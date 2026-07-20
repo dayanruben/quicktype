@@ -53,6 +53,7 @@ jobs:
                     - ruby
                     - php,schema-php
                     - scala3,schema-scala3
+                    - scala3-upickle,schema-scala3-upickle
                     - elixir,schema-elixir,graphql-elixir
                     - comment-injection-treesitter,comment-injection-typescript,comment-injection-typescript-zod,comment-injection-typescript-effect-schema
 

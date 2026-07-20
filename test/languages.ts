@@ -1044,57 +1044,31 @@ export const Scala3Language: Language = {
         return `cp "${sample}" sample.json && ./run.sh`;
     },
     diffViaSchema: true,
-    skipDiffViaSchema: ["bug427.json", "keywords.json"],
+    skipDiffViaSchema: [
+        "bug427.json",
+        // These round-trip fine; the code generated via JSON Schema
+        // orders one property differently (a pre-existing
+        // alphabetization quirk around renamed keyword properties).
+        "github-events.json",
+        "0a91a.json",
+        "34702.json",
+        "76ae1.json",
+        "af2d1.json",
+    ],
     allowMissingNull: true,
     features: ["enum", "union", "no-defaults"],
     output: "TopLevel.scala",
     topLevel: "TopLevel",
     skipJSON: [
-        // These tests have "_" as a param name. Scala can't do this?
+        // The renderer emits raw JSON property names as (backticked)
+        // Scala identifiers, so empty names, a bare "_", and names
+        // containing backticks or line separators cannot compile, and
+        // properties named "None"/"Option" generate case classes that
+        // shadow the Scala prelude.
         "blns-object.json",
         "identifiers.json",
         "simple-identifiers.json",
         "keywords.json",
-
-        // these actually work as far as I can tell, but seem to fail because properties are sorted differently
-        // I don't think they fail... but I can't figure out sorting so hey ho let's skip them
-        "github-events.json",
-        "0a358.json",
-        "0a91a.json",
-        "34702.json",
-        "76ae1.json",
-        "af2d1.json",
-        "bug427.json",
-        "3d04a0.json",
-
-        // Top level primitives... trivial,
-        //  but annoying as it breaks compilation of the "Top Level" construct... which doesn't exist.
-        // It's too much hassle to fix
-        // and has no practical application in this context. Skip.
-        "no-classes.json",
-
-        // spaces in variables names doesn't seem to work
-        "name-style.json",
-
-        /*
-I havea no idea how to encode these tests correctly. 
-*/
-        "kitchen-sink.json",
-        "26c9c.json",
-        "421d4.json",
-        "a0496.json",
-        "fcca3.json",
-        "ae9ca.json",
-        "617e8.json",
-        "5f7fe.json",
-        "f74d5.json",
-        "a3d8c.json",
-        "combinations1.json",
-        "combinations2.json",
-        "combinations3.json",
-        "combinations4.json",
-        "unions.json",
-        "php-mixed-union.json",
         "nst-test-suite.json",
 
         // Scala3 has the same prelude-shadowing bug that this input
@@ -1103,26 +1077,62 @@ I havea no idea how to encode these tests correctly.
         "bug2521.json",
     ],
     skipSchema: [
-        // 12 skips
-        "required.schema",
-        "multi-type-enum.schema", // I think it doesn't correctly realise this is an array of enums.
-        "integer-string.schema",
-        "intersection.schema",
-        ...skipsUntypedUnions,
-        // The test driver prints the circe DecodingFailure and exits 0, so
-        // expected-failure samples cannot be detected.
-        "nested-intersection-union.schema",
-        "prefix-items.schema",
-        "date-time-or-string.schema",
-        "implicit-one-of.schema",
-        "go-schema-pattern-properties.schema",
-        ...skipsEnumValueValidation,
-        "class-with-additional.schema",
+        // Same raw-identifier limitation as in skipJSON: a property
+        // named "_" and classes shadowing None/Option don't compile.
         "keyword-unions.schema",
-        "keyword-enum.schema",
     ],
     skipMiscJSON: false,
     rendererOptions: { framework: "circe" },
+    quickTestRendererOptions: [],
+    sourceFiles: ["src/language/Scala3/index.ts"],
+};
+
+export const Scala3UpickleLanguage: Language = {
+    name: "scala3",
+    base: "test/fixtures/scala3-upickle",
+    runCommand(sample: string) {
+        return `cp "${sample}" sample.json && ./run.sh`;
+    },
+    diffViaSchema: true,
+    skipDiffViaSchema: [
+        "bug427.json",
+        // These round-trip fine; the code generated via JSON Schema
+        // orders one property differently (a pre-existing
+        // alphabetization quirk around renamed keyword properties).
+        "github-events.json",
+        "0a91a.json",
+        "34702.json",
+        "76ae1.json",
+        "af2d1.json",
+    ],
+    allowMissingNull: true,
+    features: ["enum", "union", "no-defaults"],
+    output: "TopLevel.scala",
+    topLevel: "TopLevel",
+    skipJSON: [
+        // The renderer emits raw JSON property names as (backticked)
+        // Scala identifiers, so empty names, a bare "_", and names
+        // containing backticks or line separators cannot compile, and
+        // properties named "None"/"Option" generate case classes that
+        // shadow the Scala prelude.
+        "blns-object.json",
+        "identifiers.json",
+        "simple-identifiers.json",
+        "keywords.json",
+        "nst-test-suite.json",
+
+        // Scala3 has the same prelude-shadowing bug that this input
+        // guards against in Rust (issue #2521): a field named "options"
+        // generates `case class Option`, which shadows scala.Option.
+        "bug2521.json",
+    ],
+    skipSchema: [
+        // Same raw-identifier limitation as in skipJSON: a property
+        // named "_" and classes shadowing None/Option don't compile.
+        "keyword-unions.schema",
+    ],
+    skipMiscJSON: false,
+    rendererOptions: { framework: "upickle" },
     quickTestRendererOptions: [],
     sourceFiles: ["src/language/Scala3/index.ts"],
 };
