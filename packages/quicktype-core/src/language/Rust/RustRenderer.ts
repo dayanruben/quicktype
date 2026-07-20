@@ -13,7 +13,6 @@ import type { Name, Namer } from "../../Naming.js";
 import type { RenderContext } from "../../Renderer.js";
 import type { OptionValues } from "../../RendererOptions/index.js";
 import { type Sourcelike, maybeAnnotated } from "../../Source.js";
-import { defined } from "../../support/Support.js";
 import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     type ClassType,
@@ -351,9 +350,10 @@ export class RustRenderer extends ConvenienceRenderer {
             return;
         }
 
-        const topLevelName = defined(
-            mapFirst(this.topLevels),
-        ).getCombinedName();
+        const topLevel = mapFirst(this.topLevels);
+        if (topLevel === undefined) return;
+
+        const topLevelName = topLevel.getCombinedName();
         this.emitMultiline(
             `// Example code that deserializes and serializes the model.
 // extern crate serde;
