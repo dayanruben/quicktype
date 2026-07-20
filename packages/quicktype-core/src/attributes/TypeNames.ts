@@ -13,6 +13,11 @@ import { assert, defined, panic } from "../support/Support.js";
 
 import { TypeAttributeKind, type TypeAttributes } from "./TypeAttributes.js";
 
+// `pluralize` otherwise treats "cookies" as ending in the generic `-ies`
+// suffix and produces "cooky".  Keep `cookie` intact, including in compound
+// names such as "documentCookies".
+pluralize.addSingularRule(/(cookie)s$/i, "$1");
+
 let chance: Chance;
 let usedRandomNames: Set<string>;
 
