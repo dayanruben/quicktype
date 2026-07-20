@@ -785,7 +785,7 @@ class Resolver {
             return [schema, result[1]];
         }
 
-        return schemaFetchError(base, virtualRef.address);
+        return schemaFetchError(base, virtualRef.toString());
     }
 
     public async resolveTopLevelRef(ref: Ref): Promise<[JSONSchema, Location]> {
