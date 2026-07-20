@@ -81,6 +81,26 @@ export interface Language {
     sourceFiles?: string[];
 }
 
+export const JSONSchemaLanguage: Language = {
+    name: "schema",
+    base: "test/fixtures/schema",
+    runCommand(sample: string) {
+        return `node main.js "${sample}"`;
+    },
+    diffViaSchema: false,
+    skipDiffViaSchema: [],
+    allowMissingNull: false,
+    features: ["minmax", "minmaxlength", "pattern"],
+    output: "TopLevel.schema",
+    topLevel: "TopLevel",
+    skipJSON: [],
+    skipMiscJSON: false,
+    skipSchema: [],
+    rendererOptions: {},
+    quickTestRendererOptions: [],
+    sourceFiles: ["src/language/JSONSchema/JSONSchemaRenderer.ts"],
+};
+
 export const CSharpLanguage: Language = {
     name: "csharp",
     base: "test/fixtures/csharp",
