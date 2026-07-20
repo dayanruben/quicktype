@@ -46,6 +46,15 @@ const skipsUntypedUnions = [
     "implicit-class-array-union.schema",
 ];
 
+// The generated code does not reject wrong-typed values in typed maps (a
+// map<string, T> accepts values that are not T), so the bare `.fail.json`
+// samples for these map-valued schemas do not fail as expected.  Add any new
+// schema whose fail sample relies on rejecting a mistyped map value.
+const skipsMapValueValidation = [
+    "go-schema-pattern-properties.schema",
+    "unevaluated-properties.schema",
+];
+
 export type LanguageFeature =
     | "enum"
     | "union"
@@ -584,7 +593,7 @@ export const CJSONLanguage: Language = {
         ...skipsEnumValueValidation,
         /* Union, Map and Arrays with invalid types are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "class-with-additional.schema",
-        "go-schema-pattern-properties.schema",
+        ...skipsMapValueValidation,
         "multi-type-enum.schema",
         "nested-intersection-union.schema",
         "prefix-items.schema",
@@ -897,7 +906,7 @@ export const SwiftLanguage: Language = {
         "required.schema",
         "multi-type-enum.schema",
         "intersection.schema",
-        "go-schema-pattern-properties.schema",
+        ...skipsMapValueValidation,
         ...skipsEnumValueValidation,
         "date-time.schema",
         "class-with-additional.schema",
@@ -1325,7 +1334,7 @@ export const KotlinLanguage: Language = {
         // instead of rejecting it.
         "nested-intersection-union.schema",
         "class-with-additional.schema",
-        "go-schema-pattern-properties.schema",
+        ...skipsMapValueValidation,
         // IllegalArgumentException
         "accessors.schema",
         "description.schema",
@@ -1416,7 +1425,7 @@ export const KotlinJacksonLanguage: Language = {
         // instead of rejecting it.
         "nested-intersection-union.schema",
         "class-with-additional.schema",
-        "go-schema-pattern-properties.schema",
+        ...skipsMapValueValidation,
         // IllegalArgumentException
         "accessors.schema",
         "description.schema",
@@ -1683,7 +1692,7 @@ export const PikeLanguage: Language = {
         // no implicit cast int <-> float in Pike
         ...skipsIntFloatUnions,
         // all below: not failing on expected failure. That's because Pike's quite tolerant with assignments.
-        "go-schema-pattern-properties.schema",
+        ...skipsMapValueValidation,
         "class-with-additional.schema",
         "multi-type-enum.schema",
         ...skipsUntypedUnions,
@@ -1772,7 +1781,7 @@ export const HaskellLanguage: Language = {
         "prefix-items.schema",
         "direct-union.schema",
         ...skipsEnumValueValidation,
-        "go-schema-pattern-properties.schema",
+        ...skipsMapValueValidation,
         "intersection.schema",
         "multi-type-enum.schema",
         "keyword-unions.schema",
@@ -1941,7 +1950,7 @@ export const TypeScriptZodLanguage: Language = {
         "constructor.schema",
         // z.coerce.date() serializes back as ISO UTC, not the input string
         "date-time.schema",
-        "go-schema-pattern-properties.schema",
+        ...skipsMapValueValidation,
         "intersection.schema",
         "multi-type-enum.schema",
         "keyword-unions.schema",
@@ -2057,7 +2066,7 @@ export const TypeScriptEffectSchemaLanguage: Language = {
         ...skipsUntypedUnions,
         "direct-union.schema",
         ...skipsEnumValueValidation,
-        "go-schema-pattern-properties.schema",
+        ...skipsMapValueValidation,
         "intersection.schema",
         "multi-type-enum.schema",
         "keyword-unions.schema",
@@ -2124,7 +2133,7 @@ export const ElixirLanguage: Language = {
 
         // The test incorrectly succeeds due to the emitter being permissive for unions that contain only primitives. A future enhancement
         // for the Elixir emitter could be a user-controlled 'strict' mode that pattern matches even on unions of only primitive types.
-        "go-schema-pattern-properties.schema",
+        ...skipsMapValueValidation,
 
         // The generated top-level type is not emitted as a TopLevel module the fixture can call.
         "recursive-union-flattening.schema",
