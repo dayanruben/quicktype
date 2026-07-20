@@ -3403,6 +3403,28 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                 );
                 this.superThis.ensureBlankLine();
 
+                if (this.superThis.haveOptionalProperties) {
+                    this.superThis.emitLine(
+                        "template<typename TF, typename TT>",
+                    );
+                    this.superThis.emitBlock(
+                        [
+                            "static toType convert(tag<",
+                            this.superThis._optionalType,
+                            "<TF> >, tag<",
+                            this.superThis._optionalType,
+                            "<TT> >, fromType opt)",
+                        ],
+                        false,
+                        () => {
+                            this.superThis.emitLine(
+                                "if (!opt) return toType(); else return toType(Utf16_Utf8<TF,TT>::convert(*opt));",
+                            );
+                        },
+                    );
+                    this.superThis.ensureBlankLine();
+                }
+
                 this.superThis.emitLine("template<typename TF, typename TT>");
                 this.superThis.emitBlock(
                     [
