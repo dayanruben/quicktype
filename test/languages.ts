@@ -1879,9 +1879,6 @@ export const TypeScriptZodLanguage: Language = {
         // Does not handle top level array
         "bug863.json",
 
-        // z.coerce.date() coerces null to the Unix epoch: #2880
-        "bug2590.json",
-
         "no-classes.json",
         "00c36.json",
         "10be4.json",
