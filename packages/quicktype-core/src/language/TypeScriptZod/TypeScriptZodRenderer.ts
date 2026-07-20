@@ -113,22 +113,23 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
             (_doubleType) => "z.number()",
             (_stringType) => "z.string()",
             (arrayType) => {
-                const minMaxItems = minMaxItemsForType(arrayType.items);
+                const [minItems, maxItems] =
+                    minMaxItemsForType(arrayType) ?? [];
 
-                const arrayString: Sourcelike[] = [
+                const arraySource: Sourcelike[] = [
                     "z.array(",
                     this.typeMapTypeFor(arrayType.items, false),
                     ")",
                 ];
-                if (minMaxItems?.[0]) {
-                    arrayString.push(".min(", minMaxItems[0].toString(10), ")");
+                if (minItems !== undefined && minItems > 0) {
+                    arraySource.push(".min(", minItems.toString(10), ")");
                 }
 
-                if (minMaxItems?.[1]) {
-                    arrayString.push(".max(", minMaxItems[1].toString(10), ")");
+                if (maxItems !== undefined) {
+                    arraySource.push(".max(", maxItems.toString(10), ")");
                 }
 
-                return arrayString;
+                return arraySource;
             },
             (_classType) => panic("Should already be handled."),
             (_mapType) => [
