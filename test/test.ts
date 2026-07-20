@@ -1,12 +1,12 @@
-import * as os from "os";
+import * as os from "node:os";
 import * as _ from "lodash";
 
-import { inParallel } from "./lib/multicore";
-import { execAsync, type Sample } from "./utils";
-import { type Fixture, allFixtures } from "./fixtures";
 import { affectedFixtures, divideParallelJobs } from "./buildkite";
+import { type Fixture, allFixtures } from "./fixtures";
+import { inParallel } from "./lib/multicore";
+import { type Sample, execAsync } from "./utils";
 
-const exit = require("exit");
+// biome-ignore lint/style/useExplicitLengthCheck: length is used as a value here, not a boolean
 const CPUs = Number.parseInt(process.env.CPUs || "0", 10) || os.cpus().length;
 
 //////////////////////////////////////
@@ -63,8 +63,8 @@ async function main(sources: string[]) {
             );
 
             for (const fixture of fixtures) {
-                await execAsync(`rm -rf test/runs`);
-                await execAsync(`mkdir -p test/runs`);
+                await execAsync("rm -rf test/runs");
+                await execAsync("mkdir -p test/runs");
 
                 await fixture.setup();
             }
@@ -76,7 +76,7 @@ async function main(sources: string[]) {
                 await fixture.runWithSample(sample, index, tests.length);
             } catch (e) {
                 console.trace(e);
-                exit(1);
+                process.exit(1);
             }
         },
     });
@@ -85,5 +85,5 @@ async function main(sources: string[]) {
 // skip 2 `node` args
 main(process.argv.slice(2)).catch((reason) => {
     console.error(reason);
-    process.exit(1);
+    process.process.exit(1);
 });

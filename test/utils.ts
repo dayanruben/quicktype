@@ -96,9 +96,9 @@ export function execAsync(
 }
 
 async function time<T>(work: () => Promise<T>): Promise<[T, number]> {
-    const start = +new Date();
+    const start = Date.now();
     const result = await work();
-    const end = +new Date();
+    const end = Date.now();
     return [result, end - start];
 }
 

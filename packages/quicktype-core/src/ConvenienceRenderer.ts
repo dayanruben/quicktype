@@ -15,18 +15,18 @@ import {
     getAccessorName,
     objectPropertyNames,
     unionMemberName,
-} from "./attributes/AccessorNames";
+} from "./attributes/AccessorNames.js";
 import {
     descriptionTypeAttributeKind,
     propertyDescriptionsTypeAttributeKind,
-} from "./attributes/Description";
-import { TypeAttributeKind } from "./attributes/TypeAttributes";
+} from "./attributes/Description.js";
+import { TypeAttributeKind } from "./attributes/TypeAttributes.js";
 import {
     type Declaration,
     type DeclarationIR,
     cycleBreakerTypesForGraph,
     declarationsForGraph,
-} from "./DeclarationIR";
+} from "./DeclarationIR.js";
 import {
     DependencyName,
     FixedName,
@@ -35,31 +35,29 @@ import {
     Namespace,
     SimpleName,
     keywordNamespace,
-} from "./Naming";
+} from "./Naming.js";
 import {
     type BlankLineConfig,
     type ForEachPosition,
-    type RenderContext,
     Renderer,
-} from "./Renderer";
+} from "./Renderer.js";
 import {
     type Sourcelike,
     serializeRenderResult,
     sourcelikeToSource,
-} from "./Source";
+} from "./Source.js";
 import {
     type Comment,
     type CommentOptions,
     isStringComment,
-} from "./support/Comments";
-import { trimEnd } from "./support/Strings";
-import { assert, defined, nonNull, panic } from "./support/Support";
-import type { TargetLanguage } from "./TargetLanguage";
+} from "./support/Comments.js";
+import { trimEnd } from "./support/Strings.js";
+import { assert, defined, nonNull, panic } from "./support/Support.js";
 import {
     type Transformation,
     followTargetType,
     transformationForType,
-} from "./Transformers";
+} from "./Transformers.js";
 import {
     type ClassProperty,
     ClassType,
@@ -69,14 +67,14 @@ import {
     type Type,
     type TypeKind,
     UnionType,
-} from "./Type";
-import { TypeAttributeStoreView } from "./Type/TypeGraph";
+} from "./Type/index.js";
+import { TypeAttributeStoreView } from "./Type/TypeGraph.js";
 import {
     isNamedType,
     matchTypeExhaustive,
     nullableFromUnion,
     separateNamedTypes,
-} from "./Type/TypeUtils";
+} from "./Type/TypeUtils.js";
 
 const wordWrap: (s: string) => string = _wordwrap(90);
 
@@ -97,7 +95,13 @@ function splitDescription(
     descriptions: Iterable<string> | undefined,
 ): string[] | undefined {
     if (descriptions === undefined) return undefined;
-    const description = Array.from(descriptions).join("\n\n").trim();
+    // U+0085, U+2028 and U+2029 count as line terminators in some
+    // target languages (JavaScript, C#), so they must not survive
+    // into single-line comments.
+    const description = Array.from(descriptions)
+        .join("\n\n")
+        .replace(/\r\n?|[\u0085\u2028\u2029]/g, "\n")
+        .trim();
     if (description === "") return undefined;
     return wordWrap(description)
         .split("\n")
@@ -170,13 +174,6 @@ export abstract class ConvenienceRenderer extends Renderer {
     private _cycleBreakerTypes?: Set<Type> | undefined;
 
     private _alphabetizeProperties = false;
-
-    public constructor(
-        targetLanguage: TargetLanguage,
-        renderContext: RenderContext,
-    ) {
-        super(targetLanguage, renderContext);
-    }
 
     public get topLevels(): ReadonlyMap<string, Type> {
         return this.typeGraph.topLevels;
@@ -828,9 +825,9 @@ export abstract class ConvenienceRenderer extends Renderer {
                 (_doubleType) => "double",
                 (_stringType) => "string",
                 (arrayType) =>
-                    typeNameForUnionMember(arrayType.items) + "_array",
+                    `${typeNameForUnionMember(arrayType.items)}_array`,
                 (classType) => lookup(this.nameForNamedType(classType)),
-                (mapType) => typeNameForUnionMember(mapType.values) + "_map",
+                (mapType) => `${typeNameForUnionMember(mapType.values)}_map`,
                 (objectType) => {
                     assert(
                         this.targetLanguage.supportsFullObjectType,
@@ -1166,6 +1163,14 @@ export abstract class ConvenienceRenderer extends Renderer {
             afterComment,
         }: CommentOptions = {},
     ): void {
+        const replacements = this.commentLineEscapes({
+            lineStart,
+            firstLineStart,
+            lineEnd,
+            beforeComment,
+            afterComment,
+        });
+
         if (beforeComment !== undefined) {
             this.emitLine(beforeComment);
         }
@@ -1174,15 +1179,20 @@ export abstract class ConvenienceRenderer extends Renderer {
         for (const line of lines) {
             let start = first ? firstLineStart : lineStart;
             first = false;
+            const escapedLine = this.escapeCommentLine(
+                line,
+                replacements,
+                lineEnd,
+            );
 
-            if (this.sourcelikeToString(line) === "") {
+            if (this.sourcelikeToString(escapedLine) === "") {
                 start = trimEnd(start);
             }
 
             if (lineEnd) {
-                this.emitLine(start, line, lineEnd);
+                this.emitLine(start, escapedLine, lineEnd);
             } else {
-                this.emitLine(start, line);
+                this.emitLine(start, escapedLine);
             }
         }
 
@@ -1195,6 +1205,79 @@ export abstract class ConvenienceRenderer extends Renderer {
         if (description === undefined) return;
         // FIXME: word-wrap
         this.emitDescriptionBlock(description);
+    }
+
+    private commentLineEscapes(
+        options: Required<
+            Pick<CommentOptions, "lineStart" | "firstLineStart">
+        > &
+            Pick<CommentOptions, "lineEnd" | "beforeComment" | "afterComment">,
+    ): ReadonlyArray<readonly [string, string]> {
+        const delimiters = [
+            options.lineStart,
+            options.firstLineStart,
+            options.lineEnd,
+            options.beforeComment,
+            options.afterComment,
+        ];
+        const containsDelimiter = (delimiter: string): boolean =>
+            delimiters.some((part) => part?.includes(delimiter) ?? false);
+
+        const replacements: Array<readonly [string, string]> = [];
+        if (containsDelimiter("/*") || containsDelimiter("*/")) {
+            // The opener must be escaped, too: some languages (Kotlin,
+            // Scala) nest block comments, so a lone `/*` would reopen a
+            // comment that the closing delimiter can't terminate.
+            replacements.push(["/*", "/ *"], ["*/", "* /"]);
+        }
+        if (containsDelimiter("{-") || containsDelimiter("-}")) {
+            replacements.push(["{-", "{ -"], ["-}", "- }"]);
+        }
+        if (containsDelimiter('"""')) {
+            // Triple-quoted comments (Python docstrings, Elixir
+            // moduledocs) are string literals, so backslashes are escape
+            // characters — in particular a trailing backslash would
+            // swallow the first quote of the closing delimiter.
+            replacements.push(["\\", "\\\\"], ['"""', '\\"\\"\\"']);
+        }
+        return replacements;
+    }
+
+    // C-family lexers splice a backslash-newline into one line even
+    // inside comments, which would pull the following line of
+    // generated code into an attacker-controlled comment.
+    protected get commentLinesSpliceOnBackslash(): boolean {
+        return false;
+    }
+
+    private escapeCommentLine(
+        line: Sourcelike,
+        replacements: ReadonlyArray<readonly [string, string]>,
+        lineEnd?: string,
+    ): Sourcelike {
+        if (replacements.length === 0 && !this.commentLinesSpliceOnBackslash) {
+            return line;
+        }
+
+        let escaped = replacements.reduce(
+            (result, [unsafe, safe]) => result.split(unsafe).join(safe),
+            this.sourcelikeToString(line),
+        );
+        // A quote at the end of the line would merge with a closing
+        // `"""` emitted right after it.  The quote needs escaping iff
+        // it's preceded by an even number of backslashes.
+        if (lineEnd?.startsWith('"')) {
+            const trailing = /(\\*)"$/.exec(escaped);
+            if (trailing !== null && trailing[1].length % 2 === 0) {
+                escaped = `${escaped.slice(0, -1)}\\"`;
+            }
+        }
+
+        if (this.commentLinesSpliceOnBackslash && escaped.endsWith("\\")) {
+            escaped = `${escaped}.`;
+        }
+
+        return escaped;
     }
 
     protected emitDescriptionBlock(lines: Sourcelike[]): void {

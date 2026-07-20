@@ -1,15 +1,15 @@
-import type { RenderContext } from "../../Renderer";
-import { BooleanOption, getOptionValues } from "../../RendererOptions";
-import { AcronymStyleOptions, acronymOption } from "../../support/Acronyms";
-import { TargetLanguage } from "../../TargetLanguage";
+import type { RenderContext } from "../../Renderer.js";
+import { BooleanOption, getOptionValues } from "../../RendererOptions/index.js";
+import { AcronymStyleOptions, acronymOption } from "../../support/Acronyms.js";
+import { TargetLanguage } from "../../TargetLanguage.js";
 import type {
     PrimitiveStringTypeKind,
     TransformedStringTypeKind,
-} from "../../Type";
-import type { StringTypeMapping } from "../../Type/TypeBuilderUtils";
-import type { LanguageName, RendererOptions } from "../../types";
+} from "../../Type/index.js";
+import type { StringTypeMapping } from "../../Type/TypeBuilderUtils.js";
+import type { LanguageName, RendererOptions } from "../../types.js";
 
-import { PhpRenderer } from "./PhpRenderer";
+import { PhpRenderer } from "./PhpRenderer.js";
 
 export const phpOptions = {
     withGet: new BooleanOption("with-get", "Create Getter", true),
@@ -51,9 +51,9 @@ export class PhpTargetLanguage extends TargetLanguage<
     public get stringTypeMapping(): StringTypeMapping {
         const mapping: Map<TransformedStringTypeKind, PrimitiveStringTypeKind> =
             new Map();
-        mapping.set("date", "date"); // TODO is not implemented yet
-        mapping.set("time", "time"); // TODO is not implemented yet
-        mapping.set("uuid", "uuid"); // TODO is not implemented yet
+        // "date" and "time" are not implemented in the renderer (it throws
+        // on them), so let them fall back to plain strings.
+        mapping.set("uuid", "uuid");
         mapping.set("date-time", "date-time");
         return mapping;
     }

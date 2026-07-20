@@ -3,14 +3,14 @@ import { arrayIntercalate } from "collection-utils";
 import {
     type ForbiddenWordsInfo,
     inferredNameOrder,
-} from "../../ConvenienceRenderer";
-import { DependencyName, type Name, SimpleName } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, modifySource } from "../../Source";
-import { camelCase, utf16StringEscape } from "../../support/Strings";
-import { defined, panic } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../ConvenienceRenderer.js";
+import { DependencyName, type Name, SimpleName } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, modifySource } from "../../Source.js";
+import { camelCase, utf16StringEscape } from "../../support/Strings.js";
+import { defined, panic } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayDecodingTransformer,
     ArrayEncodingTransformer,
@@ -30,7 +30,7 @@ import {
     UnionMemberMatchTransformer,
     followTargetType,
     transformationForType,
-} from "../../Transformers";
+} from "../../Transformers.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -38,11 +38,11 @@ import {
     EnumType,
     type Type,
     UnionType,
-} from "../../Type";
-import { nullableFromUnion } from "../../Type/TypeUtils";
+} from "../../Type/index.js";
+import { nullableFromUnion } from "../../Type/TypeUtils.js";
 
-import { CSharpRenderer } from "./CSharpRenderer";
-import type { systemTextJsonCSharpOptions } from "./language";
+import { CSharpRenderer } from "./CSharpRenderer.js";
+import type { systemTextJsonCSharpOptions } from "./language.js";
 import {
     AccessModifier,
     alwaysApplyTransformation,
@@ -50,7 +50,7 @@ import {
     denseNullValueHandlingEnumName,
     isValueType,
     namingFunction,
-} from "./utils";
+} from "./utils.js";
 
 export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
     private readonly _enumExtensionsNames = new Map<Name, Name>();
@@ -69,8 +69,10 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         >,
     ) {
         super(targetLanguage, renderContext, _options);
-        this._needHelpers = _options.features.helpers;
-        this._needAttributes = _options.features.attributes;
+        // `--just-types` wins over whatever `--features` says.
+        this._needHelpers = _options.features.helpers && !_options.justTypes;
+        this._needAttributes =
+            _options.features.attributes && !_options.justTypes;
         this._needNamespaces = _options.features.namespaces;
     }
 
@@ -194,6 +196,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
 
         this.emitLine("#pragma warning restore CS8618");
         this.emitLine("#pragma warning restore CS8601");
+        this.emitLine("#pragma warning restore CS8602");
         this.emitLine("#pragma warning restore CS8603");
     }
 
@@ -235,6 +238,9 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         this.emitLine("#nullable enable");
         this.emitLine("#pragma warning disable CS8618");
         this.emitLine("#pragma warning disable CS8601");
+        // CS8602: the emitted constraint-check converters dereference
+        // Deserialize<T>() results, which are nullable under NRT.
+        this.emitLine("#pragma warning disable CS8602");
         this.emitLine("#pragma warning disable CS8603");
     }
 
@@ -272,6 +278,13 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         const escapedName = utf16StringEscape(jsonName);
         const isNullable = followTargetType(property.type).isNullable;
         const isOptional = property.isOptional;
+
+        // [JsonRequired] makes deserialization fail if the property is
+        // missing from the JSON.  It requires System.Text.Json 7.0 or
+        // later (.NET 7+).
+        if (this._options.checkRequired && !isOptional) {
+            attributes.push(["[JsonRequired]"]);
+        }
 
         if (isOptional && !isNullable) {
             attributes.push([
@@ -516,6 +529,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         xfer: Transformer | undefined,
         targetType: Type,
         emitFinish: (value: Sourcelike) => void,
+        varGen?: { counter: number },
     ): void {
         if (xfer === undefined) return;
 
@@ -529,6 +543,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                 targetType,
                 emitFinish,
                 variableName,
+                varGen,
             );
             if (!allHandled) {
                 this.emitLine("break;");
@@ -555,6 +570,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         targetType: Type,
         emitFinish: (value: Sourcelike) => void,
         variableName = "value",
+        varGen: { counter: number } = { counter: 0 },
     ): boolean {
         if (xfer instanceof DecodingTransformer) {
             const source = xfer.sourceType;
@@ -566,14 +582,23 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     this.converterObject(converter),
                     ";",
                 );
+                // The converter is for the non-null type, so if the target
+                // type is nullable we have to handle null ourselves.
+                const isNullable =
+                    targetType instanceof UnionType &&
+                    nullableFromUnion(targetType) !== null;
                 this.emitLine(
                     "var ",
                     variableName,
-                    " = (",
+                    " = ",
+                    isNullable
+                        ? "reader.TokenType == JsonTokenType.Null ? null : "
+                        : "",
+                    "(",
                     typeSource,
-                    ")converter.ReadJson(reader, typeof(",
+                    ")converter.Read(ref reader, typeof(",
                     typeSource,
-                    "), null, serializer);",
+                    "), options);",
                 );
             } else if (source.kind !== "null") {
                 const output =
@@ -610,13 +635,14 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                 this.csType(targetType.items),
                 ">();",
             );
-            this.emitLine("while (reader.TokenType != JsonToken.EndArray)");
+            this.emitLine("while (reader.TokenType != JsonTokenType.EndArray)");
             this.emitBlock(() => {
                 this.emitDecodeTransformer(
                     xfer.itemTransformer,
                     xfer.itemTargetType,
                     (v) => this.emitLine(variableName, ".Add(", v, ");"),
                     "arrayItem",
+                    varGen,
                 );
                 // FIXME: handle EOF
                 this.emitLine("reader.Read();");
@@ -641,6 +667,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                             targetType,
                             emitFinish,
                             "null",
+                            varGen,
                         );
                         if (!allHandled) {
                             this.emitLine("break");
@@ -648,27 +675,81 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     });
                 }
 
-                this.emitDecoderTransformerCase(
-                    ["Number"],
-                    "integerValue",
-                    xfer.integerTransformer,
-                    targetType,
-                    emitFinish,
-                );
-                this.emitDecoderTransformerCase(
-                    ["Number"],
-                    // xfer.integerTransformer === undefined ? ["Integer", "Float"] : ["Float"],
-                    "doubleValue",
-                    xfer.doubleTransformer,
-                    targetType,
-                    emitFinish,
-                );
+                // Handle number (integer/double) union properly
+                const { integerTransformer, doubleTransformer } = xfer;
+                if (
+                    integerTransformer !== undefined &&
+                    doubleTransformer !== undefined
+                ) {
+                    varGen.counter++;
+                    const intTryVar = `intTryValue${varGen.counter}`;
+                    varGen.counter++;
+                    const intVar = `intValue${varGen.counter}`;
+                    varGen.counter++;
+                    const doubleVar = `doubleValue${varGen.counter}`;
+                    this.emitTokenCase("Number");
+                    this.indent(() => {
+                        this.emitLine(
+                            `if (reader.TryGetInt64(out long ${intTryVar}))`,
+                        );
+                        this.emitBlock(() => {
+                            const allHandled = this.emitDecodeTransformer(
+                                integerTransformer,
+                                targetType,
+                                emitFinish,
+                                intVar,
+                                varGen,
+                            );
+                            if (!allHandled) {
+                                this.emitLine("break;");
+                            }
+                        });
+                        this.emitLine("else");
+                        this.emitBlock(() => {
+                            const allHandled = this.emitDecodeTransformer(
+                                doubleTransformer,
+                                targetType,
+                                emitFinish,
+                                doubleVar,
+                                varGen,
+                            );
+                            if (!allHandled) {
+                                this.emitLine("break;");
+                            }
+                        });
+                    });
+                } else if (xfer.integerTransformer !== undefined) {
+                    // Only one present, emit as before
+                    varGen.counter++;
+                    const intVar = `intValue${varGen.counter}`;
+                    this.emitDecoderTransformerCase(
+                        ["Number"],
+                        intVar,
+                        xfer.integerTransformer,
+                        targetType,
+                        emitFinish,
+                        varGen,
+                    );
+                } else if (xfer.doubleTransformer !== undefined) {
+                    varGen.counter++;
+                    const doubleVar = `doubleValue${varGen.counter}`;
+                    this.emitDecoderTransformerCase(
+                        ["Number"],
+                        doubleVar,
+                        xfer.doubleTransformer,
+                        targetType,
+                        emitFinish,
+                        varGen,
+                    );
+                }
+
                 this.emitDecoderTransformerCase(
                     ["True", "False"],
                     "boolValue",
                     xfer.boolTransformer,
                     targetType,
                     emitFinish,
+                    varGen,
                 );
                 this.emitDecoderTransformerCase(
                     // ["String", "Date"],
@@ -677,6 +758,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     xfer.stringTransformer,
                     targetType,
                     emitFinish,
+                    varGen,
                 );
                 this.emitDecoderTransformerCase(
                     ["StartObject"],
@@ -684,6 +766,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     xfer.objectTransformer,
                     targetType,
                     emitFinish,
+                    varGen,
                 );
                 this.emitDecoderTransformerCase(
                     ["StartArray"],
@@ -691,6 +774,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     xfer.arrayTransformer,
                     targetType,
                     emitFinish,
+                    varGen,
                 );
             });
             return false;
@@ -830,11 +914,37 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     this.converterObject(converter),
                     ";",
                 );
-                this.emitLine(
-                    "converter.WriteJson(writer, ",
-                    variable,
-                    ", serializer);",
-                );
+                // The converter is for the non-null type, so if the source
+                // type is nullable we have to handle null ourselves.
+                const maybeNullable =
+                    xfer.sourceType instanceof UnionType
+                        ? nullableFromUnion(xfer.sourceType)
+                        : null;
+                if (maybeNullable !== null) {
+                    let member: Sourcelike = variable;
+                    if (isValueType(followTargetType(maybeNullable))) {
+                        member = [member, ".Value"];
+                    }
+
+                    this.emitLine("if (", variable, " == null)");
+                    this.emitBlock(() =>
+                        this.emitLine("writer.WriteNullValue();"),
+                    );
+                    this.emitLine("else");
+                    this.emitBlock(() =>
+                        this.emitLine(
+                            "converter.Write(writer, ",
+                            member,
+                            ", options);",
+                        ),
+                    );
+                } else {
+                    this.emitLine(
+                        "converter.Write(writer, ",
+                        variable,
+                        ", options);",
+                    );
+                }
             } else {
                 this.emitLine(this.serializeValueCode(variable), ";");
             }
@@ -850,9 +960,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
                     itemVariable,
                     xfer.itemTransformer,
                     xfer.itemTargetType,
-                    () => {
-                        return;
-                    },
+                    () => {},
                 );
             });
             this.emitLine("writer.WriteEndArray();");

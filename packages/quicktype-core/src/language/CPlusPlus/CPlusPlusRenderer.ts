@@ -11,37 +11,37 @@ import {
 import {
     anyTypeIssueAnnotation,
     nullTypeIssueAnnotation,
-} from "../../Annotation";
-import { getAccessorName } from "../../attributes/AccessorNames";
-import { enumCaseValues } from "../../attributes/EnumValues";
+} from "../../Annotation.js";
+import { getAccessorName } from "../../attributes/AccessorNames.js";
+import { enumCaseValues } from "../../attributes/EnumValues.js";
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import type { Declaration } from "../../DeclarationIR";
+} from "../../ConvenienceRenderer.js";
+import type { Declaration } from "../../DeclarationIR.js";
 import {
     DependencyName,
     type Name,
     type NameStyle,
     type Namer,
     funPrefixNamer,
-} from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, maybeAnnotated } from "../../Source";
+} from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, maybeAnnotated } from "../../Source.js";
 import {
     type NamingStyle,
     makeNameStyle,
     stringEscape,
-} from "../../support/Strings";
+} from "../../support/Strings.js";
 import {
     assert,
     assertNever,
     defined,
     numberEnumValues,
     panic,
-} from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -50,17 +50,17 @@ import {
     MapType,
     type Type,
     UnionType,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     directlyReachableTypes,
     isNamedType,
     matchType,
     nullableFromUnion,
     removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import { keywords } from "./constants";
-import type { cPlusPlusOptions } from "./language";
+import { keywords } from "./constants.js";
+import type { cPlusPlusOptions } from "./language.js";
 import {
     BaseString,
     type ConstraintMember,
@@ -78,7 +78,7 @@ import {
     legalizeName,
     optionalAsSharedType,
     optionalFactoryAsSharedType,
-} from "./utils";
+} from "./utils.js";
 
 export class CPlusPlusRenderer extends ConvenienceRenderer {
     /**
@@ -586,6 +586,10 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
         return kind === "class";
     }
 
+    protected get commentLinesSpliceOnBackslash(): boolean {
+        return true;
+    }
+
     protected emitDescriptionBlock(lines: Sourcelike[]): void {
         this.emitCommentLines(lines, {
             lineStart: " * ",
@@ -652,7 +656,7 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
 
         const typeList: Sourcelike = [];
         for (const t of nonNulls) {
-            if (typeList.length !== 0) {
+            if (typeList.length > 0) {
                 typeList.push(", ");
             }
 
@@ -1002,11 +1006,8 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                     GlobalNames.CheckConstraint,
                 );
                 if (
-                    (property.type instanceof UnionType &&
-                        property.type.findMember("null") !== undefined) ||
-                    (property.isOptional &&
-                        property.type.kind !== "null" &&
-                        property.type.kind !== "any")
+                    property.type instanceof UnionType &&
+                    property.type.findMember("null") !== undefined
                 ) {
                     this.emitLine(
                         rendered,
@@ -1104,6 +1105,10 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
             const { minMax, minMaxLength, pattern } = constraints;
 
             // TODO is there a better way to check if property.type is an integer or a number?
+            // We only generate this to classify the underlying type, so we
+            // always pass `false` for `isOptional` — otherwise `cppType`
+            // wraps the type in the optional<> container and the comparisons
+            // below never match.
             const cppType = this.cppType(
                 property.type,
                 {
@@ -1113,31 +1118,37 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                 },
                 true,
                 false,
-                property.isOptional,
+                false,
             );
 
+            // Compare bounds against `undefined` explicitly, since 0 is a
+            // valid constraint value too.
             res.set(jsonName, [
                 this.constraintMember(jsonName),
                 "(",
-                minMax?.[0] && cppType === "int64_t"
+                minMax?.[0] !== undefined && cppType === "int64_t"
                     ? String(minMax[0])
                     : this._nulloptType,
                 ", ",
-                minMax?.[1] && cppType === "int64_t"
+                minMax?.[1] !== undefined && cppType === "int64_t"
                     ? String(minMax[1])
                     : this._nulloptType,
                 ", ",
-                minMax?.[0] && cppType === "double"
+                minMax?.[0] !== undefined && cppType === "double"
                     ? String(minMax[0])
                     : this._nulloptType,
                 ", ",
-                minMax?.[1] && cppType === "double"
+                minMax?.[1] !== undefined && cppType === "double"
                     ? String(minMax[1])
                     : this._nulloptType,
                 ", ",
-                minMaxLength?.[0] ? String(minMaxLength[0]) : this._nulloptType,
+                minMaxLength?.[0] !== undefined
+                    ? String(minMaxLength[0])
+                    : this._nulloptType,
                 ", ",
-                minMaxLength?.[1] ? String(minMaxLength[1]) : this._nulloptType,
+                minMaxLength?.[1] !== undefined
+                    ? String(minMaxLength[1])
+                    : this._nulloptType,
                 ", ",
                 pattern === undefined
                     ? this._nulloptType
@@ -1986,10 +1997,12 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                         );
                         onFirst = false;
                     });
-                    this.emitLine(
-                        'else { throw std::runtime_error("Input JSON does not conform to schema!"); }',
-                    );
                 }
+                this.emitLine(
+                    'else { throw std::runtime_error("Cannot deserialize to enumeration \\"',
+                    enumName,
+                    '\\""); }',
+                );
             },
         );
         this.ensureBlankLine();
@@ -2131,8 +2144,14 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                             ],
                             false,
                             () => {
+                                // A JSON null must become an *empty*
+                                // optional.  Only `optType<T>()` guarantees
+                                // that: the factory would wrap a
+                                // default-constructed T (std::make_optional
+                                // and std::make_shared both do), turning
+                                // null into 0/""/{} on round-trip.
                                 this.emitLine(
-                                    `if (j.is_null()) return ${factory}<T>(); else return ${factory}<T>(j.get<T>());`,
+                                    `if (j.is_null()) return ${optType}<T>(); else return ${factory}<T>(j.get<T>());`,
                                 );
                             },
                         );
@@ -2304,6 +2323,29 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                     },
                 );
                 this.ensureBlankLine();
+            },
+        );
+        this.ensureBlankLine();
+
+        this.emitBlock(
+            [
+                "inline void ",
+                checkConst,
+                "(",
+                this._stringType.getConstType(),
+                " name, ",
+                this.withConst(classConstraint),
+                " & c, const ",
+                this._optionalType,
+                "<",
+                cppType,
+                "> & value)",
+            ],
+            false,
+            () => {
+                this.emitBlock(["if (value)"], false, () => {
+                    this.emitLine(checkConst, "(name, c, *value);");
+                });
             },
         );
         this.ensureBlankLine();
@@ -2584,6 +2626,29 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                     },
                 );
                 this.ensureBlankLine();
+            },
+        );
+        this.ensureBlankLine();
+
+        this.emitBlock(
+            [
+                "inline void ",
+                checkConst,
+                "(",
+                this._stringType.getConstType(),
+                " name, ",
+                this.withConst(classConstraint),
+                " & c, const ",
+                this._optionalType,
+                "<",
+                this._stringType.getType(),
+                "> & value)",
+            ],
+            false,
+            () => {
+                this.emitBlock(["if (value)"], false, () => {
+                    this.emitLine(checkConst, "(name, c, *value);");
+                });
             },
         );
     }
@@ -2980,12 +3045,10 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                 if (maybeNull !== undefined) {
                     /** Houston this is a variant, include it */
                     propRecord.kind = IncludeKind.Include;
+                } else if (t.forceInclude) {
+                    propRecord.kind = IncludeKind.Include;
                 } else {
-                    if (t.forceInclude) {
-                        propRecord.kind = IncludeKind.Include;
-                    } else {
-                        propRecord.kind = IncludeKind.ForwardDeclare;
-                    }
+                    propRecord.kind = IncludeKind.ForwardDeclare;
                 }
             }
 
@@ -3029,7 +3092,7 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
             );
         }
 
-        if (includes.size !== 0) {
+        if (includes.size > 0) {
             let numForwards = 0;
             let numIncludes = 0;
             includes.forEach((rec: IncludeRecord, name: string) => {
@@ -3272,9 +3335,7 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
             return inner;
         }
 
-        public emitHelperFunctions(): void {
-            return;
-        }
+        public emitHelperFunctions(): void {}
     })();
 
     public WideString = new (class extends BaseString implements StringType {

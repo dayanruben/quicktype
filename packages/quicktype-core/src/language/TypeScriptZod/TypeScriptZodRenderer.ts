@@ -1,11 +1,11 @@
 import { arrayIntercalate } from "collection-utils";
 
-import { ConvenienceRenderer } from "../../ConvenienceRenderer";
-import { type Name, type Namer, funPrefixNamer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import type { Sourcelike } from "../../Source";
-import { AcronymStyleOptions, acronymStyle } from "../../support/Acronyms";
+import { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
+import { type Name, type Namer, funPrefixNamer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import type { Sourcelike } from "../../Source.js";
+import { AcronymStyleOptions, acronymStyle } from "../../support/Acronyms.js";
 import {
     allLowerWordStyle,
     capitalize,
@@ -15,9 +15,9 @@ import {
     splitIntoWords,
     stringEscape,
     utf16StringEscape,
-} from "../../support/Strings";
-import { panic } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../support/Strings.js";
+import { panic } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -26,13 +26,18 @@ import {
     ObjectType,
     SetOperationType,
     type Type,
-} from "../../Type";
-import { matchType } from "../../Type/TypeUtils";
-import { legalizeName } from "../JavaScript/utils";
+} from "../../Type/index.js";
+import { matchType } from "../../Type/TypeUtils.js";
+import { legalizeName } from "../JavaScript/utils.js";
 
-import type { typeScriptZodOptions } from "./language";
+import type { typeScriptZodOptions } from "./language.js";
 
 export class TypeScriptZodRenderer extends ConvenienceRenderer {
+    /** TypeRefs of object types that participate in a reference cycle.
+     * These must be emitted as z.lazy() schemas with an explicit type
+     * annotation, since zod cannot infer recursive types. */
+    private _recursiveTypeRefs: Set<number> = new Set();
+
     public constructor(
         targetLanguage: TargetLanguage,
         renderContext: RenderContext,
@@ -128,6 +133,9 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
                 if (_transformedStringType.kind === "date-time") {
                     return "z.coerce.date()";
                 }
+                if (_transformedStringType.kind === "uuid") {
+                    return "z.string().uuid()";
+                }
 
                 return "z.string()";
             },
@@ -140,7 +148,67 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
         return match;
     }
 
+    /** TypeScript type for `t`, used to annotate recursive schemas for
+     * which zod cannot infer the type.
+     *
+     * This intentionally duplicates neither `typeMapTypeFor` above nor
+     * `sourceFor` in the plain TypeScript renderer
+     * (`TypeScriptFlowBaseRenderer`): it must mirror exactly what
+     * `z.infer` would derive from the schemas emitted by
+     * `typeMapTypeFor` (e.g. `z.coerce.date()` implies `Date`), while
+     * `sourceFor` is shaped by ts/flow-specific options like
+     * `preferConstValues` and `declareUnions` that don't exist here. */
+    protected underlyingTypeFor(t: Type): Sourcelike {
+        if (["class", "object", "enum"].includes(t.kind)) {
+            return this.nameForNamedType(t);
+        }
+
+        return matchType<Sourcelike>(
+            t,
+            (_anyType) => "any",
+            (_nullType) => "null",
+            (_boolType) => "boolean",
+            (_integerType) => "number",
+            (_doubleType) => "number",
+            (_stringType) => "string",
+            (arrayType) => [
+                "Array<",
+                this.underlyingTypeFor(arrayType.items),
+                ">",
+            ],
+            (_classType) => panic("Should already be handled."),
+            (mapType) => [
+                "Record<string, ",
+                this.underlyingTypeFor(mapType.values),
+                ">",
+            ],
+            (_enumType) => panic("Should already be handled."),
+            (unionType) => {
+                const children = Array.from(unionType.getChildren()).map(
+                    (type: Type) => this.underlyingTypeFor(type),
+                );
+                return arrayIntercalate(" | ", children);
+            },
+            (_transformedStringType) => {
+                if (_transformedStringType.kind === "date-time") {
+                    return "Date";
+                }
+
+                return "string";
+            },
+        );
+    }
+
+    protected isRecursive(t: ObjectType): boolean {
+        return this._recursiveTypeRefs.has(t.typeRef);
+    }
+
     protected emitObject(name: Name, t: ObjectType): void {
+        if (this.isRecursive(t)) {
+            this.emitLazyObject(name, t);
+            return;
+        }
+
         this.ensureBlankLine();
         this.emitLine("\nexport const ", name, "Schema = ", "z.object({");
         this.indent(() => {
@@ -163,6 +231,65 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
                 "Schema>;",
             );
         }
+    }
+
+    /** Emit a recursive object type. zod cannot infer recursive types, so
+     * the type is declared explicitly and the schema is wrapped in
+     * z.lazy() with a z.ZodType annotation. */
+    protected emitLazyObject(name: Name, t: ObjectType): void {
+        this.ensureBlankLine();
+        if (this._options.justSchema) {
+            this.emitLine(
+                "\nexport const ",
+                name,
+                "Schema: z.ZodType<any> = z.lazy(() =>",
+            );
+        } else {
+            this.emitLine("\nexport type ", name, " = {");
+            this.indent(() => {
+                this.forEachClassProperty(
+                    t,
+                    "none",
+                    (_, jsonName, property) => {
+                        this.emitLine(
+                            `"${utf16StringEscape(jsonName)}"`,
+                            property.isOptional ? "?" : "",
+                            ": ",
+                            this.underlyingTypeFor(property.type),
+                            ";",
+                        );
+                    },
+                );
+            });
+            this.emitLine("};");
+            this.emitLine(
+                "export const ",
+                name,
+                "Schema: z.ZodType<",
+                name,
+                "> = z.lazy(() =>",
+            );
+        }
+
+        this.indent(() => {
+            this.emitLine("z.object({");
+            this.indent(() => {
+                this.forEachClassProperty(
+                    t,
+                    "none",
+                    (_, jsonName, property) => {
+                        this.emitLine(
+                            `"${utf16StringEscape(jsonName)}"`,
+                            ": ",
+                            this.typeMapTypeForProperty(property),
+                            ",",
+                        );
+                    },
+                );
+            });
+            this.emitLine("})");
+        });
+        this.emitLine(");");
     }
 
     protected emitEnum(e: EnumType, enumName: Name): void {
@@ -282,10 +409,45 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
             mapChildTypeRefs.push(childTypeRefs);
         });
 
+        // Find types that participate in a reference cycle: types from
+        // which we can get back to the same type by following child type
+        // references. Those can never be topologically ordered.
+        const indexForTypeRef = new Map<number, number>();
+        mapTypeRef.forEach((typeRef, index) => {
+            indexForTypeRef.set(typeRef, index);
+        });
+        this._recursiveTypeRefs = new Set();
+        mapType.forEach((_, startIndex) => {
+            const visited = new Set<number>();
+            const stack = [...mapChildTypeRefs[startIndex]];
+            while (stack.length > 0) {
+                const childRef = stack.pop() as number;
+                const childIndex = indexForTypeRef.get(childRef);
+                if (childIndex === undefined) continue;
+                if (childIndex === startIndex) {
+                    this._recursiveTypeRefs.add(mapTypeRef[startIndex]);
+                    break;
+                }
+
+                if (visited.has(childIndex)) continue;
+                visited.add(childIndex);
+                stack.push(...mapChildTypeRefs[childIndex]);
+            }
+        });
+
         // Items to process on this pass
         let indices: number[] = [];
         mapType.forEach((_, index) => {
-            indices.push(index);
+            if (this._recursiveTypeRefs.has(mapTypeRef[index])) {
+                // Recursive types are emitted first: they are wrapped in
+                // z.lazy(), so all their references to other schemas are
+                // deferred until parse time and don't constrain the
+                // output order, while other schemas can reference them
+                // directly.
+                order.push(index);
+            } else {
+                indices.push(index);
+            }
         });
         // items to process on the next pass
         let deferredIndices: number[] = [];
@@ -306,10 +468,7 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
                         // find this childs's ordinal, if it has already been added
                         // faster to go through what we've defined so far than all definitions
 
-                        // FIXME: refactor this
-                        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-                        for (let j = 0; j < order.length; j++) {
-                            const childIndex = order[j];
+                        for (const childIndex of order) {
                             if (mapTypeRef[childIndex] === childRef) {
                                 found = true;
                                 break;
@@ -338,8 +497,9 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
             passNum++;
 
             if (passNum > MAX_PASSES) {
-                // giving up
-                order.push(...deferredIndices);
+                // giving up: emit the stuck items anyway rather than
+                // silently dropping them
+                order.push(...indices);
                 console.warn(
                     "Exceeded maximum number of passes when determining output order, output may contain forward references",
                 );
@@ -347,13 +507,13 @@ export class TypeScriptZodRenderer extends ConvenienceRenderer {
         } while (indices.length > 0 && passNum <= MAX_PASSES);
 
         // now emit ordered source
-        order.forEach((i) =>
+        order.forEach((i) => {
             this.emitGatheredSource(
-                this.gatherSource(() =>
-                    this.emitObject(mapName[i], mapType[i]),
-                ),
-            ),
-        );
+                this.gatherSource(() => {
+                    this.emitObject(mapName[i], mapType[i]);
+                }),
+            );
+        });
     }
 
     protected emitSourceStructure(): void {
