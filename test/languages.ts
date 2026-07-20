@@ -761,7 +761,11 @@ export const ElmLanguage: Language = {
     // package cache when parallel compiles race on a cold cache (still
     // reproducible with elm 0.19.2).
     setupCommand: "rm -rf elm-stuff && elm make Warmup.elm --output=/dev/null",
-    compileCommand: "elm make Main.elm --output elm.js",
+    // The retry after clearing elm-stuff works around the compiler's flaky
+    // per-project cache locking ("d.dat: withBinaryFile: resource busy",
+    // elm/compiler#2258), which strikes under heavy parallel load.
+    compileCommand:
+        "elm make Main.elm --output elm.js || (rm -rf elm-stuff && elm make Main.elm --output elm.js)",
     runCommand(sample: string) {
         return `node ./runner.js "${sample}"`;
     },
