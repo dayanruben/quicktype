@@ -138,14 +138,6 @@ export const minMaxItemsTypeAttributeKind: TypeAttributeKind<MinMaxConstraint> =
         "maxItems",
     );
 
-export const minMaxContainsTypeAttributeKind: TypeAttributeKind<MinMaxConstraint> =
-    new MinMaxConstraintTypeAttributeKind(
-        "minMaxItems",
-        new Set<TypeKind>(["array"]),
-        "minContains",
-        "maxContains",
-    );
-
 function producer(
     schema: JSONSchema,
     minProperty: string,
@@ -198,25 +190,15 @@ export function minMaxLengthAttributeProducer(
 export function minMaxItemsAttributeProducer(
     schema: JSONSchema,
     _ref: Ref,
-    types: Set<JSONSchemaType>
+    types: Set<JSONSchemaType>,
 ): JSONSchemaAttributes | undefined {
     if (!types.has("array")) return undefined;
 
-    const maybeMinMaxLength = producer(schema, "minItems", "maxItems");
-    if (maybeMinMaxLength === undefined) return undefined;
-    return { forArray: minMaxItemsTypeAttributeKind.makeAttributes(maybeMinMaxLength) };
-}
-
-export function minMaxContainsAttributeProducer(
-    schema: JSONSchema,
-    _ref: Ref,
-    types: Set<JSONSchemaType>
-): JSONSchemaAttributes | undefined {
-    if (!types.has("array")) return undefined;
-
-    const maybeMinMaxLength = producer(schema, "minContains", "maxContains");
-    if (maybeMinMaxLength === undefined) return undefined;
-    return { forArray: minMaxContainsTypeAttributeKind.makeAttributes(maybeMinMaxLength) };
+    const maybeMinMaxItems = producer(schema, "minItems", "maxItems");
+    if (maybeMinMaxItems === undefined) return undefined;
+    return {
+        forArray: minMaxItemsTypeAttributeKind.makeAttributes(maybeMinMaxItems),
+    };
 }
 
 export function minMaxValueForType(t: Type): MinMaxConstraint | undefined {
@@ -229,10 +211,6 @@ export function minMaxLengthForType(t: Type): MinMaxConstraint | undefined {
 
 export function minMaxItemsForType(t: Type): MinMaxConstraint | undefined {
     return minMaxItemsTypeAttributeKind.tryGetInAttributes(t.getAttributes());
-}
-
-export function minMaxContainsForType(t: Type): MinMaxConstraint | undefined {
-    return minMaxContainsTypeAttributeKind.tryGetInAttributes(t.getAttributes());
 }
 
 export class PatternTypeAttributeKind extends TypeAttributeKind<string> {
