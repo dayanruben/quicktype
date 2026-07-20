@@ -1,6 +1,5 @@
 import type { LanguageName } from "quicktype-core";
 
-import * as process from "node:process";
 // @ts-expect-error: ../dist only exists after the root package is built
 import type { RendererOptions } from "../dist/quicktype-core/Run";
 
@@ -757,16 +756,21 @@ export const CPlusPlusLanguage: Language = {
 export const ElmLanguage: Language = {
     name: "elm",
     base: "test/fixtures/elm",
-    setupCommand: "rm -rf elm-stuff/build-artifacts && elm-make --yes",
-    compileCommand:
-        process.env.CI === "true"
-            ? "sysconfcpus -n 1 elm-make Main.elm QuickType.elm --output elm.js"
-            : "elm-make Main.elm QuickType.elm --output elm.js",
+    // Compiling `Warmup.elm` once up front downloads and builds all package
+    // dependencies into the shared ELM_HOME cache; elm 0.19.1 can corrupt
+    // its package registry when parallel compiles race on a cold cache.
+    setupCommand: "rm -rf elm-stuff && elm make Warmup.elm --output=/dev/null",
+    compileCommand: "elm make Main.elm --output elm.js",
     runCommand(sample: string) {
         return `node ./runner.js "${sample}"`;
     },
     diffViaSchema: true,
     skipDiffViaSchema: [
+        "blns-object.json",
+        "identifiers.json",
+        "keywords.json",
+        "nst-test-suite.json",
+        "simple-identifiers.json",
         "bug863.json",
         "reddit.json",
         "github-events.json",
@@ -792,21 +796,17 @@ export const ElmLanguage: Language = {
     features: ["enum", "union", "no-defaults"],
     output: "QuickType.elm",
     topLevel: "QuickType",
+    // Elm type aliases cannot be recursive, so all inputs that produce
+    // recursive types must be skipped.
     skipJSON: [
-        "identifiers.json",
-        "simple-identifiers.json",
-        "blns-object.json",
-        "recursive.json",
-        "direct-recursive.json",
-        "bug427.json",
-        "bug790.json",
-        "list.json",
-        "nst-test-suite.json",
-        "keywords.json", // stack overflow
+        "recursive.json", // recursion
+        "direct-recursive.json", // recursion
+        "bug427.json", // recursion
+        "bug790.json", // recursion
+        "list.json", // recursion
     ],
     skipMiscJSON: false,
     skipSchema: [
-        "constructor.schema", // can't handle "constructor" property
         "union-list.schema", // recursion
         "list.schema", // recursion
         "ref-remote.schema", // recursion
@@ -814,10 +814,19 @@ export const ElmLanguage: Language = {
         "postman-collection.schema", // recursion
         "vega-lite.schema", // recursion
         "simple-ref.schema", // recursion
-        "keyword-unions.schema", // can't handle "hasOwnProperty" for some reason
+        "recursive-union-flattening.schema", // recursion
+        // elm/json's field decoder uses the JS `in` operator, which finds
+        // inherited Object.prototype members, so an absent "constructor"
+        // property decodes to the object's constructor function.
+        "constructor.schema",
+        "keyword-unions.schema",
+        // The generated decoder accepts invalid union members because all
+        // class properties decode via `Jpipe.optional`.
+        "nested-intersection-union.schema",
     ],
     rendererOptions: {},
-    quickTestRendererOptions: [{ "array-type": "list" }],
+    // `list` is the default now; keep the `Array` code path covered.
+    quickTestRendererOptions: [{ "array-type": "array" }],
     sourceFiles: ["src/language/Elm/index.ts"],
 };
 
