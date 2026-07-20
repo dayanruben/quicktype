@@ -15,6 +15,9 @@ JSON to the input.
   `.N.json` samples and `.N.fail.<feature>.json` expected-failure samples. A
   fail sample must make the generated program exit nonzero; which fail
   samples run is controlled by the language's `features` list.
+- Every schema fixture test must have at least one positive (`.N.json`) and
+  one negative (`.N.fail.<feature>.json`) test case, unless there is a very
+  good reason not to.
 - Per-language configuration — which inputs run (`skipJSON`, `includeJSON`,
   `skipSchema`), renderer options, and `features` — lives in
   `test/languages.ts`; fixtures are registered in `test/fixtures.ts`.
