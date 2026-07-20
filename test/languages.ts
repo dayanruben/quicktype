@@ -1508,6 +1508,8 @@ export const KotlinXLanguage: Language = {
         "bug863.json",
         "github-events.json",
         "optional-union.json",
+        "issue2680-object-array.json",
+        "issue2680-scalar-array.json",
         "00c36.json",
         "010b1.json",
         "050b0.json",
@@ -1607,6 +1609,7 @@ export const KotlinXLanguage: Language = {
         // Top-level array: `typealias TopLevel = JsonArray<T>` doesn't
         // compile (documented TODO in KotlinXRenderer.ts).
         "union.schema",
+        "issue2680-top-level-array.schema",
     ],
     skipMiscJSON: false,
     rendererOptions: { framework: "kotlinx" },
@@ -1866,6 +1869,7 @@ export const PHPLanguage: Language = {
         "top-level-enum.schema",
         // The driver does not support top-level arrays.
         "union.schema",
+        "issue2680-top-level-array.schema",
     ],
     rendererOptions: {},
     quickTestRendererOptions: [],
@@ -1918,10 +1922,6 @@ export const TypeScriptZodLanguage: Language = {
         // input has none
         "github-events.json",
 
-        // Does not handle top level array
-        "bug863.json",
-
-        "no-classes.json",
         "00c36.json",
         "10be4.json",
         "050b0.json",
@@ -2039,8 +2039,9 @@ export const TypeScriptEffectSchemaLanguage: Language = {
         "list.json",
         "bug790.json",
 
-        // Does not handle top level array
+        // Does not handle top level arrays
         "bug863.json",
+        "issue2680-scalar-array.json",
 
         "no-classes.json",
         "00c36.json",
@@ -2095,6 +2096,7 @@ export const TypeScriptEffectSchemaLanguage: Language = {
         "optional-any.schema",
         "required.schema",
         "required-non-properties.schema",
+        "issue2680-top-level-array.schema",
     ],
     rendererOptions: {},
     quickTestRendererOptions: [],
