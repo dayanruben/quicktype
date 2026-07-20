@@ -1691,7 +1691,11 @@ export const HaskellLanguage: Language = {
     setupCommand: "stack install",
     compileCommand: "true",
     runCommand(sample: string) {
-        return `stack run haskell -- "${sample}"`;
+        // Round-tripping cannot distinguish generated constructor names.
+        const sourceCheck = sample.endsWith("haskell-enum-forbidden.1.json")
+            ? "grep -q '^    = ErrorHealth$' QuickType.hs && "
+            : "";
+        return `${sourceCheck}stack run haskell -- "${sample}"`;
     },
     diffViaSchema: true,
     skipDiffViaSchema: [
