@@ -500,7 +500,12 @@ export const GoLanguage: Language = {
         "postman-collection.schema",
     ],
     rendererOptions: {},
-    quickTestRendererOptions: [],
+    quickTestRendererOptions: [
+        // Runs against the expected-output file
+        // `omit-empty.out.omit-empty.json`, which asserts that `omitempty`
+        // actually drops the null field.
+        ["omit-empty.json", { "omit-empty": "true" }],
+    ],
     sourceFiles: ["src/language/Golang/index.ts"],
 };
 

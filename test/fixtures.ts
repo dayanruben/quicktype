@@ -359,14 +359,39 @@ class JSONFixture extends LanguageFixture {
             return 0;
         }
 
-        compareJsonFileToJson(
-            comparisonArgs(
+        // The analog of the JSON Schema fixture's `.out.<feature>.json`
+        // convention: a JSON input `foo.json` can come with an expected-output
+        // file `foo.out.<key>.json`, which applies when `<key>` is one of the
+        // language's `features`, or the name of a renderer option this
+        // particular run sets (via `quickTestRendererOptions`).  When it
+        // applies, the output must match it exactly, without the usual
+        // round-trip leniency for null properties.  This is how output that
+        // legitimately differs from the input — e.g. Go's `omitempty`
+        // dropping null fields — gets asserted.
+        let expectedFilename = filename;
+        let strict = false;
+        const expectedOutputKeys = [
+            ...this.language.features,
+            ...Object.keys(additionalRendererOptions),
+        ];
+        for (const key of expectedOutputKeys) {
+            const outFilename = filename.replace(/\.json$/, `.out.${key}.json`);
+            if (fs.existsSync(outFilename)) {
+                expectedFilename = outFilename;
+                strict = true;
+                break;
+            }
+        }
+
+        compareJsonFileToJson({
+            ...comparisonArgs(
                 this.language,
                 filename,
-                filename,
+                expectedFilename,
                 additionalRendererOptions,
             ),
-        );
+            strict,
+        });
 
         if (
             this.language.diffViaSchema &&
