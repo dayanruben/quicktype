@@ -1,83 +1,17 @@
 import type { Name } from "../../Naming.js";
 import type { Sourcelike } from "../../Source.js";
-import {
-    matchType,
-    nullableFromUnion,
-    removeNullFromUnion,
-} from "../../Type/TypeUtils.js";
+import { removeNullFromUnion } from "../../Type/TypeUtils.js";
 import type { ClassType, EnumType, Type, UnionType } from "../../Type/index.js";
+import { stringEscape } from "../../support/Strings.js";
 
 import { Scala3Renderer } from "./Scala3Renderer.js";
-import { shouldAddBacktick, wrapOption } from "./utils.js";
+import { unionMemberSortOrder, wrapOption } from "./utils.js";
 
 export class UpickleRenderer extends Scala3Renderer {
-    private seenUnionTypes: string[] = [];
-
-    protected upickleEncoderForType(
-        t: Type,
-        __ = false,
-        noOptional = false,
-        paramName = "",
-    ): Sourcelike {
-        return matchType<Sourcelike>(
-            t,
-            (_anyType) => ["OptionPickler.writeJs(", paramName, ")"],
-            (_nullType) => ["OptionPickler.writeJs(", paramName, ")"],
-            (_boolType) => ["OptionPickler.writeJs(", paramName, ")"],
-            (_integerType) => ["OptionPickler.writeJs(", paramName, ")"],
-            (_doubleType) => ["OptionPickler.writeJs(", paramName, ")"],
-            (_stringType) => ["OptionPickler.writeJs(", paramName, ")"],
-            (arrayType) => [
-                "OptionPickler.writeJs[",
-                this.scalaType(arrayType.items),
-                "].apply(",
-                paramName,
-                ")",
-            ],
-            (classType) => [
-                "OptionPickler.writeJs[",
-                this.scalaType(classType),
-                "].apply(",
-                paramName,
-                ")",
-            ],
-            (mapType) => [
-                "OptionPickler.writeJs[String,",
-                this.scalaType(mapType.values),
-                "].apply(",
-                paramName,
-                ")",
-            ],
-            (_) => ["OptionPickler.writeJs(", paramName, ")"],
-            (unionType) => {
-                const nullable = nullableFromUnion(unionType);
-                if (nullable !== null) {
-                    if (noOptional) {
-                        return [
-                            "OptionPickler.writeJs[",
-                            this.nameForNamedType(nullable),
-                            "]",
-                        ];
-                    }
-
-                    return [
-                        "OptionPickler.writeJs[Option[",
-                        this.nameForNamedType(nullable),
-                        "]]",
-                    ];
-                }
-
-                return [
-                    "OptionPickler.writeJs[",
-                    this.nameForNamedType(unionType),
-                    "]",
-                ];
-            },
-        );
-    }
+    private readonly seenUnionTypes: string[] = [];
 
     protected emitClassDefinitionMethods(): void {
-        this.emitLine(") derives OptionPickler.ReadWriter ");
+        this.emitLine(") derives OptionPickler.ReadWriter");
     }
 
     protected anySourceType(optional: boolean): Sourcelike {
@@ -86,7 +20,10 @@ export class UpickleRenderer extends Scala3Renderer {
 
     protected emitHeader(): void {
         super.emitHeader();
-        const optionPickler = `object OptionPickler extends upickle.AttributeTagged :
+        this.emitMultiline(`// Custom pickler so that missing keys and JSON nulls both read as None,
+// and None is left out when writing (upickle's default for Option is a
+// JSON array).
+object OptionPickler extends upickle.AttributeTagged:
     import upickle.default.Writer
     import upickle.default.Reader
     override implicit def OptionWriter[T: Writer]: Writer[Option[T]] =
@@ -102,8 +39,37 @@ export class UpickleRenderer extends Scala3Renderer {
     }
 end OptionPickler
 
+// If a union has a null in, then we'll need this too...
+type NullValue = None.type
+given OptionPickler.ReadWriter[NullValue] = OptionPickler.readwriter[ujson.Value].bimap[NullValue](
+    _ => ujson.Null,
+    json => if json.isNull then None else throw new upickle.core.Abort("not null")
+)
+
 object JsonExt:
     val valueReader = OptionPickler.readwriter[ujson.Value]
+
+    // upickle's built-in primitive readers are lenient -- the numeric and
+    // boolean readers accept strings, and the string reader accepts
+    // numbers and booleans -- so untagged unions need strict readers to
+    // pick the right member.
+    val strictString: OptionPickler.Reader[String] = valueReader.map {
+        case ujson.Str(s) => s
+        case json => throw new upickle.core.Abort("expected string, got " + json)
+    }
+    val strictLong: OptionPickler.Reader[Long] = valueReader.map {
+        case ujson.Num(n) if n.isWhole => n.toLong
+        case json => throw new upickle.core.Abort("expected integer, got " + json)
+    }
+    val strictDouble: OptionPickler.Reader[Double] = valueReader.map {
+        case ujson.Num(n) => n
+        case json => throw new upickle.core.Abort("expected number, got " + json)
+    }
+    val strictBoolean: OptionPickler.Reader[Boolean] = valueReader.map {
+        case ujson.Bool(b) => b
+        case json => throw new upickle.core.Abort("expected boolean, got " + json)
+    }
+
     def badMerge[T](r1: => OptionPickler.Reader[?], rest: OptionPickler.Reader[?]*): OptionPickler.Reader[T] = valueReader.map { json =>
         var t: T | Null = null
         val stack       = Vector.newBuilder[Throwable]
@@ -116,19 +82,9 @@ object JsonExt:
         }
         if t != null then t.nn else throw new Exception(json.toString(), stack.result().headOption.getOrElse(null))
     }
-
-    extension [T](r: OptionPickler.Reader[T]) def widen[K >: T] = r.map(_.asInstanceOf[K])
 end JsonExt
-`;
-        //         const singletonPickler = `given singletonStringPickler[A <: Singleton](using A <:< String): OptionPickler.ReadWriter[A] = OptionPickler.readwriter[ujson.Value].bimap[A](
-        //     _.toString(),
-        //     str => {
-        //     str.toString().asInstanceOf[A]()
-        //     }
-        // )`;
-        this.emitMultiline(optionPickler);
+`);
         this.ensureBlankLine();
-        // this.emitMultiline(singletonPickler);
     }
 
     protected override emitEmptyClassDefinition(
@@ -144,12 +100,6 @@ end JsonExt
         u: UnionType,
         unionName: Name,
     ): void {
-        // function sortBy(t: Type): string {
-        //     const kind = t.kind;
-        //     if (kind === "class") return kind;
-        //     return "_" + kind;
-        // }
-
         this.emitDescription(this.descriptionForType(u));
 
         const [maybeNull, nonNulls] = removeNullFromUnion(u, false);
@@ -173,9 +123,15 @@ end JsonExt
         if (!this.seenUnionTypes.some((y) => y === thisUnionType)) {
             this.seenUnionTypes.push(thisUnionType);
             const sourceLikeTypes: Array<[Sourcelike, Type]> = [];
-            this.forEachUnionMember(u, nonNulls, "none", null, (_, t) => {
-                sourceLikeTypes.push([this.scalaType(t), t]);
-            });
+            this.forEachUnionMember(
+                u,
+                nonNulls,
+                "none",
+                unionMemberSortOrder,
+                (_, t) => {
+                    sourceLikeTypes.push([this.scalaType(t), t]);
+                },
+            );
             if (maybeNull !== null) {
                 sourceLikeTypes.push([
                     this.nameForUnionMember(u, maybeNull),
@@ -185,7 +141,7 @@ end JsonExt
 
             this.ensureBlankLine();
             this.emitLine([
-                "given unionWriter",
+                "given unionReader",
                 unionName,
                 ": OptionPickler.Reader[",
                 unionName,
@@ -194,18 +150,34 @@ end JsonExt
                 "](",
             ]);
             this.indent(() => {
-                sourceLikeTypes.forEach((t) => {
-                    this.emitLine([
-                        "summon[OptionPickler.Reader[",
-                        t[0],
-                        "]],",
-                    ]);
+                sourceLikeTypes.forEach(([srcType, t]) => {
+                    // Use the strict readers for primitive members --
+                    // upickle's built-in ones accept too much (see the
+                    // comment in the emitted JsonExt).
+                    const strictReaders: Partial<Record<string, string>> = {
+                        Boolean: "JsonExt.strictBoolean",
+                        Double: "JsonExt.strictDouble",
+                        Long: "JsonExt.strictLong",
+                        String: "JsonExt.strictString",
+                    };
+                    const strict = t.isPrimitive()
+                        ? strictReaders[this.sourcelikeToString(srcType)]
+                        : undefined;
+                    if (strict === undefined) {
+                        this.emitLine([
+                            "summon[OptionPickler.Reader[",
+                            srcType,
+                            "]],",
+                        ]);
+                    } else {
+                        this.emitLine([strict, ","]);
+                    }
                 });
                 this.emitLine(")");
             });
             this.ensureBlankLine();
             this.emitLine([
-                "given unionReader",
+                "given unionWriter",
                 unionName,
                 ": OptionPickler.Writer[",
                 unionName,
@@ -220,7 +192,7 @@ end JsonExt
                         this.emitLine([
                             "case v: ",
                             t[0],
-                            " => OptionPickler.write[",
+                            " => OptionPickler.writeJs[",
                             t[0],
                             "](v)",
                         ]);
@@ -233,112 +205,59 @@ end JsonExt
 
     protected emitEnumDefinition(e: EnumType, enumName: Name): void {
         this.emitDescription(this.descriptionForType(e));
+        this.ensureBlankLine();
 
-        let hasBlank = false;
-        this.forEachEnumCase(e, "none", (_, jsonName) => {
-            if (jsonName.trim() === "") {
-                hasBlank = true;
-            }
+        // Enum cases are styled Scala identifiers; the ReadWriter below
+        // maps them back to the original JSON strings, which can be
+        // anything (keywords, `"_"`, `""`, …).
+        this.emitLine(["enum ", enumName, " : "]);
+        this.indent(() => {
+            this.forEachEnumCase(e, "none", (name) => {
+                this.emitLine("case ", name);
+            });
         });
         this.ensureBlankLine();
-        if (hasBlank) {
-            //console.log("enumName: " + enumName + " has blank");
-            this.emitItem(["type ", enumName, ' = "" | ', enumName, "NonBlank"]);
-            this.ensureBlankLine();
-            this.emitLine([
-                "given singleton",
-                enumName,
-                'Pickler[A <: "" | ',
-                enumName,
-                "NonBlank]: OptionPickler.ReadWriter[A] = ",
-            ]);
 
+        this.emitLine([
+            "given OptionPickler.ReadWriter[",
+            enumName,
+            "] = OptionPickler.readwriter[String].bimap[",
+            enumName,
+            "](",
+        ]);
+        this.indent(() => {
+            this.emitLine("{");
             this.indent(() => {
+                this.forEachEnumCase(e, "none", (name, jsonName) => {
+                    this.emitLine([
+                        "case ",
+                        enumName,
+                        ".",
+                        name,
+                        ` => "${stringEscape(jsonName)}"`,
+                    ]);
+                });
+            });
+            this.emitLine("},");
+            this.emitLine("{");
+            this.indent(() => {
+                this.forEachEnumCase(e, "none", (name, jsonName) => {
+                    this.emitLine([
+                        `case "${stringEscape(jsonName)}" => `,
+                        enumName,
+                        ".",
+                        name,
+                    ]);
+                });
                 this.emitLine([
-                    "OptionPickler.readwriter[ujson.Value].bimap[A](",
+                    'case other => throw new upickle.core.Abort("invalid ',
+                    enumName,
+                    ': " + other)',
                 ]);
-                this.indent(() => {
-                    this.emitLine(["_.toString(),"]);
-                    this.emitLine(["str => {"]);
-                    this.indent(() => {
-                        this.emitLine(["val str2 = str.str"]);
-                        this.emitLine(["str2 match {"]);
-                        this.indent(() => {
-                            this.emitLine([
-                                'case _ if str2.length == 0 => "".asInstanceOf[A] ',
-                            ]);
-                            this.emitLine([
-                                "case parseable =>",
-                                enumName,
-                                "NonBlank.valueOf(parseable).asInstanceOf[A] ",
-                            ]);
-                        });
-                        this.emitLine(["}"]);
-                    });
-                    this.emitLine(["}"]);
-                });
-                this.emitLine([")"]);
             });
-            this.ensureBlankLine();
-            //let count = e.cases.size;
-            this.ensureBlankLine();
-            this.emitLine([
-                "enum ",
-                enumName,
-                "NonBlank derives OptionPickler.ReadWriter: ",
-            ]);
-            this.indent(() => {
-                this.forEachEnumCase(e, "none", (_, jsonName) => {
-                    if (!(jsonName.trim() === "")) {
-                        let strBuild = "";
-                        const backticks =
-                            shouldAddBacktick(jsonName) ||
-                            jsonName.includes(" ") ||
-                            !Number.isNaN(Number.parseInt(jsonName.charAt(0)));
-                        this.emitItem(["case "]);
-                        if (backticks) {
-                            strBuild = strBuild + "`";
-                        }
-
-                        strBuild = strBuild + jsonName;
-                        if (backticks) {
-                            strBuild = strBuild + "`";
-                        }
-
-                        //                        if (--count > 0) strBuild + ",";
-                        this.emitLine([strBuild]);
-                    }
-                });
-            });
-        } else {
-            //console.log("enumName: " + enumName + " has non blank");
-            this.emitLine([
-                "enum ",
-                enumName,
-                " derives OptionPickler.ReadWriter: ",
-            ]);
-
-            this.indent(() => {
-                this.forEachEnumCase(e, "none", (_, jsonName) => {
-                    let strBuild = "";
-                    const backticks =
-                        shouldAddBacktick(jsonName) ||
-                        jsonName.includes(" ") ||
-                        !Number.isNaN(Number.parseInt(jsonName.charAt(0)));
-                    this.emitItem(["case "]);
-                    if (backticks) {
-                        strBuild = strBuild + "`";
-                    }
-
-                    strBuild = strBuild + jsonName;
-                    if (backticks) {
-                        strBuild = strBuild + "`";
-                    }
-
-                    //                  if (--count > 0) strBuild + ",";
-                    this.emitLine([strBuild]);
-                });
-            });
-        }
+            this.emitLine("}");
+        });
+        this.emitLine(")");
+        this.ensureBlankLine();
     }
 }
