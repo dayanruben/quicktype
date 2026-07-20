@@ -1809,6 +1809,7 @@ export const PHPLanguage: Language = {
         // The motivating repro for non-nullable union support: a
         // heterogeneous array under a PHP-reserved-word property name.
         "php-mixed-union.json",
+        "php-validation.json",
     ],
     skipMiscJSON: true,
     skipSchema: [
