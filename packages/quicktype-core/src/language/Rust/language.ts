@@ -28,10 +28,10 @@ export const rustOptions = {
             crate: Visibility.Crate,
             public: Visibility.Public,
         } as const,
-        "private",
+        "public",
     ),
-    deriveDebug: new BooleanOption("derive-debug", "Derive Debug impl", false),
-    deriveClone: new BooleanOption("derive-clone", "Derive Clone impl", false),
+    deriveDebug: new BooleanOption("derive-debug", "Derive Debug impl", true),
+    deriveClone: new BooleanOption("derive-clone", "Derive Clone impl", true),
     derivePartialEq: new BooleanOption(
         "derive-partial-eq",
         "Derive PartialEq impl",
@@ -42,7 +42,6 @@ export const rustOptions = {
         "Skip serializing empty Option fields",
         false,
     ),
-    edition2018: new BooleanOption("edition-2018", "Edition 2018", true),
     leadingComments: new BooleanOption(
         "leading-comments",
         "Leading Comments",

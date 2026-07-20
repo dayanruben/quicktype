@@ -33,7 +33,7 @@ export const kotlinOptions = {
             klaxon: "Klaxon",
             kotlinx: "KotlinX",
         } as const,
-        "klaxon",
+        "jackson",
     ),
     acronymStyle: acronymOption(AcronymStyleOptions.Pascal),
     packageName: new StringOption("package", "Package", "PACKAGE", "quicktype"),

@@ -113,11 +113,15 @@ export const CSharpLanguage: Language = {
     skipSchema: [
         "top-level-enum.schema", // The code we generate for top-level enums is incompatible with the driver
     ],
-    rendererOptions: { "check-required": "true" },
+    // The default framework is SystemTextJson; this fixture deliberately
+    // pins NewtonSoft so the Newtonsoft renderer keeps end-to-end coverage.
+    rendererOptions: { "check-required": "true", framework: "NewtonSoft" },
     quickTestRendererOptions: [
         { "array-type": "list" },
+        // The default is csharp-version=8; these keep the older
+        // language-version code paths covered.
         { "csharp-version": "5" },
-        { "csharp-version": "8" },
+        { "csharp-version": "6" },
         { density: "dense" },
         { "number-type": "decimal" },
         { "any-type": "dynamic" },
@@ -157,15 +161,22 @@ export const CSharpLanguageSystemTextJson: Language = {
         // The following skips are pre-existing System.Text.Json renderer issues,
         // found when first enabling the schema fixture for this language:
         "keyword-unions.schema", // a property named "JsonSerializer" collides with System.Text.Json.JsonSerializer: CS0120
-        "minmaxlength.schema", // generated converter triggers CS8602 warnings, which "dotnet run" prints to stdout, breaking the JSON comparison
-        "optional-constraints.schema", // same CS8602 stdout issue; also min/max on integers and pattern on optional strings aren't checked, so expected-failure samples don't fail
-        "optional-const-ref.schema", // same CS8602 stdout issue; also min/max on integers isn't checked, so the expected-failure sample doesn't fail
+        // minmaxlength.schema, optional-constraints.schema, and
+        // optional-const-ref.schema used to be skipped here because the
+        // generated converters triggered CS8602 warnings, which "dotnet
+        // run" prints to stdout, breaking the JSON comparison.  The
+        // generated code now suppresses CS8602 alongside the other NRT
+        // pragmas, so they run.  (Their .fail.<feature>.json samples are
+        // not exercised because this fixture doesn't declare the minmax,
+        // minmaxlength, or pattern features.)
     ],
     rendererOptions: { "check-required": "true", framework: "SystemTextJson" },
     quickTestRendererOptions: [
         { "array-type": "list" },
+        // The default is csharp-version=8; these keep the older
+        // language-version code paths covered.
+        { "csharp-version": "5" },
         { "csharp-version": "6" },
-        { "csharp-version": "8" },
         { density: "dense" },
         { "number-type": "decimal" },
         { "any-type": "dynamic" },
@@ -196,7 +207,9 @@ export const JavaLanguage: Language = {
     skipMiscJSON: false,
     skipSchema: ["keyword-unions.schema"], // generates classes with names that are case-insensitively equal
     rendererOptions: {},
-    quickTestRendererOptions: [{ "array-type": "list" }],
+    // The default is array-type=list; this keeps the T[] code path
+    // covered.
+    quickTestRendererOptions: [{ "array-type": "array" }],
     sourceFiles: ["src/language/Java/index.ts"],
 };
 
@@ -213,13 +226,13 @@ export const JavaLanguageWithLegacyDateTime: Language = {
     ],
     skipMiscJSON: true, // Handles edge cases differently and does not allow optional milliseconds.
     rendererOptions: { "datetime-provider": "legacy" },
-    quickTestRendererOptions: [{ "array-type": "list" }],
+    quickTestRendererOptions: [{ "array-type": "array" }],
 };
 
 export const JavaLanguageWithLombok: Language = {
     ...JavaLanguage,
     base: "test/fixtures/java-lombok",
-    quickTestRendererOptions: [{ "array-type": "list", lombok: "true" }],
+    quickTestRendererOptions: [{ "array-type": "array", lombok: "true" }],
 };
 
 export const PythonLanguage: Language = {
@@ -307,8 +320,13 @@ export const RustLanguage: Language = {
     quickTestRendererOptions: [
         { density: "dense" },
         { visibility: "crate" },
-        { visibility: "private" },
-        { visibility: "public" },
+        // The pre-flip defaults: private fields without Debug/Clone
+        // derives, kept covered after the defaults changed.
+        {
+            visibility: "private",
+            "derive-debug": "false",
+            "derive-clone": "false",
+        },
     ],
     sourceFiles: ["src/language/Rust/index.ts"],
 };
@@ -723,7 +741,14 @@ export const CPlusPlusLanguage: Language = {
         { "code-format": "with-struct" },
         { wstring: "use-wstring" },
         { "const-style": "east-const" },
-        { boost: "false" },
+        // The default is boost=false (C++17); this keeps the boost code
+        // path covered.  Pinned to specific inputs because the default
+        // quicktest inputs (combinations[1-4].json) are all in this
+        // fixture's skipJSON, so plain-options quicktests never run for
+        // C++.  unions.json exercises nulls inside unions, where the
+        // boost and std optional/variant code paths differ.
+        ["unions.json", { boost: "true" }],
+        ["pokedex.json", { boost: "true" }],
     ],
     sourceFiles: ["src/language/CPlusPlus/index.ts"],
 };
@@ -879,8 +904,9 @@ export const SwiftLanguage: Language = {
             "simple-object.json",
             { "struct-or-class": "class", "final-classes": "true" },
         ],
+        // The default is density=normal; this keeps the dense code path
+        // covered.
         { density: "dense" },
-        { density: "normal" },
         { "access-level": "internal" },
         { "access-level": "public" },
         { protocol: "equatable" },
@@ -969,6 +995,9 @@ export const TypeScriptLanguage: Language = {
         { "acronym-style": "pascal" },
         { converters: "all-objects" },
         { readonly: "true" },
+        // The default is prefer-unions=true; this keeps the TypeScript
+        // enum code path covered.
+        { "prefer-unions": "false" },
         { "prefer-unknown": "false" },
     ],
     sourceFiles: ["src/language/TypeScript/index.ts"],
@@ -1049,6 +1078,10 @@ export const FlowLanguage: Language = {
         { "runtime-typecheck": "false" },
         { "runtime-typecheck-ignore-unknown-properties": "true" },
         { "nice-property-names": "true" },
+        // Flow always renders enums as unions of string literals, so
+        // this only asserts that the flipped default stays a no-op for
+        // Flow output.
+        { "prefer-unions": "false" },
         { "prefer-unknown": "false" },
     ],
     sourceFiles: ["src/language/Flow/index.ts"],
@@ -1306,7 +1339,9 @@ export const KotlinLanguage: Language = {
         "recursive-union-flattening.schema",
     ],
     skipMiscJSON: false,
-    rendererOptions: {},
+    // The default framework is jackson; this fixture deliberately pins
+    // klaxon so the Klaxon renderer keeps end-to-end coverage.
+    rendererOptions: { framework: "klaxon" },
     quickTestRendererOptions: [],
     sourceFiles: ["src/language/Kotlin/index.ts"],
 };
@@ -1592,7 +1627,9 @@ export const DartLanguage: Language = {
     ],
     skipMiscJSON: true,
     rendererOptions: {},
-    quickTestRendererOptions: [],
+    // The default is final-props=true; this keeps the mutable-property
+    // code path covered.
+    quickTestRendererOptions: [{ "final-props": "false" }],
     sourceFiles: ["src/language/Dart/index.ts"],
 };
 
@@ -1736,7 +1773,9 @@ export const HaskellLanguage: Language = {
         "required-non-properties.schema",
     ],
     rendererOptions: {},
-    quickTestRendererOptions: [{ "array-type": "list" }],
+    // The default is array-type=list; this keeps the Vector code path
+    // covered.
+    quickTestRendererOptions: [{ "array-type": "array" }],
     sourceFiles: ["src/language/Haskell/index.ts"],
 };
 

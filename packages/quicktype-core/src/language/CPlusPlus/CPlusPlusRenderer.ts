@@ -2144,8 +2144,14 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                             ],
                             false,
                             () => {
+                                // A JSON null must become an *empty*
+                                // optional.  Only `optType<T>()` guarantees
+                                // that: the factory would wrap a
+                                // default-constructed T (std::make_optional
+                                // and std::make_shared both do), turning
+                                // null into 0/""/{} on round-trip.
                                 this.emitLine(
-                                    `if (j.is_null()) return ${factory}<T>(); else return ${factory}<T>(j.get<T>());`,
+                                    `if (j.is_null()) return ${optType}<T>(); else return ${factory}<T>(j.get<T>());`,
                                 );
                             },
                         );
