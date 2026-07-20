@@ -192,6 +192,15 @@ export class NewtonsoftCSharpRenderer extends CSharpRenderer {
         return this._options.baseclass;
     }
 
+    protected emitDefaultFollowingComments(): void {
+        if (!this._needHelpers || this._options.version < 8) return;
+
+        this.emitLine("#pragma warning restore CS8618");
+        this.emitLine("#pragma warning restore CS8601");
+        this.emitLine("#pragma warning restore CS8603");
+        this.emitLine("#pragma warning restore CS8765");
+    }
+
     protected emitDefaultLeadingComments(): void {
         if (!this._needHelpers) return;
 
@@ -225,6 +234,14 @@ export class NewtonsoftCSharpRenderer extends CSharpRenderer {
                 ";",
             );
         });
+
+        if (this._options.version >= 8) {
+            this.emitLine("#nullable enable");
+            this.emitLine("#pragma warning disable CS8618");
+            this.emitLine("#pragma warning disable CS8601");
+            this.emitLine("#pragma warning disable CS8603");
+            this.emitLine("#pragma warning disable CS8765");
+        }
     }
 
     private converterForType(t: Type): Name | undefined {
