@@ -322,7 +322,7 @@ export class DartRenderer extends ConvenienceRenderer {
         if (isNullable && !this._options.requiredProperties) {
             return [
                 list,
-                " == null ? [] : ",
+                " == null ? null : ",
                 "List<",
                 itemType,
                 ">.from(",

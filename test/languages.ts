@@ -1662,9 +1662,6 @@ export const DartLanguage: Language = {
         "keyword-unions.schema",
         "ref-remote.schema",
         "uuid.schema",
-        /* Absent optional lists don't round-trip: the generated fromJson/toJson
-           turn them into [], so the output no longer matches the input */
-        "optional-const-ref.schema",
     ],
     skipMiscJSON: true,
     rendererOptions: {},
