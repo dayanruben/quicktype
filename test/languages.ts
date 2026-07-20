@@ -732,8 +732,9 @@ export const ElmLanguage: Language = {
     name: "elm",
     base: "test/fixtures/elm",
     // Compiling `Warmup.elm` once up front downloads and builds all package
-    // dependencies into the shared ELM_HOME cache; elm 0.19.1 can corrupt
-    // its package registry when parallel compiles race on a cold cache.
+    // dependencies into the shared ELM_HOME cache; elm corrupts its shared
+    // package cache when parallel compiles race on a cold cache (still
+    // reproducible with elm 0.19.2).
     setupCommand: "rm -rf elm-stuff && elm make Warmup.elm --output=/dev/null",
     compileCommand: "elm make Main.elm --output elm.js",
     runCommand(sample: string) {
