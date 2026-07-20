@@ -413,7 +413,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         this.emitType(
             undefined,
             AccessModifier.Public,
-            "static class",
+            "static partial class",
             "Serialize",
             undefined,
             () => {
@@ -484,7 +484,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         this.emitType(
             undefined,
             AccessModifier.Internal,
-            "static class",
+            "static partial class",
             converterName,
             undefined,
             () => {
