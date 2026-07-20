@@ -11,37 +11,37 @@ import {
 import {
     anyTypeIssueAnnotation,
     nullTypeIssueAnnotation,
-} from "../../Annotation";
-import { getAccessorName } from "../../attributes/AccessorNames";
-import { enumCaseValues } from "../../attributes/EnumValues";
+} from "../../Annotation.js";
+import { getAccessorName } from "../../attributes/AccessorNames.js";
+import { enumCaseValues } from "../../attributes/EnumValues.js";
 import {
     ConvenienceRenderer,
     type ForbiddenWordsInfo,
-} from "../../ConvenienceRenderer";
-import type { Declaration } from "../../DeclarationIR";
+} from "../../ConvenienceRenderer.js";
+import type { Declaration } from "../../DeclarationIR.js";
 import {
     DependencyName,
     type Name,
     type NameStyle,
     type Namer,
     funPrefixNamer,
-} from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
-import { type Sourcelike, maybeAnnotated } from "../../Source";
+} from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
+import { type Sourcelike, maybeAnnotated } from "../../Source.js";
 import {
     type NamingStyle,
     makeNameStyle,
     stringEscape,
-} from "../../support/Strings";
+} from "../../support/Strings.js";
 import {
     assert,
     assertNever,
     defined,
     numberEnumValues,
     panic,
-} from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayType,
     type ClassProperty,
@@ -50,17 +50,17 @@ import {
     MapType,
     type Type,
     UnionType,
-} from "../../Type";
+} from "../../Type/index.js";
 import {
     directlyReachableTypes,
     isNamedType,
     matchType,
     nullableFromUnion,
     removeNullFromUnion,
-} from "../../Type/TypeUtils";
+} from "../../Type/TypeUtils.js";
 
-import { keywords } from "./constants";
-import type { cPlusPlusOptions } from "./language";
+import { keywords } from "./constants.js";
+import type { cPlusPlusOptions } from "./language.js";
 import {
     BaseString,
     type ConstraintMember,
@@ -78,7 +78,7 @@ import {
     legalizeName,
     optionalAsSharedType,
     optionalFactoryAsSharedType,
-} from "./utils";
+} from "./utils.js";
 
 export class CPlusPlusRenderer extends ConvenienceRenderer {
     /**
@@ -656,7 +656,7 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
 
         const typeList: Sourcelike = [];
         for (const t of nonNulls) {
-            if (typeList.length !== 0) {
+            if (typeList.length > 0) {
                 typeList.push(", ");
             }
 
@@ -2144,8 +2144,14 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                             ],
                             false,
                             () => {
+                                // A JSON null must become an *empty*
+                                // optional.  Only `optType<T>()` guarantees
+                                // that: the factory would wrap a
+                                // default-constructed T (std::make_optional
+                                // and std::make_shared both do), turning
+                                // null into 0/""/{} on round-trip.
                                 this.emitLine(
-                                    `if (j.is_null()) return ${factory}<T>(); else return ${factory}<T>(j.get<T>());`,
+                                    `if (j.is_null()) return ${optType}<T>(); else return ${factory}<T>(j.get<T>());`,
                                 );
                             },
                         );
@@ -3039,12 +3045,10 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                 if (maybeNull !== undefined) {
                     /** Houston this is a variant, include it */
                     propRecord.kind = IncludeKind.Include;
+                } else if (t.forceInclude) {
+                    propRecord.kind = IncludeKind.Include;
                 } else {
-                    if (t.forceInclude) {
-                        propRecord.kind = IncludeKind.Include;
-                    } else {
-                        propRecord.kind = IncludeKind.ForwardDeclare;
-                    }
+                    propRecord.kind = IncludeKind.ForwardDeclare;
                 }
             }
 
@@ -3088,7 +3092,7 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
             );
         }
 
-        if (includes.size !== 0) {
+        if (includes.size > 0) {
             let numForwards = 0;
             let numIncludes = 0;
             includes.forEach((rec: IncludeRecord, name: string) => {
@@ -3331,9 +3335,7 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
             return inner;
         }
 
-        public emitHelperFunctions(): void {
-            return;
-        }
+        public emitHelperFunctions(): void {}
     })();
 
     public WideString = new (class extends BaseString implements StringType {

@@ -4,17 +4,17 @@ import {
     type TypeAttributes,
     combineTypeAttributes,
     emptyTypeAttributes,
-} from "./attributes/TypeAttributes";
-import { assert, indentationString, panic } from "./support/Support";
+} from "./attributes/TypeAttributes.js";
+import { assert, indentationString, panic } from "./support/Support.js";
 import type {
     ClassProperty,
     MaybeTypeIdentity,
     PrimitiveTypeKind,
     Type,
-} from "./Type";
-import { TypeBuilder } from "./Type/TypeBuilder";
-import type { StringTypeMapping } from "./Type/TypeBuilderUtils";
-import type { TypeGraph } from "./Type/TypeGraph";
+} from "./Type/index.js";
+import { TypeBuilder } from "./Type/TypeBuilder.js";
+import type { StringTypeMapping } from "./Type/TypeBuilderUtils.js";
+import type { TypeGraph } from "./Type/TypeGraph.js";
 import {
     type TypeRef,
     assertTypeRefGraph,
@@ -22,8 +22,8 @@ import {
     isTypeRef,
     typeAndAttributesForTypeRef,
     typeRefIndex,
-} from "./Type/TypeRef";
-import { combineTypeAttributesOfTypes } from "./Type/TypeUtils";
+} from "./Type/TypeRef.js";
+import { combineTypeAttributesOfTypes } from "./Type/TypeUtils.js";
 
 export interface TypeLookerUp {
     lookupTypeRefs: (

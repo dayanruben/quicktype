@@ -5,6 +5,8 @@ import { randomBytes } from "node:crypto";
 import * as shell from "shelljs";
 
 const Ajv = require("ajv");
+const addFormats = require("ajv-formats");
+const draft06MetaSchema = require("ajv/dist/refs/json-schema-draft-06.json");
 
 import {
     compareJsonFileToJson,
@@ -100,10 +102,10 @@ function additionalTestFiles(
 function runEnvForLanguage(
     additionalRendererOptions: RendererOptions,
 ): NodeJS.ProcessEnv {
-    const newEnv = Object.assign({}, process.env);
+    const newEnv = { ...process.env };
 
     for (const option of Object.keys(additionalRendererOptions)) {
-        newEnv["QUICKTYPE_" + option.toUpperCase().replace("-", "_")] = (
+        newEnv[`QUICKTYPE_${option.toUpperCase().replace("-", "_")}`] = (
             additionalRendererOptions[
                 option as keyof typeof additionalRendererOptions
             ] as Option<string, unknown>
@@ -159,9 +161,7 @@ export abstract class Fixture {
         return this.name === name;
     }
 
-    async setup(): Promise<void> {
-        return;
-    }
+    async setup(): Promise<void> {}
 
     abstract getSamples(sources: string[]): {
         priority: Sample[];
@@ -216,10 +216,6 @@ export abstract class Fixture {
 }
 
 abstract class LanguageFixture extends Fixture {
-    constructor(language: languages.Language) {
-        super(language);
-    }
-
     async setup() {
         const setupCommand = this.language.setupCommand;
         if (!setupCommand || ONLY_OUTPUT) {
@@ -606,17 +602,26 @@ class JSONSchemaJSONFixture extends JSONToXToYFixture {
             fs.readFileSync(this.language.output, "utf8"),
         );
 
-        const ajv = new Ajv({
-            format: "full",
-            unknownFormats: ["integer", "boolean"],
-        });
+        const ajv = new Ajv();
+        // We generate draft-06 schemas, which Ajv 8 doesn't support out of
+        // the box anymore.
+        ajv.addMetaSchema(draft06MetaSchema);
+        // Ajv 8 moved the format validators into the ajv-formats package;
+        // its default mode is "full", like the old `format: "full"` option.
+        addFormats(ajv);
+        // Our custom schema keywords, which strict mode would reject.
+        ajv.addVocabulary(["qt-uri-protocols", "qt-uri-extensions"]);
         // Make Ajv's date-time compatible with what we recognize.  All non-standard
         // JSON formats that we use for transformed type kinds must be registered here
-        // with a validation function.
+        // with a validation function.  Formats registered with `true` are
+        // accepted without validating the string.  This replaces the old
+        // `unknownFormats: ["integer", "boolean"]` option.
         // FIXME: Unify this with what's in StringTypes.ts.
         ajv.addFormat("date-time", (s: string) =>
             dateTimeRecognizer.isDateTime(s),
         );
+        ajv.addFormat("integer", true);
+        ajv.addFormat("boolean", true);
         const valid = ajv.validate(schema, input);
         if (!valid) {
             failWith("Generated schema does not validate input JSON.", {
@@ -873,6 +878,7 @@ const commentInjectionNestedCommentSchema =
 const commentInjectionEnumNestedCommentSchema =
     "test/inputs/schema/comment-injection-enum-nested-comment.schema";
 const treeSitterWasm = (filename: string): string =>
+    // biome-ignore lint/correctness/noGlobalDirnameFilename: the test harness runs as CommonJS
     path.join(__dirname, "tree-sitter-wasms", filename);
 
 const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
@@ -947,7 +953,9 @@ const commentInjectionTreeSitterTargets: TreeSitterTarget[] = [
     {
         displayName: "cjson",
         language: languages.CJSONLanguage,
-        output: "TopLevel.c",
+        // CJSONLanguage renders with header-only=false, so this produces
+        // both TopLevel.h and TopLevel.c; both are collected and parsed.
+        output: "TopLevel.h",
         wasmModule: "tree-sitter-c/tree-sitter-c.wasm",
         extensions: [".c", ".h"],
         schema: commentInjectionSchema,
@@ -1114,9 +1122,7 @@ class CommentInjectionTreeSitterFixture extends Fixture {
         return this.name === name;
     }
 
-    async setup(): Promise<void> {
-        return;
-    }
+    async setup(): Promise<void> {}
 
     getSamples(sources: string[]): { priority: Sample[]; others: Sample[] } {
         const commentInjectionSamples = [
@@ -1151,6 +1157,7 @@ class CommentInjectionTreeSitterFixture extends Fixture {
     private readonly _treeSitterLanguages = new Map<string, unknown>();
 
     private async loadTreeSitterLanguage(
+        // biome-ignore lint/suspicious/noExplicitAny: web-tree-sitter is loaded dynamically without types
         TreeSitter: any,
         wasmModule: string,
     ): Promise<unknown> {
@@ -1165,6 +1172,7 @@ class CommentInjectionTreeSitterFixture extends Fixture {
     }
 
     private async parseGeneratedFiles(
+        // biome-ignore lint/suspicious/noExplicitAny: web-tree-sitter is loaded dynamically without types
         TreeSitter: any,
         target: TreeSitterTarget,
         generatedFiles: string[],
@@ -1187,6 +1195,7 @@ class CommentInjectionTreeSitterFixture extends Fixture {
             const tree = parser.parse(source);
             const problems: TreeSitterParseProblem[] = [];
 
+            // biome-ignore lint/suspicious/noExplicitAny: web-tree-sitter is loaded dynamically without types
             function visit(node: any): void {
                 if (
                     node.type === "ERROR" ||
@@ -1550,6 +1559,9 @@ export const allFixtures: Fixture[] = [
     new JSONFixture(languages.JavaLanguageWithLombok, "java-lombok"),
     new JSONFixture(languages.GoLanguage),
     new JSONFixture(languages.CJSONLanguage),
+    new JSONFixture(languages.CJSONDefaultLanguage, "cjson-default"),
+    new JSONFixture(languages.CJSONMultiHeaderLanguage, "cjson-multi-header"),
+    new JSONFixture(languages.CJSONMultiSplitLanguage, "cjson-multi-split"),
     new JSONFixture(languages.CPlusPlusLanguage),
     new JSONFixture(languages.PHPLanguage),
     new JSONFixture(languages.RustLanguage),
@@ -1565,7 +1577,9 @@ export const allFixtures: Fixture[] = [
     new JSONFixture(languages.JavaScriptLanguage),
     new JSONFixture(languages.KotlinLanguage),
     new JSONFixture(languages.Scala3Language),
+    new JSONFixture(languages.Scala3UpickleLanguage, "scala3-upickle"),
     new JSONFixture(languages.KotlinJacksonLanguage, "kotlin-jackson"),
+    new JSONFixture(languages.KotlinXLanguage, "kotlinx"),
     new JSONFixture(languages.DartLanguage),
     new JSONFixture(languages.PikeLanguage),
     new JSONFixture(languages.HaskellLanguage),
@@ -1593,6 +1607,7 @@ export const allFixtures: Fixture[] = [
     new JSONSchemaFixture(languages.RustLanguage),
     new JSONSchemaFixture(languages.RubyLanguage),
     new JSONSchemaFixture(languages.PythonLanguage),
+    new JSONSchemaFixture(languages.PHPLanguage),
     new JSONSchemaFixture(languages.ElmLanguage),
     new JSONSchemaFixture(languages.SwiftLanguage),
     new JSONSchemaFixture(languages.TypeScriptLanguage),
@@ -1604,7 +1619,12 @@ export const allFixtures: Fixture[] = [
         languages.KotlinJacksonLanguage,
         "schema-kotlin-jackson",
     ),
+    new JSONSchemaFixture(languages.KotlinXLanguage, "schema-kotlinx"),
     new JSONSchemaFixture(languages.Scala3Language),
+    new JSONSchemaFixture(
+        languages.Scala3UpickleLanguage,
+        "schema-scala3-upickle",
+    ),
     new JSONSchemaFixture(languages.DartLanguage),
     new JSONSchemaFixture(languages.PikeLanguage),
     new JSONSchemaFixture(languages.HaskellLanguage),

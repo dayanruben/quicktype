@@ -1,7 +1,7 @@
-import { minMaxItemsForType } from "../../attributes/Constraints";
-import { type Name, type Namer, funPrefixNamer } from "../../Naming";
-import type { RenderContext } from "../../Renderer";
-import type { OptionValues } from "../../RendererOptions";
+import { minMaxItemsForType } from "../../attributes/Constraints.js";
+import { type Name, type Namer, funPrefixNamer } from "../../Naming.js";
+import type { RenderContext } from "../../Renderer.js";
+import type { OptionValues } from "../../RendererOptions/index.js";
 import {
     type MultiWord,
     type Sourcelike,
@@ -9,25 +9,25 @@ import {
     multiWord,
     parenIfNeeded,
     singleWord,
-} from "../../Source";
-import { camelCase, utf16StringEscape } from "../../support/Strings";
-import { panic } from "../../support/Support";
-import type { TargetLanguage } from "../../TargetLanguage";
+} from "../../Source.js";
+import { camelCase, utf16StringEscape } from "../../support/Strings.js";
+import { panic } from "../../support/Support.js";
+import type { TargetLanguage } from "../../TargetLanguage.js";
 import {
     ArrayType,
     type ClassType,
     EnumType,
     type Type,
     UnionType,
-} from "../../Type";
-import { matchType, nullableFromUnion } from "../../Type/TypeUtils";
+} from "../../Type/index.js";
+import { matchType, nullableFromUnion } from "../../Type/TypeUtils.js";
 import {
     JavaScriptRenderer,
     type JavaScriptTypeAnnotations,
-} from "../JavaScript";
+} from "../JavaScript/index.js";
 
-import type { tsFlowOptions } from "./language";
-import { quotePropertyName } from "./utils";
+import type { tsFlowOptions } from "./language.js";
+import { quotePropertyName } from "./utils.js";
 
 export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
     public constructor(
@@ -65,7 +65,7 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
 
         return matchType<MultiWord>(
             t,
-            (_anyType) => singleWord("any"),
+            (_anyType) => singleWord(this.anyType()),
             (_nullType) => singleWord("null"),
             (_boolType) => singleWord("boolean"),
             (_integerType) => singleWord("number"),
@@ -134,6 +134,12 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
             },
         );
     }
+
+    /** The type emitted for `any`-typed values in type declarations
+     * and converter signatures: the language's type-safe top type
+     * (`unknown` for TypeScript, `mixed` for Flow) with the
+     * `prefer-unknown` option, plain `any` without it. */
+    protected abstract anyType(): string;
 
     protected abstract emitEnum(e: EnumType, enumName: Name): void;
 
@@ -213,14 +219,14 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
         );
     }
 
-    protected emitUsageComments(): void {
+    protected emitUsageComments(givenOutputFilename: string): void {
         if (this._tsFlowOptions.justTypes) return;
-        super.emitUsageComments();
+        super.emitUsageComments(givenOutputFilename);
     }
 
     protected deserializerFunctionLine(t: Type, name: Name): Sourcelike {
         const jsonType =
-            this._tsFlowOptions.rawType === "json" ? "string" : "any";
+            this._tsFlowOptions.rawType === "json" ? "string" : this.anyType();
         return [
             "function to",
             name,
@@ -234,7 +240,7 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
     protected serializerFunctionLine(t: Type, name: Name): Sourcelike {
         const camelCaseName = modifySource(camelCase, name);
         const returnType =
-            this._tsFlowOptions.rawType === "json" ? "string" : "any";
+            this._tsFlowOptions.rawType === "json" ? "string" : this.anyType();
         return [
             "function ",
             camelCaseName,
@@ -249,6 +255,10 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
         return undefined;
     }
 
+    // The runtime typecheck helpers are deliberately dynamic, so they
+    // stay on `any` even with `prefer-unknown`.  Only the public API
+    // surface (type declarations and converter signatures) uses
+    // `anyType()`.
     protected get castFunctionLines(): [string, string] {
         return [
             "function cast<T>(val: any, typ: any): T",
@@ -272,7 +282,6 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
 
     protected emitModuleExports(): void {
         if (this._tsFlowOptions.justTypes) {
-            return;
         } else {
             super.emitModuleExports();
         }

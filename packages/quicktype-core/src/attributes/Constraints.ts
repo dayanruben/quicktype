@@ -2,13 +2,13 @@ import type {
     JSONSchemaAttributes,
     JSONSchemaType,
     Ref,
-} from "../input/JSONSchemaInput";
-import type { JSONSchema } from "../input/JSONSchemaStore";
-import { messageError } from "../Messages";
-import { assert } from "../support/Support";
-import type { Type, TypeKind } from "../Type";
+} from "../input/JSONSchemaInput.js";
+import type { JSONSchema } from "../input/JSONSchemaStore.js";
+import { messageError } from "../Messages.js";
+import { assert } from "../support/Support.js";
+import type { Type, TypeKind } from "../Type/index.js";
 
-import { TypeAttributeKind } from "./TypeAttributes";
+import { TypeAttributeKind } from "./TypeAttributes.js";
 
 // This can't be an object type, unfortunately, because it's in the
 // type's identity and as such must be comparable and hashable with
@@ -34,8 +34,8 @@ export class MinMaxConstraintTypeAttributeKind extends TypeAttributeKind<MinMaxC
     public constructor(
         name: string,
         private readonly _typeKinds: Set<TypeKind>,
-        private _minSchemaProperty: string,
-        private _maxSchemaProperty: string,
+        private readonly _minSchemaProperty: string,
+        private readonly _maxSchemaProperty: string,
     ) {
         super(name);
     }
@@ -153,8 +153,8 @@ function producer(
 ): MinMaxConstraint | undefined {
     if (!(typeof schema === "object")) return undefined;
 
-    let min: number | undefined = undefined;
-    let max: number | undefined = undefined;
+    let min: number | undefined;
+    let max: number | undefined;
 
     if (typeof schema[minProperty] === "number") {
         min = schema[minProperty];
