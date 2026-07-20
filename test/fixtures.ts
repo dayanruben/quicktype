@@ -486,6 +486,11 @@ class JSONFixture extends LanguageFixture {
                 .flatMap((qt) => {
                     if (Array.isArray(qt)) {
                         const [filename, ro] = qt;
+                        if (filename.endsWith(".schema")) {
+                            // Runs in the JSON Schema fixture instead.
+                            return [];
+                        }
+
                         const input = _.find(
                             ([] as string[]).concat(
                                 prioritySamples,
@@ -772,7 +777,50 @@ class JSONSchemaFixture extends LanguageFixture {
 
     getSamples(sources: string[]): { priority: Sample[]; others: Sample[] } {
         const prioritySamples = testsInDir("test/inputs/schema/", "schema");
-        return samplesFromSources(sources, prioritySamples, [], "schema");
+        const samples = samplesFromSources(
+            sources,
+            prioritySamples,
+            [],
+            "schema",
+        );
+
+        if (sources.length === 0 && !ONLY_OUTPUT) {
+            // Pinned-input quick-test entries that name a `.schema` file
+            // run in this fixture with their renderer options.  Plain
+            // renderer-option combinations and `.json` entries run in
+            // the JSON fixture.
+            const quickTestSamples = _.chain(
+                this.language.quickTestRendererOptions,
+            )
+                .flatMap((qt) => {
+                    if (!Array.isArray(qt)) return [];
+
+                    const [filename, ro] = qt;
+                    if (!filename.endsWith(".schema")) return [];
+
+                    const input = _.find(prioritySamples, (p) =>
+                        p.endsWith(`/${filename}`),
+                    );
+                    if (input === undefined) {
+                        return failWith(
+                            `quick-test schema ${filename} not found`,
+                            { qt },
+                        );
+                    }
+
+                    return [
+                        {
+                            path: input,
+                            additionalRendererOptions: ro,
+                            saveOutput: false,
+                        },
+                    ];
+                })
+                .value();
+            samples.priority = quickTestSamples.concat(samples.priority);
+        }
+
+        return samples;
     }
 
     shouldSkipTest(sample: Sample): boolean {
@@ -1533,6 +1581,11 @@ class CommandSuccessfulLanguageFixture extends LanguageFixture {
                 .flatMap((qt) => {
                     if (Array.isArray(qt)) {
                         const [filename, ro] = qt;
+                        if (filename.endsWith(".schema")) {
+                            // Runs in the JSON Schema fixture instead.
+                            return [];
+                        }
+
                         const input = _.find(
                             ([] as string[]).concat(
                                 prioritySamples,
