@@ -503,21 +503,13 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                 "",
             ]);
 
-            if (this._options.typeSourceStyle) {
-                this.forEachTopLevel("none", (_, topLevelName) => {
-                    this.emitLine(
-                        "//     ",
-                        topLevelName,
-                        " data = nlohmann::json::parse(jsonString);",
-                    );
-                });
-            } else {
+            this.forEachTopLevel("none", (_, topLevelName) => {
                 this.emitLine(
                     "//     ",
-                    basename,
+                    topLevelName,
                     " data = nlohmann::json::parse(jsonString);",
                 );
-            }
+            });
 
             if (this._options.wstring) {
                 this.emitLine("//");
@@ -3187,6 +3179,7 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
             this.emitHelper();
 
             this.startFile("Generators.hpp", true);
+            this._generatedFiles.add("Generators.hpp");
 
             this._allTypeNames.forEach((t) => {
                 this.emitInclude(false, [t, ".hpp"]);

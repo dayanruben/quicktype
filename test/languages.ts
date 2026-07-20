@@ -712,7 +712,7 @@ export const CPlusPlusLanguage: Language = {
         "union",
         "no-defaults",
     ],
-    output: "TopLevel.hpp",
+    output: "quicktype.hpp",
     topLevel: "TopLevel",
     skipJSON: [
         // fails on a string containing null
@@ -737,7 +737,6 @@ export const CPlusPlusLanguage: Language = {
     ],
     rendererOptions: {},
     quickTestRendererOptions: [
-        { "source-style": "multi-source" },
         { "code-format": "with-struct" },
         { wstring: "use-wstring" },
         { "const-style": "east-const" },
@@ -751,6 +750,13 @@ export const CPlusPlusLanguage: Language = {
         ["pokedex.json", { boost: "true" }],
     ],
     sourceFiles: ["src/language/CPlusPlus/index.ts"],
+};
+
+export const CPlusPlusMultiSourceLanguage: Language = {
+    ...CPlusPlusLanguage,
+    includeJSON: ["pokedex.json"],
+    rendererOptions: { "source-style": "multi-source" },
+    quickTestRendererOptions: [],
 };
 
 export const ElmLanguage: Language = {
