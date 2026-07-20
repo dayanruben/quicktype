@@ -25,6 +25,7 @@ import URI from "urijs";
 import { accessorNamesAttributeProducer } from "../attributes/AccessorNames.js";
 import {
     minMaxAttributeProducer,
+    minMaxItemsAttributeProducer,
     minMaxLengthAttributeProducer,
     patternAttributeProducer,
 } from "../attributes/Constraints.js";
@@ -649,6 +650,7 @@ const schemaTypes = Object.getOwnPropertyNames(
 ) as JSONSchemaType[];
 
 export interface JSONSchemaAttributes {
+    forArray?: TypeAttributes;
     forCases?: TypeAttributes[];
     forNumber?: TypeAttributes;
     forObject?: TypeAttributes;
@@ -1031,7 +1033,9 @@ async function addTypesInSchema(
             return typeBuilder.getPrimitiveType(kind, attributes);
         }
 
-        async function makeArrayType(): Promise<TypeRef> {
+        async function makeArrayType(
+            arrayAttributes: TypeAttributes,
+        ): Promise<TypeRef> {
             const singularAttributes = singularizeTypeNames(typeAttributes);
             const items = schema.items;
             // JSON Schema 2020-12 renamed the array (tuple) form of `items` to
@@ -1097,7 +1101,7 @@ async function addTypesInSchema(
             }
 
             typeBuilder.addAttributes(itemType, singularAttributes);
-            return typeBuilder.getArrayType(emptyTypeAttributes, itemType);
+            return typeBuilder.getArrayType(arrayAttributes, itemType);
         }
 
         async function makeObjectType(): Promise<TypeRef> {
@@ -1322,7 +1326,10 @@ async function addTypesInSchema(
             }
 
             if (includeArray) {
-                unionTypes.push(await makeArrayType());
+                const arrayAttributes = combineProducedAttributes(
+                    ({ forArray }) => forArray,
+                );
+                unionTypes.push(await makeArrayType(arrayAttributes));
             }
 
             if (includeObject) {
@@ -1557,6 +1564,7 @@ export class JSONSchemaInput implements Input<JSONSchemaSourceData> {
             uriSchemaAttributesProducer,
             minMaxAttributeProducer,
             minMaxLengthAttributeProducer,
+            minMaxItemsAttributeProducer,
             patternAttributeProducer,
         ].concat(additionalAttributeProducers);
     }

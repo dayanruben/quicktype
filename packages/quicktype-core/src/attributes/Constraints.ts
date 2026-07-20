@@ -130,6 +130,14 @@ export const minMaxLengthTypeAttributeKind: TypeAttributeKind<MinMaxConstraint> 
         "maxLength",
     );
 
+export const minMaxItemsTypeAttributeKind: TypeAttributeKind<MinMaxConstraint> =
+    new MinMaxConstraintTypeAttributeKind(
+        "minMaxItems",
+        new Set<TypeKind>(["array"]),
+        "minItems",
+        "maxItems",
+    );
+
 function producer(
     schema: JSONSchema,
     minProperty: string,
@@ -179,12 +187,30 @@ export function minMaxLengthAttributeProducer(
     };
 }
 
+export function minMaxItemsAttributeProducer(
+    schema: JSONSchema,
+    _ref: Ref,
+    types: Set<JSONSchemaType>,
+): JSONSchemaAttributes | undefined {
+    if (!types.has("array")) return undefined;
+
+    const maybeMinMaxItems = producer(schema, "minItems", "maxItems");
+    if (maybeMinMaxItems === undefined) return undefined;
+    return {
+        forArray: minMaxItemsTypeAttributeKind.makeAttributes(maybeMinMaxItems),
+    };
+}
+
 export function minMaxValueForType(t: Type): MinMaxConstraint | undefined {
     return minMaxTypeAttributeKind.tryGetInAttributes(t.getAttributes());
 }
 
 export function minMaxLengthForType(t: Type): MinMaxConstraint | undefined {
     return minMaxLengthTypeAttributeKind.tryGetInAttributes(t.getAttributes());
+}
+
+export function minMaxItemsForType(t: Type): MinMaxConstraint | undefined {
+    return minMaxItemsTypeAttributeKind.tryGetInAttributes(t.getAttributes());
 }
 
 export class PatternTypeAttributeKind extends TypeAttributeKind<string> {
