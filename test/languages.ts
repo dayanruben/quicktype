@@ -180,6 +180,9 @@ export const CSharpLanguageSystemTextJson: Language = {
         { density: "dense" },
         { "number-type": "decimal" },
         { "any-type": "dynamic" },
+        // Suppressing the DateOnly/TimeOnly converters (for pre-.NET 6
+        // targets) must still produce compiling, round-tripping code.
+        ["unions.json", { "dateonly-timeonly-converters": "false" }],
     ],
     sourceFiles: ["src/language/CSharp/index.ts"],
 };
