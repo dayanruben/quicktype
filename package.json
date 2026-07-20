@@ -6,7 +6,7 @@
     "types": "dist/index.d.ts",
     "repository": "https://github.com/glideapps/quicktype",
     "engines": {
-        "node": ">=20.0.0"
+        "node": ">=20.19.0"
     },
     "scripts": {
         "pub": "script/publish-npm.sh && script/publish-vscode.sh",
