@@ -128,6 +128,7 @@ export const CSharpLanguage: Language = {
     rendererOptions: { "check-required": "true", framework: "NewtonSoft" },
     quickTestRendererOptions: [
         { "array-type": "list" },
+        ["simple-object.json", { features: "attributes-only" }],
         // The default is csharp-version=8; these keep the older
         // language-version code paths covered.
         { "csharp-version": "5" },
@@ -183,6 +184,7 @@ export const CSharpLanguageSystemTextJson: Language = {
     rendererOptions: { "check-required": "true", framework: "SystemTextJson" },
     quickTestRendererOptions: [
         { "array-type": "list" },
+        ["simple-object.json", { features: "attributes-only" }],
         // The default is csharp-version=8; these keep the older
         // language-version code paths covered.
         { "csharp-version": "5" },
