@@ -1049,7 +1049,10 @@ export const JavaScriptPropTypesLanguage: Language = {
         "spotify-album.json", // renderer does not support recursion
         "76ae1.json", // renderer does not support recursion
     ],
-    skipSchema: [],
+    skipSchema: [
+        // The renderer does not support a bare top-level map.
+        "empty-object.schema",
+    ],
     skipMiscJSON: false,
     rendererOptions: { "module-system": "es6" },
     quickTestRendererOptions: [{ converters: "top-level" }],
@@ -1247,7 +1250,10 @@ I havea no idea how to encode these tests correctly.
         "php-mixed-union.json",
         "nst-test-suite.json",
     ],
-    skipSchema: [],
+    skipSchema: [
+        // The renderer does not support a bare top-level map.
+        "empty-object.schema",
+    ],
     skipMiscJSON: false,
     rendererOptions: { "just-types": "true" },
     quickTestRendererOptions: [],
@@ -1812,6 +1818,8 @@ export const PHPLanguage: Language = {
     ],
     skipMiscJSON: true,
     skipSchema: [
+        // The renderer does not support a bare top-level map.
+        "empty-object.schema",
         // PHP class names are case-insensitive, but the namer dedups
         // case-sensitively, so this declares classes that collide (same
         // reason Java and Python skip it).
@@ -1924,6 +1932,8 @@ export const TypeScriptZodLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        // The renderer does not support a bare top-level map.
+        "empty-object.schema",
         "any.schema",
         ...skipsUntypedUnions,
         "direct-union.schema",
@@ -2045,6 +2055,8 @@ export const TypeScriptEffectSchemaLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        // The renderer does not support a bare top-level map.
+        "empty-object.schema",
         "any.schema",
         ...skipsUntypedUnions,
         "direct-union.schema",
