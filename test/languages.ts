@@ -119,8 +119,10 @@ export const CSharpLanguage: Language = {
     rendererOptions: { "check-required": "true", framework: "NewtonSoft" },
     quickTestRendererOptions: [
         { "array-type": "list" },
+        // The default is csharp-version=8; these keep the older
+        // language-version code paths covered.
         { "csharp-version": "5" },
-        { "csharp-version": "8" },
+        { "csharp-version": "6" },
         { density: "dense" },
         { "number-type": "decimal" },
         { "any-type": "dynamic" },
@@ -160,15 +162,22 @@ export const CSharpLanguageSystemTextJson: Language = {
         // The following skips are pre-existing System.Text.Json renderer issues,
         // found when first enabling the schema fixture for this language:
         "keyword-unions.schema", // a property named "JsonSerializer" collides with System.Text.Json.JsonSerializer: CS0120
-        "minmaxlength.schema", // generated converter triggers CS8602 warnings, which "dotnet run" prints to stdout, breaking the JSON comparison
-        "optional-constraints.schema", // same CS8602 stdout issue; also min/max on integers and pattern on optional strings aren't checked, so expected-failure samples don't fail
-        "optional-const-ref.schema", // same CS8602 stdout issue; also min/max on integers isn't checked, so the expected-failure sample doesn't fail
+        // minmaxlength.schema, optional-constraints.schema, and
+        // optional-const-ref.schema used to be skipped here because the
+        // generated converters triggered CS8602 warnings, which "dotnet
+        // run" prints to stdout, breaking the JSON comparison.  The
+        // generated code now suppresses CS8602 alongside the other NRT
+        // pragmas, so they run.  (Their .fail.<feature>.json samples are
+        // not exercised because this fixture doesn't declare the minmax,
+        // minmaxlength, or pattern features.)
     ],
     rendererOptions: { "check-required": "true", framework: "SystemTextJson" },
     quickTestRendererOptions: [
         { "array-type": "list" },
+        // The default is csharp-version=8; these keep the older
+        // language-version code paths covered.
+        { "csharp-version": "5" },
         { "csharp-version": "6" },
-        { "csharp-version": "8" },
         { density: "dense" },
         { "number-type": "decimal" },
         { "any-type": "dynamic" },

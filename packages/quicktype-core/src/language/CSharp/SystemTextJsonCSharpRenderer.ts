@@ -196,6 +196,7 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
 
         this.emitLine("#pragma warning restore CS8618");
         this.emitLine("#pragma warning restore CS8601");
+        this.emitLine("#pragma warning restore CS8602");
         this.emitLine("#pragma warning restore CS8603");
     }
 
@@ -237,6 +238,9 @@ export class SystemTextJsonCSharpRenderer extends CSharpRenderer {
         this.emitLine("#nullable enable");
         this.emitLine("#pragma warning disable CS8618");
         this.emitLine("#pragma warning disable CS8601");
+        // CS8602: the emitted constraint-check converters dereference
+        // Deserialize<T>() results, which are nullable under NRT.
+        this.emitLine("#pragma warning disable CS8602");
         this.emitLine("#pragma warning disable CS8603");
     }
 

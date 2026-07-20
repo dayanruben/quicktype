@@ -71,7 +71,7 @@ export const cSharpOptions = {
             "6": 6,
             "8": 8,
         } as const,
-        "6",
+        "8",
         "secondary",
     ),
     virtual: new BooleanOption("virtual", "Generate virtual properties", false),

@@ -197,7 +197,10 @@ export class NewtonsoftCSharpRenderer extends CSharpRenderer {
 
         this.emitLine("#pragma warning restore CS8618");
         this.emitLine("#pragma warning restore CS8601");
+        this.emitLine("#pragma warning restore CS8602");
         this.emitLine("#pragma warning restore CS8603");
+        this.emitLine("#pragma warning restore CS8604");
+        this.emitLine("#pragma warning restore CS8625");
         this.emitLine("#pragma warning restore CS8765");
     }
 
@@ -239,7 +242,13 @@ export class NewtonsoftCSharpRenderer extends CSharpRenderer {
             this.emitLine("#nullable enable");
             this.emitLine("#pragma warning disable CS8618");
             this.emitLine("#pragma warning disable CS8601");
+            // CS8602/CS8604/CS8625: the emitted constraint-check and
+            // string-transformer helpers dereference and pass around
+            // Deserialize<T>() results, which are nullable under NRT.
+            this.emitLine("#pragma warning disable CS8602");
             this.emitLine("#pragma warning disable CS8603");
+            this.emitLine("#pragma warning disable CS8604");
+            this.emitLine("#pragma warning disable CS8625");
             this.emitLine("#pragma warning disable CS8765");
         }
     }
