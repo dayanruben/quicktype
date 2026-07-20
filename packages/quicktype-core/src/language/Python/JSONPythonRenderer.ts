@@ -1,15 +1,15 @@
 import { arrayIntercalate } from "collection-utils";
 
-import { topLevelNameOrder } from "../../ConvenienceRenderer";
-import { DependencyName, type Name, funPrefixNamer } from "../../Naming";
+import { topLevelNameOrder } from "../../ConvenienceRenderer.js";
+import { DependencyName, type Name, funPrefixNamer } from "../../Naming.js";
 import {
     type MultiWord,
     type Sourcelike,
     multiWord,
     parenIfNeeded,
     singleWord,
-} from "../../Source";
-import { assertNever, defined, panic } from "../../support/Support";
+} from "../../Source.js";
+import { assertNever, defined, panic } from "../../support/Support.js";
 import {
     ChoiceTransformer,
     DecodingChoiceTransformer,
@@ -21,12 +21,12 @@ import {
     UnionInstantiationTransformer,
     UnionMemberMatchTransformer,
     transformationForType,
-} from "../../Transformers";
-import type { ClassType, Type } from "../../Type";
-import { matchType } from "../../Type/TypeUtils";
+} from "../../Transformers.js";
+import type { ClassType, Type } from "../../Type/index.js";
+import { matchType } from "../../Type/TypeUtils.js";
 
-import { PythonRenderer } from "./PythonRenderer";
-import { snakeNameStyle } from "./utils";
+import { PythonRenderer } from "./PythonRenderer.js";
+import { snakeNameStyle } from "./utils.js";
 
 export type ConverterFunction =
     | "none"
@@ -66,13 +66,6 @@ export interface ValueOrLambda {
 //
 // * If `input` is a value, the result is `f(input)`.
 // * If `input` is a lambda, the result is `lambda x: f(input(x))`
-function compose(
-    input: ValueOrLambda,
-    f: (arg: Sourcelike) => Sourcelike,
-): ValueOrLambda;
-// FIXME: refactor this
-// eslint-disable-next-line @typescript-eslint/unified-signatures
-function compose(input: ValueOrLambda, f: ValueOrLambda): ValueOrLambda;
 function compose(
     input: ValueOrLambda,
     f: ValueOrLambda | ((arg: Sourcelike) => Sourcelike),
@@ -377,7 +370,15 @@ export class JSONPythonRenderer extends PythonRenderer {
                 ", ",
                 this.typingDecl("x", "Any"),
                 ")",
-                this.typeHint(" -> ", this.withTyping("List"), "[", tvar, "]"),
+                this.typeHint(
+                    " -> ",
+                    this.pyOptions.features.builtinGenerics
+                        ? "list"
+                        : this.withTyping("List"),
+                    "[",
+                    tvar,
+                    "]",
+                ),
                 ":",
             ],
             () => {
@@ -429,7 +430,9 @@ export class JSONPythonRenderer extends PythonRenderer {
                 ")",
                 this.typeHint(
                     " -> ",
-                    this.withTyping("Dict"),
+                    this.pyOptions.features.builtinGenerics
+                        ? "dict"
+                        : this.withTyping("Dict"),
                     "[str, ",
                     tvar,
                     "]",
@@ -618,7 +621,8 @@ export class JSONPythonRenderer extends PythonRenderer {
             (_integerType) => "int",
             (_doubleType) => "float",
             (_stringType) => "str",
-            (_arrayType) => "List",
+            (_arrayType) =>
+                this.pyOptions.features.builtinGenerics ? "list" : "List",
             (classType) => this.nameForNamedType(classType),
             (_mapType) => "dict",
             (enumType) => this.nameForNamedType(enumType),
