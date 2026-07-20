@@ -739,7 +739,9 @@ export const CPlusPlusLanguage: Language = {
     quickTestRendererOptions: [
         { "source-style": "multi-source" },
         { "code-format": "with-struct" },
-        { wstring: "use-wstring" },
+        // bug2521.json has an optional string, exercising UTF conversion
+        // through std::optional.
+        ["bug2521.json", { wstring: "use-wstring" }],
         { "const-style": "east-const" },
         // The default is boost=false (C++17); this keeps the boost code
         // path covered.  Pinned to specific inputs because the default
