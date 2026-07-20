@@ -306,7 +306,7 @@ export class Ref {
     public get definitionName(): string | undefined {
         const pe = arrayGetFromEnd(this.path, 2);
         if (pe === undefined) return undefined;
-        if (keyOrIndex(pe) === "definitions")
+        if (keyOrIndex(pe) === "definitions" || keyOrIndex(pe) === "$defs")
             return keyOrIndex(defined(arrayLast(this.path)));
         return undefined;
     }
