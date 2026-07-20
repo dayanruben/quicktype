@@ -55,13 +55,11 @@ jobs:
                     - scala3,schema-scala3
                     - scala3-upickle,schema-scala3-upickle
                     - elixir,schema-elixir,graphql-elixir
+                    - elm,schema-elm
                     - comment-injection-treesitter,comment-injection-typescript,comment-injection-typescript-zod,comment-injection-typescript-effect-schema
 
                     # Partially working
                     # - schema-typescript # TODO Unify with typescript once fixed
-
-                    # Implementation is too outdated to test in GitHub Actions
-                    # - elm,schema-elm
 
                     # Language is too niche / obscure to test easily on ubuntu-22.04
                     # - pike,schema-pike
