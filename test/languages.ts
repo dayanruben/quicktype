@@ -1769,6 +1769,7 @@ export const HaskellLanguage: Language = {
         "nested-intersection-union.schema",
         "prefix-items.schema",
         "direct-union.schema",
+        "empty-object.schema",
         ...skipsEnumValueValidation,
         "go-schema-pattern-properties.schema",
         "intersection.schema",
