@@ -486,7 +486,8 @@ function o(props${anyArrayAnnotation}, additional${anyAnnotation}) {
 }
 
 function m(additional${anyAnnotation}) {
-    return { props: [], additional };
+    const props${anyArrayAnnotation} = [];
+    return { props, additional };
 }
 
 function r(name${stringAnnotation}) {
