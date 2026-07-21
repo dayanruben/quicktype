@@ -92,6 +92,26 @@ export interface Language {
     sourceFiles?: string[];
 }
 
+export const JSONSchemaLanguage: Language = {
+    name: "schema",
+    base: "test/fixtures/schema",
+    runCommand(sample: string) {
+        return `node main.js "${sample}"`;
+    },
+    diffViaSchema: false,
+    skipDiffViaSchema: [],
+    allowMissingNull: false,
+    features: ["minmax", "minmaxlength", "pattern"],
+    output: "TopLevel.schema",
+    topLevel: "TopLevel",
+    skipJSON: [],
+    skipMiscJSON: false,
+    skipSchema: [],
+    rendererOptions: {},
+    quickTestRendererOptions: [],
+    sourceFiles: ["src/language/JSONSchema/JSONSchemaRenderer.ts"],
+};
+
 export const CSharpLanguage: Language = {
     name: "csharp",
     base: "test/fixtures/csharp",
@@ -607,6 +627,7 @@ export const CJSONLanguage: Language = {
         "prefix-items.schema",
         /* Constraints (min/max and regex) are not supported (for the current implementation, can be added later, should abord parsing and return NULL) */
         "minmaxlength.schema",
+        "schema-constraints.schema",
         "optional-const-ref.schema",
         /* Same unsupported min/max, length and regex constraints, applied to optional properties */
         "optional-constraints.schema",

@@ -1665,6 +1665,7 @@ export const allFixtures: Fixture[] = [
     new JSONSchemaJSONFixture(languages.CSharpLanguage),
     new JSONTypeScriptFixture(languages.CSharpLanguage),
     // new JSONSchemaFixture(languages.CrystalLanguage),
+    new JSONSchemaFixture(languages.JSONSchemaLanguage),
     new JSONSchemaFixture(languages.CSharpLanguage),
     new JSONSchemaFixture(
         languages.CSharpLanguageSystemTextJson,
