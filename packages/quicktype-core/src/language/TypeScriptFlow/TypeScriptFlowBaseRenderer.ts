@@ -16,6 +16,7 @@ import {
     ArrayType,
     type ClassType,
     EnumType,
+    ObjectType,
     type Type,
     UnionType,
 } from "../../Type/index.js";
@@ -47,7 +48,43 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
         return super.namerForObjectProperty();
     }
 
+    protected get emptyObjectType(): string | undefined {
+        return undefined;
+    }
+
+    protected emptyObjectTypeFor(t: Type): string | undefined {
+        if (
+            t instanceof ObjectType &&
+            t.getProperties().size === 0 &&
+            t.getAdditionalProperties() === undefined
+        ) {
+            return this.emptyObjectType;
+        }
+
+        return undefined;
+    }
+
+    protected typeMapTypeFor(t: Type): Sourcelike {
+        if (this.emptyObjectTypeFor(t) !== undefined) {
+            return '"any"';
+        }
+
+        return super.typeMapTypeFor(t);
+    }
+
+    protected shouldEmitTypeMapEntry(t: ObjectType): boolean {
+        return (
+            this.emptyObjectTypeFor(t) === undefined &&
+            super.shouldEmitTypeMapEntry(t)
+        );
+    }
+
     protected sourceFor(t: Type): MultiWord {
+        const emptyObjectType = this.emptyObjectTypeFor(t);
+        if (emptyObjectType !== undefined) {
+            return singleWord(emptyObjectType);
+        }
+
         if (
             this._tsFlowOptions.preferConstValues &&
             t.kind === "enum" &&
@@ -157,6 +194,22 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
     }
 
     private emitClass(c: ClassType, className: Name): void {
+        const emptyObjectType = this.emptyObjectTypeFor(c);
+        if (emptyObjectType !== undefined) {
+            if (Array.from(this.topLevels.values()).includes(c)) {
+                this.emitDescription(this.descriptionForType(c));
+                this.emitLine(
+                    "export type ",
+                    className,
+                    " = ",
+                    emptyObjectType,
+                    ";",
+                );
+            }
+
+            return;
+        }
+
         this.emitDescription(this.descriptionForType(c));
         this.emitClassBlock(c, className);
     }
