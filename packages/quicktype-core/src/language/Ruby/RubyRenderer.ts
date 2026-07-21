@@ -860,8 +860,15 @@ export class RubyRenderer extends ConvenienceRenderer {
                         const self = modifySource(snakeCase, name);
 
                         // The json gem defines to_json on maps and primitives, so we only need to supply
-                        // it for arrays.
-                        const needsToJsonDefined = topLevel.kind === "array";
+                        // it for arrays whose elements don't already marshal implicitly (e.g. arrays of
+                        // classes or unions). For arrays that marshal implicitly (e.g. arrays of scalars),
+                        // defining a singleton #to_json that calls JSON.generate(self) would make JSON's
+                        // internal generator re-invoke that very singleton method (this time passing it a
+                        // state argument), causing an ArgumentError ("wrong number of arguments (given 1,
+                        // expected 0)") since the block takes none.
+                        const needsToJsonDefined =
+                            topLevel.kind === "array" &&
+                            !this.marshalsImplicitlyToDynamic(topLevel);
 
                         const classDeclaration = (): void => {
                             this.emitBlock(["class ", name], () => {
