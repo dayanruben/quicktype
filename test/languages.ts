@@ -1895,6 +1895,7 @@ export const HaskellLanguage: Language = {
         "multi-type-enum.schema",
         "keyword-unions.schema",
         "optional-any.schema",
+        "ie-suffix-singularization.schema",
         "required.schema",
         "required-non-properties.schema",
     ],
