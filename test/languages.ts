@@ -813,6 +813,7 @@ export const CPlusPlusLanguage: Language = {
         // boost and std optional/variant code paths differ.
         ["unions.json", { boost: "true" }],
         ["pokedex.json", { boost: "true" }],
+        ["optional-any.schema", { "hide-null-optional": "true" }],
     ],
     sourceFiles: ["src/language/CPlusPlus/index.ts"],
 };
@@ -2218,6 +2219,7 @@ export const ElixirLanguage: Language = {
         "strict-optional.schema",
         "required.schema",
         "intersection.schema",
+        "optional-any.schema",
 
         // The test incorrectly succeeds due to the emitter being permissive for unions that contain only primitives. A future enhancement
         // for the Elixir emitter could be a user-controlled 'strict' mode that pattern matches even on unions of only primitive types.
