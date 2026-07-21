@@ -892,6 +892,7 @@ export const ElmLanguage: Language = {
         "vega-lite.schema", // recursion
         "simple-ref.schema", // recursion
         "recursive-union-flattening.schema", // recursion
+        "rust-cycle-breaker-union.schema", // recursion
         // elm/json's field decoder uses the JS `in` operator, which finds
         // inherited Object.prototype members, so an absent "constructor"
         // property decodes to the object's constructor function.
