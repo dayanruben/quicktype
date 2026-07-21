@@ -630,6 +630,7 @@ export const CJSONLanguage: Language = {
         /* Enum with invalid values are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         ...skipsEnumValueValidation,
         /* Union, Map and Arrays with invalid types are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
+        "boolean-subschema.schema",
         "class-with-additional.schema",
         ...skipsMapValueValidation,
         "multi-type-enum.schema",
@@ -1865,6 +1866,7 @@ export const HaskellLanguage: Language = {
         ...skipsUntypedUnions,
         // The test driver encodes the Maybe result, so a failed decode prints
         // "null" and exits 0 — expected-failure samples cannot be detected.
+        "boolean-subschema.schema",
         "nested-intersection-union.schema",
         "prefix-items.schema",
         "direct-union.schema",
@@ -2218,6 +2220,7 @@ export const ElixirLanguage: Language = {
         // Struct keys cannot be enforced at runtime in Elixir and their values will just be set to null.
         "strict-optional.schema",
         "required.schema",
+        "boolean-subschema.schema",
         "intersection.schema",
         "optional-any.schema",
 
