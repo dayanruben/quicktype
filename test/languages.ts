@@ -1603,6 +1603,7 @@ export const KotlinXLanguage: Language = {
         "mutually-recursive.schema",
         "prefix-items.schema",
         "recursive-union-flattening.schema",
+        "rust-cycle-breaker-union.schema",
         "tuple.schema",
         "union-int-double.schema",
         "union-list.schema",
