@@ -1,4 +1,4 @@
 {
-  "foo": { "not": "a string" },
-  "empty": []
+  "foo": "hello",
+  "empty": "not an array"
 }
