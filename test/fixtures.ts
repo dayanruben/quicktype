@@ -700,6 +700,7 @@ const skipTypeScriptTests = [
     "github-events.json",
     "bug855-short.json",
     "bug863.json",
+    "issue2680-object-array.json",
     "00c36.json",
     "010b1.json",
     "050b0.json",
