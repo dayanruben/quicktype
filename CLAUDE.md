@@ -28,7 +28,9 @@ Any change that affects generated output MUST be covered by a JSON or JSON
 Schema fixture test — by enabling existing inputs for the language or adding
 new ones. Unit tests in `test/unit/` are a complement for what fixtures cannot
 express (asserting that some code is *not* generated, API-level behavior, fast
-local iteration) — never a substitute.
+local iteration) — never a substitute. Do not add a unit test when a fixture
+test will do the job: if a fixture input already exercises the behavior, a
+unit test duplicating that coverage is superfluous and should not be added.
 
 ## Known CI flakiness
 
