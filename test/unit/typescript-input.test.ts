@@ -24,7 +24,7 @@ afterAll(() => {
 
 let uniqueFileIndex = 0;
 
-function schemaSourceDataForSource(source: string) {
+function schemaSourceForSource(source: string) {
     const fileName = path.join(
         path.relative(process.cwd(), temporaryDirectory),
         `input-${uniqueFileIndex++}.ts`,
@@ -34,7 +34,7 @@ function schemaSourceDataForSource(source: string) {
 }
 
 function schemaForSource(source: string) {
-    const result = schemaSourceDataForSource(source);
+    const result = schemaSourceForSource(source);
     return {
         name: result.name ?? "",
         schema: JSON.parse(result.schema),
@@ -42,9 +42,20 @@ function schemaForSource(source: string) {
     };
 }
 
+async function swiftForSource(source: string): Promise<string> {
+    const schemaInput = new JSONSchemaInput(undefined);
+    await schemaInput.addSource(schemaSourceForSource(source));
+
+    const inputData = new InputData();
+    inputData.addInput(schemaInput);
+
+    const result = await quicktype({ inputData, lang: "swift" });
+    return result.lines.join("\n");
+}
+
 async function generateTypeScriptForSource(source: string): Promise<string> {
     const schemaInput = new JSONSchemaInput(new FetchingJSONSchemaStore());
-    await schemaInput.addSource(schemaSourceDataForSource(source));
+    await schemaInput.addSource(schemaSourceForSource(source));
     const inputData = new InputData();
     inputData.addInput(schemaInput);
 
@@ -57,6 +68,21 @@ async function generateTypeScriptForSource(source: string): Promise<string> {
 }
 
 describe("schemaForTypeScriptSources", () => {
+    test("preserves class property declaration order in generated output", async () => {
+        const output = await swiftForSource(`
+            class A {
+                name: string;
+                age: number;
+            }
+        `);
+
+        const nameIndex = output.indexOf("let name: String");
+        const ageIndex = output.indexOf("let age: Double");
+        expect(nameIndex).toBeGreaterThanOrEqual(0);
+        expect(ageIndex).toBeGreaterThanOrEqual(0);
+        expect(nameIndex).toBeLessThan(ageIndex);
+    });
+
     test("converts a simple interface", () => {
         const { schema, uris } = schemaForSource(`
             export interface Person {
@@ -106,6 +132,23 @@ describe("schemaForTypeScriptSources", () => {
             $ref: "#/definitions/Person",
         });
         expect(schema.definitions.Person.type).toBe("object");
+    });
+
+    // https://github.com/glideapps/quicktype/issues/2695
+    test("strips braces from JSDoc type annotations", () => {
+        const { schema } = schemaForSource(`
+            export type Person = {
+                /**
+                 * @type {string}
+                 * @memberOf {Person}
+                 */
+                name: string;
+            };
+
+            export type MemberInfo = Required<Person>;
+        `);
+
+        expect(schema.definitions.Person.properties.name.type).toBe("string");
     });
 
     test("class property initializers become defaults", () => {
