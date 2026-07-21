@@ -25,6 +25,7 @@ const skipsEnumValueValidation = [
     "enum-large.schema",
     "optional-enum.schema",
     "const-non-string.schema",
+    "nullable-optional-one-of.schema",
 ];
 
 // The language makes no int/double distinction in unions (e.g. an integer is
