@@ -105,10 +105,9 @@ export class PythonTargetLanguage extends TargetLanguage<
     public get stringTypeMapping(): StringTypeMapping {
         const mapping: Map<TransformedStringTypeKind, PrimitiveStringTypeKind> =
             new Map();
-        const dateTimeType = "date-time";
-        mapping.set("date", dateTimeType);
-        mapping.set("time", dateTimeType);
-        mapping.set("date-time", dateTimeType);
+        mapping.set("date", "date");
+        mapping.set("time", "time");
+        mapping.set("date-time", "date-time");
         mapping.set("uuid", "uuid");
         mapping.set("integer-string", "integer-string");
         mapping.set("bool-string", "bool-string");
