@@ -20,6 +20,7 @@ const settings: PartialArgs = {
     titles: true,
     topRef: true,
     noExtraProps: true,
+    propOrder: true,
 };
 
 const compilerOptions: ts.CompilerOptions = {
@@ -212,9 +213,17 @@ export function schemaForTypeScriptSources(
             if (
                 definition === null ||
                 Array.isArray(definition) ||
-                typeof definition !== "object" ||
-                typeof definition.description !== "string"
+                typeof definition !== "object"
             ) {
+                continue;
+            }
+
+            if (Array.isArray(definition.propertyOrder)) {
+                (definition as Record<string, unknown>).quicktypePropertyOrder =
+                    definition.propertyOrder;
+            }
+
+            if (typeof definition.description !== "string") {
                 continue;
             }
 
