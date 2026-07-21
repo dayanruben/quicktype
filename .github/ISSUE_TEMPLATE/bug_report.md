@@ -1,56 +1,22 @@
 ---
-name: New Bug Report
-about: Use this template for reporting new bugs.
-title: "[BUG]: bug description here"
+name: Bug report
+about: Report a reproducible problem with quicktype
+title: "[BUG]: "
 labels: bug
 ---
 
-<!--- Provide a general summary of the issue in the Title above -->
-
-## Issue Type
-
-<!--- Is this an issue with quicktype output, input parsing, or during runtime ? -->
-
-## Context (Environment, Version, Language)
-
-<!-- What input format and what target output language were you using ? -->
-
-Input Format:
-Output Language:
-
-<!-- Please specify how you were using the library (CLI, npm package, or app.quicktype.io) and what version, if applicable -->
-
-CLI, npm, or app.quicktype.io:
-Version:
-
 ## Description
 
-<!--- How has this issue affected you? What are you trying to accomplish? -->
-<!--- Providing context helps us come up with a solution that is most useful in the real world -->
+<!-- What went wrong? -->
 
-## Input Data
+## Reproduction
 
-<!--- Please provide a snippet of your input data. -->
-<!--- Please truncate if it is too large and ideally isolate to a minimum reproducible example -->
+<!-- Provide the smallest input and steps that reproduce the problem. -->
 
-## Expected Behaviour / Output
+## Expected behavior
 
-<!--- Tell us what should happen / what output should be generated -->
+<!-- What should have happened? -->
 
-## Current Behaviour / Output
+## Environment
 
-<!--- Tell us what happens instead of the expected behavior / what output is currently generated -->
-
-## Steps to Reproduce
-
-<!--- Provide a link to a live example, or an unambiguous set of steps to -->
-<!--- reproduce this bug. Include code to reproduce, if relevant -->
-
-1.
-2.
-3.
-4.
-
-## Possible Solution
-
-<!--- Optional, suggest a fix/reason for the bug, -->
+<!-- Include the quicktype version, input format, target language, and how you ran quicktype. -->
