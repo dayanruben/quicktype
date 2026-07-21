@@ -1858,6 +1858,7 @@ export const HaskellLanguage: Language = {
         ...skipsUntypedUnions,
         // The test driver encodes the Maybe result, so a failed decode prints
         // "null" and exits 0 — expected-failure samples cannot be detected.
+        "boolean-subschema.schema",
         "nested-intersection-union.schema",
         "prefix-items.schema",
         "direct-union.schema",
