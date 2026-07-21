@@ -1811,6 +1811,7 @@ export class PhpRenderer extends ConvenienceRenderer {
 
     protected emitSourceStructure(givenFilename: string): void {
         this.emitLine("<?php");
+        this.emitLine("declare(strict_types=1);");
         this.forEachNamedType(
             "leading-and-interposing",
             (c: ClassType, n: Name) => this.emitClassDefinition(c, n),
