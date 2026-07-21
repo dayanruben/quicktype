@@ -84,6 +84,23 @@ describe("schemaForTypeScriptSources", () => {
         expect(schema.definitions.Person.type).toBe("object");
     });
 
+    // https://github.com/glideapps/quicktype/issues/2695
+    test("strips braces from JSDoc type annotations", () => {
+        const { schema } = schemaForSource(`
+            export type Person = {
+                /**
+                 * @type {string}
+                 * @memberOf {Person}
+                 */
+                name: string;
+            };
+
+            export type MemberInfo = Required<Person>;
+        `);
+
+        expect(schema.definitions.Person.properties.name.type).toBe("string");
+    });
+
     test("class property initializers become defaults", () => {
         const { schema } = schemaForSource(`
             export class Config {
