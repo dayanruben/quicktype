@@ -23,6 +23,20 @@ async function generateTypeScript(schema: object): Promise<string> {
     return result.lines.join("\n");
 }
 
+test("unevaluatedProperties false closes an object", async () => {
+    const output = await generateTypeScript({
+        $schema: "https://json-schema.org/draft/2020-12/schema",
+        type: "object",
+        properties: {
+            string: { type: "string" },
+        },
+        unevaluatedProperties: false,
+    });
+
+    expect(output).toContain("string?: string;");
+    expect(output).not.toContain("[property: string]");
+});
+
 test("unevaluatedProperties identifies an object schema", async () => {
     const output = await generateTypeScript({
         unevaluatedProperties: false,
