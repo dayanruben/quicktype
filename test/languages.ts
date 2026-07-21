@@ -995,6 +995,24 @@ export const SwiftLanguage: Language = {
     sourceFiles: ["src/language/Swift/index.ts"],
 };
 
+export const SwiftSendableObjectiveCSupportLanguage: Language = {
+    ...SwiftLanguage,
+    compileCommand: "node verify-sendable.cjs",
+    diffViaSchema: false,
+    includeJSON: ["pokedex.json"],
+    rendererOptions: {
+        ...SwiftLanguage.rendererOptions,
+        sendable: "true",
+        "struct-or-class": "class",
+        "objective-c-support": "true",
+    },
+    quickTestRendererOptions: [
+        ["pokedex.json", { "struct-or-class": "struct" }],
+    ],
+    runCommand: undefined,
+    skipMiscJSON: true,
+};
+
 export const ObjectiveCLanguage: Language = {
     name: "objective-c",
     base: "test/fixtures/objective-c",

@@ -1737,6 +1737,10 @@ export const allFixtures: Fixture[] = [
     new JSONFixture(languages.PythonLanguage),
     new JSONFixture(languages.ElmLanguage),
     new JSONFixture(languages.SwiftLanguage),
+    new JSONFixture(
+        languages.SwiftSendableObjectiveCSupportLanguage,
+        "swift-sendable-objective-c",
+    ),
     new JSONFixture(languages.ObjectiveCLanguage),
     new JSONFixture(languages.TypeScriptLanguage),
     new JSONFixture(languages.TypeScriptZodLanguage),
