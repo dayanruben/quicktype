@@ -2255,6 +2255,12 @@ export const ElixirLanguage: Language = {
     skipJSON: [
         // Some field names are too long to be expressed as atoms and some contain invalid characters.
         "blns-object.json",
+        // A top-level array of scalars generates a TopLevel that maps
+        // `TopLevelElement.from_map/1` over the elements, but no
+        // `TopLevelElement` module is emitted for a scalar element type, so
+        // the program raises UndefinedFunctionError at runtime. (A top-level
+        // array of objects works because that module is emitted.)
+        "issue2680-scalar-array.json",
     ],
     skipMiscJSON: false,
     skipSchema: [
