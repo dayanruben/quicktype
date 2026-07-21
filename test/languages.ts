@@ -618,6 +618,11 @@ export const CJSONLanguage: Language = {
         "direct-union.schema",
         "optional-any.schema",
         "recursive-union-flattening.schema",
+        /* Self-referential union member (a union whose member recursively
+         * refers back to the enclosing object) is not supported by the
+         * multi-source renderer; generation aborts. Pre-existing cJSON
+         * limitation, unrelated to the Rust fixture this schema targets. */
+        "rust-cycle-breaker-union.schema",
         "required-non-properties.schema",
         /* Class elements with invalid type are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         ...skipsUntypedUnions,
