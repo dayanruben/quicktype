@@ -4863,15 +4863,55 @@ export class CJSONRenderer extends ConvenienceRenderer {
                                                             cJSON.items?.cType,
                                                             " *));",
                                                         );
-                                                    } else {
+                                                    } else if (
+                                                        cJSON.items
+                                                            ?.cjsonType ===
+                                                            "cJSON_Object" ||
+                                                        cJSON.items
+                                                            ?.cjsonType ===
+                                                            "cJSON_Union"
+                                                    ) {
                                                         this.emitLine(
                                                             "list_add_tail(x->value, ",
-                                                            // @ts-expect-error awaiting refactor
                                                             cJSON.items
                                                                 ?.getValue,
                                                             "(e), sizeof(",
                                                             cJSON.items?.cType,
                                                             " *));",
+                                                        );
+                                                    } else {
+                                                        // Scalars (numbers, bools, enums) are returned by
+                                                        // value from getValue(), so they must be copied
+                                                        // into freshly allocated storage before being
+                                                        // handed to list_add_tail(), which stores a
+                                                        // void * element pointer.
+                                                        this.emitLine(
+                                                            // @ts-expect-error awaiting refactor
+                                                            cJSON.items?.cType,
+                                                            " * tmp = cJSON_malloc(sizeof(",
+                                                            cJSON.items?.cType,
+                                                            "));",
+                                                        );
+                                                        this.emitBlock(
+                                                            [
+                                                                "if (NULL != tmp)",
+                                                            ],
+                                                            () => {
+                                                                this.emitLine(
+                                                                    "* tmp = ",
+                                                                    // @ts-expect-error awaiting refactor
+                                                                    cJSON.items
+                                                                        ?.getValue,
+                                                                    "(e);",
+                                                                );
+                                                                this.emitLine(
+                                                                    "list_add_tail(x->value, tmp, sizeof(",
+                                                                    // @ts-expect-error awaiting refactor
+                                                                    cJSON.items
+                                                                        ?.cType,
+                                                                    " *));",
+                                                                );
+                                                            },
                                                         );
                                                     }
                                                 };

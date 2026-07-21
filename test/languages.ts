@@ -632,6 +632,9 @@ export const CJSONLanguage: Language = {
         /* Union, Map and Arrays with invalid types are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "class-with-additional.schema",
         ...skipsMapValueValidation,
+        /* Top-level array elements with invalid types (e.g. a string where
+         * an integer is expected) are not checked either. */
+        "issue2680-top-level-array.schema",
         "multi-type-enum.schema",
         "nested-intersection-union.schema",
         "prefix-items.schema",
