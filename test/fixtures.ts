@@ -849,9 +849,7 @@ class LeadingCommentsGoFixture extends JSONSchemaFixture {
     }
 
     private async inputData(filename: string): Promise<InputData> {
-        const schemaInput = new JSONSchemaInput(
-            new FetchingJSONSchemaStore(),
-        );
+        const schemaInput = new JSONSchemaInput(new FetchingJSONSchemaStore());
         await schemaInput.addSource({
             name: this.language.topLevel,
             schema: fs.readFileSync(filename, "utf8"),
