@@ -22,7 +22,11 @@ function validationMethod(php: string, propertyName: string): string {
     const start = php.indexOf(
         `public static function validate${propertyName}(`,
     );
-    expect(start).toBeGreaterThanOrEqual(0);
+    if (start < 0) {
+        throw new Error(
+            `No validate${propertyName} method found in generated PHP`,
+        );
+    }
     const end = php.indexOf("\n    /**", start);
     return php.slice(start, end < 0 ? undefined : end);
 }
@@ -38,7 +42,9 @@ describe("PHP property validation", () => {
                 nullableNumber: { type: ["number", "null"] },
                 string: { type: "string" },
                 integers: { type: "array", items: { type: "integer" } },
-                scalarUnion: { oneOf: [{ type: "integer" }, { type: "string" }] },
+                scalarUnion: {
+                    oneOf: [{ type: "integer" }, { type: "string" }],
+                },
             },
             required: [
                 "boolean",
