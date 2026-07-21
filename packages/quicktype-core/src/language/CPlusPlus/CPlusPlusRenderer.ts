@@ -1373,6 +1373,11 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
             ],
             false,
             () => {
+                if (c.getProperties().size === 0) {
+                    this.emitLine("(void)j;");
+                    this.emitLine("(void)x;");
+                }
+
                 this.forEachClassProperty(c, "none", (name, json, p) => {
                     const [, , setterName] = defined(
                         this._gettersAndSettersForPropertyName.get(name),
@@ -1562,6 +1567,10 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
             false,
             () => {
                 this.emitLine("j = json::object();");
+                if (c.getProperties().size === 0) {
+                    this.emitLine("(void)x;");
+                }
+
                 this.forEachClassProperty(c, "none", (name, json, p) => {
                     const propType = p.type;
                     cppType = this.cppType(

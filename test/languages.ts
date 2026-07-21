@@ -734,7 +734,8 @@ export const CPlusPlusLanguage: Language = {
     base: "test/fixtures/cplusplus",
     setupCommand:
         "curl -o json.hpp https://raw.githubusercontent.com/nlohmann/json/87df1d6708915ffbfa26a051ad7562ecc22e5579/src/json.hpp",
-    compileCommand: "g++ -O0 -o quicktype -std=c++17 main.cpp",
+    compileCommand:
+        "g++ -O0 -o quicktype -std=c++17 -Werror=unused-parameter main.cpp",
     runCommand(sample: string) {
         return `./quicktype "${sample}"`;
     },
