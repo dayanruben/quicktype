@@ -650,6 +650,11 @@ export const CJSONLanguage: Language = {
         "direct-union.schema",
         "optional-any.schema",
         "recursive-union-flattening.schema",
+        /* Self-referential union member (a union whose member recursively
+         * refers back to the enclosing object) is not supported by the
+         * multi-source renderer; generation aborts. Pre-existing cJSON
+         * limitation, unrelated to the Rust fixture this schema targets. */
+        "rust-cycle-breaker-union.schema",
         "required-non-properties.schema",
         /* Class elements with invalid type are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         ...skipsUntypedUnions,
@@ -887,6 +892,7 @@ export const ElmLanguage: Language = {
         "vega-lite.schema", // recursion
         "simple-ref.schema", // recursion
         "recursive-union-flattening.schema", // recursion
+        "rust-cycle-breaker-union.schema", // recursion
         // elm/json's field decoder uses the JS `in` operator, which finds
         // inherited Object.prototype members, so an absent "constructor"
         // property decodes to the object's constructor function.
@@ -1650,6 +1656,7 @@ export const KotlinXLanguage: Language = {
         "mutually-recursive.schema",
         "prefix-items.schema",
         "recursive-union-flattening.schema",
+        "rust-cycle-breaker-union.schema",
         "tuple.schema",
         "union-int-double.schema",
         "union-list.schema",

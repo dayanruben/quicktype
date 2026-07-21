@@ -184,6 +184,13 @@ export class RustRenderer extends ConvenienceRenderer {
         const rustType = this.rustType(t, withIssues);
         const isCycleBreaker = this.isCycleBreakerType(t);
 
+        if (isCycleBreaker && t instanceof UnionType) {
+            const nullable = nullableFromUnion(t);
+            if (nullable === null || this.isCycleBreakerType(nullable)) {
+                return rustType;
+            }
+        }
+
         return isCycleBreaker ? ["Box<", rustType, ">"] : rustType;
     }
 
