@@ -1621,13 +1621,9 @@ export class CPlusPlusRenderer extends ConvenienceRenderer {
                             propType.kind === "null" || propType.kind === "any"
                                 ? ["!", value, ".is_null()"]
                                 : value;
-                        this.emitBlock(
-                            ["if (", condition, ")"],
-                            false,
-                            () => {
-                                this.emitLine(assignment);
-                            },
-                        );
+                        this.emitBlock(["if (", condition, ")"], false, () => {
+                            this.emitLine(assignment);
+                        });
                     } else {
                         this.emitLine(assignment);
                     }
