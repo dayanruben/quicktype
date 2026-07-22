@@ -1591,6 +1591,7 @@ export const KotlinXLanguage: Language = {
         // Top-level arrays render as `typealias TopLevel = JsonArray<T>`,
         // which doesn't compile — kotlinx's JsonArray takes no type
         // arguments (documented TODO in KotlinXRenderer.ts).
+        "kotlin-enum-class-case-collision.json",
         "bug863.json",
         "github-events.json",
         "optional-union.json",

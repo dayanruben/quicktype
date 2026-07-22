@@ -698,6 +698,7 @@ const skipTypeScriptTests = [
     "optional-union.json",
     "pokedex.json", // Enums are screwed up: https://github.com/YousefED/typescript-json-schema/issues/186
     "github-events.json",
+    "kotlin-enum-class-case-collision.json",
     "bug855-short.json",
     "bug863.json",
     "00c36.json",
