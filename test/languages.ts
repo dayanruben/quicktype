@@ -2087,6 +2087,9 @@ export const TypeScriptZodLanguage: Language = {
         // The default-value fail sample also relies on required-property enforcement.
         "default-value.schema",
         "required-non-properties.schema",
+        // The renderer does not emit a schema for top-level arrays.
+        "top-level-array.schema",
+        "top-level-primitive-array.schema",
     ],
     rendererOptions: {},
     quickTestRendererOptions: [],
