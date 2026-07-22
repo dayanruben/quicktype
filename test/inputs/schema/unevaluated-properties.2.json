@@ -1,5 +1,6 @@
 {
     "config": {
+        "closed": {},
         "name": "multiple-versions",
         "settings": {
             "v1.0.0": [
