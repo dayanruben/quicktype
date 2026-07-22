@@ -242,25 +242,48 @@ function validateResult(value: unknown): asserts value is OutputDiffResult {
 }
 
 function renderPatchLines(section: string): string {
-    return section
-        .split("\n")
-        .map((line) => {
-            const kind =
-                line.startsWith("diff --git") ||
-                line.startsWith("index ") ||
-                line.startsWith("+++") ||
-                line.startsWith("---")
-                    ? "meta"
-                    : line.startsWith("@@")
-                      ? "hunk"
-                      : line.startsWith("+")
-                        ? "addition"
-                        : line.startsWith("-")
-                          ? "deletion"
-                          : "context";
-            return `<span class="line ${kind}">${escapeHTML(line)}</span>`;
-        })
-        .join("\n");
+    let oldLine = 0;
+    let newLine = 0;
+    let insideHunk = false;
+    const rows: string[] = [];
+
+    for (const line of section.split("\n")) {
+        const hunk = /^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(line);
+        if (hunk !== null) {
+            oldLine = Number.parseInt(hunk[1], 10);
+            newLine = Number.parseInt(hunk[2], 10);
+            insideHunk = true;
+            rows.push(
+                `<tr class="diff-hunk"><td class="blob-num"></td><td class="blob-num"></td><td class="blob-code">${escapeHTML(line)}</td></tr>`,
+            );
+            continue;
+        }
+        if (!insideHunk) continue;
+
+        const prefix = line[0] ?? " ";
+        const content = line.slice(1);
+        let kind: "addition" | "context" | "deletion" | "note";
+        let oldNumber = "";
+        let newNumber = "";
+        if (prefix === "+") {
+            kind = "addition";
+            newNumber = String(newLine++);
+        } else if (prefix === "-") {
+            kind = "deletion";
+            oldNumber = String(oldLine++);
+        } else if (prefix === "\\") {
+            kind = "note";
+        } else {
+            kind = "context";
+            oldNumber = String(oldLine++);
+            newNumber = String(newLine++);
+        }
+        rows.push(
+            `<tr class="diff-line ${kind}"><td class="blob-num old" data-line-number="${oldNumber}">${oldNumber}</td><td class="blob-num new" data-line-number="${newNumber}">${newNumber}</td><td class="blob-code"><span class="marker">${escapeHTML(prefix)}</span><span class="code">${escapeHTML(content)}</span></td></tr>`,
+        );
+    }
+
+    return `<table class="diff-table"><tbody>${rows.join("")}</tbody></table>`;
 }
 
 export function renderOutputDiffReport(args: {
@@ -292,9 +315,9 @@ export function renderOutputDiffReport(args: {
                     : file.status === "deleted"
                       ? "D"
                       : "M";
-            return `<details class="file" data-path="${escapeHTML(file.path.toLowerCase())}" data-status="${file.status}" data-fixture="${escapeHTML(fixture)}" id="file-${index}">
+            return `<details class="file" data-path="${escapeHTML(file.path.toLowerCase())}" data-status="${file.status}" data-fixture="${escapeHTML(fixture)}" id="file-${index}" open>
 <summary><span class="status ${file.status}">${statusLetter}</span><span class="file-path">${escapeHTML(file.path)}</span><span class="counts"><b>+${formatNumber(file.additions)}</b> <i>−${formatNumber(file.deletions)}</i></span></summary>
-<pre>${renderPatchLines(sections[index])}</pre>
+<div class="diff">${renderPatchLines(sections[index])}</div>
 </details>`;
         })
         .join("\n");
@@ -314,7 +337,87 @@ export function renderOutputDiffReport(args: {
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>quicktype generated-output diff</title>
 <style>
-:root{color-scheme:light dark;--bg:#0d1117;--panel:#161b22;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--green:#3fb950;--red:#f85149;--blue:#58a6ff;--purple:#bc8cff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:var(--blue)}header,main{width:min(1500px,calc(100% - 32px));margin:auto}header{padding:34px 0 20px}h1{font-size:28px;margin:0 0 8px}.subtitle,.commits{color:var(--muted)}.pr-link{display:inline-block;margin-top:12px;font-weight:700}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:24px 0}.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px}.card strong{display:block;font-size:24px}.card span{color:var(--muted)}.toolbar{position:sticky;top:0;z-index:2;display:flex;gap:10px;flex-wrap:wrap;padding:12px;background:rgba(13,17,23,.95);border:1px solid var(--border);border-radius:10px;margin-bottom:14px}input,select,button{background:var(--panel);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px 10px}input{flex:1;min-width:240px}.file{border:1px solid var(--border);border-radius:8px;background:var(--panel);margin:10px 0;overflow:hidden}.file[hidden]{display:none}.file summary{cursor:pointer;display:flex;align-items:center;gap:10px;padding:11px 14px}.file-path{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}.counts{margin-left:auto;white-space:nowrap}.counts b{color:var(--green)}.counts i{color:var(--red);font-style:normal}.status{width:24px;height:24px;display:inline-grid;place-items:center;border-radius:5px;font-weight:800;color:#fff}.status.added{background:#238636}.status.deleted{background:#da3633}.status.modified{background:#8957e5}pre{margin:0;padding:12px 0;overflow:auto;border-top:1px solid var(--border);background:#010409;font:12px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace}.line{display:block;white-space:pre;padding:0 14px;min-height:1.45em}.line.addition{background:rgba(46,160,67,.2);color:#aff5b4}.line.deletion{background:rgba(248,81,73,.2);color:#ffdcd7}.line.hunk{background:rgba(56,139,253,.15);color:#a5d6ff}.line.meta{color:var(--muted)}.empty{display:none;padding:40px;text-align:center;color:var(--muted)}footer{padding:30px 0 50px;color:var(--muted)}@media(prefers-color-scheme:light){:root{--bg:#fff;--panel:#f6f8fa;--border:#d0d7de;--text:#1f2328;--muted:#656d76;--green:#1a7f37;--red:#cf222e;--blue:#0969da}.toolbar{background:rgba(255,255,255,.95)}pre{background:#fff}.line.addition{color:#116329}.line.deletion{color:#82071e}}
+:root {
+    color-scheme: light dark;
+    --bg: #0d1117;
+    --panel: #161b22;
+    --panel-hover: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --green: #3fb950;
+    --red: #f85149;
+    --blue: #58a6ff;
+    --diff-bg: #0d1117;
+    --add-bg: rgba(46, 160, 67, .15);
+    --add-num-bg: rgba(46, 160, 67, .3);
+    --del-bg: rgba(248, 81, 73, .15);
+    --del-num-bg: rgba(248, 81, 73, .3);
+    --hunk-bg: rgba(56, 139, 253, .15);
+}
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif }
+a { color: var(--blue) }
+header, main { width: min(1400px, calc(100% - 32px)); margin: auto }
+header { padding: 32px 0 20px }
+h1 { font-size: 28px; line-height: 1.25; margin: 0 0 8px }
+.subtitle, .commits { color: var(--muted) }
+.pr-link { display: inline-block; margin-top: 12px; font-weight: 600 }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 12px; margin: 24px 0 }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 16px }
+.card strong { display: block; font-size: 24px; line-height: 1.25 }
+.card span { color: var(--muted) }
+.toolbar { position: sticky; top: 0; z-index: 5; display: flex; gap: 8px; flex-wrap: wrap; padding: 10px; background: color-mix(in srgb, var(--bg) 94%, transparent); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 16px; backdrop-filter: blur(8px) }
+input, select, button { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font: inherit; padding: 7px 10px }
+input:focus, select:focus, button:focus { border-color: var(--blue); outline: 2px solid color-mix(in srgb, var(--blue) 25%, transparent); outline-offset: -1px }
+button { cursor: pointer }
+button:hover { background: var(--panel-hover) }
+input { flex: 1; min-width: 240px }
+.file { border: 1px solid var(--border); border-radius: 6px; background: var(--diff-bg); margin: 16px 0; overflow: hidden }
+.file[hidden] { display: none }
+.file summary { cursor: pointer; display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 8px 12px; background: var(--panel); font-weight: 600 }
+.file summary:hover { background: var(--panel-hover) }
+.file[open] summary { border-bottom: 1px solid var(--border) }
+.file-path { font: 600 13px/1.5 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace; overflow-wrap: anywhere }
+.counts { margin-left: auto; white-space: nowrap; font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace }
+.counts b { color: var(--green) }
+.counts i { color: var(--red); font-style: normal }
+.status { width: 22px; height: 22px; flex: 0 0 22px; display: inline-grid; place-items: center; border-radius: 50%; font-size: 11px; font-weight: 700; color: #fff }
+.status.added { background: #238636 }
+.status.deleted { background: #da3633 }
+.status.modified { background: #8957e5 }
+.diff { overflow: auto; background: var(--diff-bg) }
+.diff-table { width: 100%; min-width: max-content; border-spacing: 0; border-collapse: collapse; font: 12px/20px ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace; tab-size: 4 }
+.blob-num { width: 1%; min-width: 50px; padding: 0 10px; color: var(--muted); text-align: right; vertical-align: top; user-select: none }
+.blob-code { padding: 0 16px 0 0; color: var(--text); white-space: pre; vertical-align: top }
+.marker { display: inline-block; width: 22px; text-align: center; user-select: none }
+.diff-line.addition .blob-code { background: var(--add-bg) }
+.diff-line.addition .blob-num { background: var(--add-num-bg); color: var(--text) }
+.diff-line.deletion .blob-code { background: var(--del-bg) }
+.diff-line.deletion .blob-num { background: var(--del-num-bg); color: var(--text) }
+.diff-line.note .blob-code { color: var(--muted) }
+.diff-hunk .blob-num, .diff-hunk .blob-code { padding-top: 4px; padding-bottom: 4px; background: var(--hunk-bg); color: var(--blue) }
+.empty { display: none; padding: 40px; text-align: center; color: var(--muted) }
+footer { padding: 30px 0 50px; color: var(--muted) }
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg: #fff;
+        --panel: #f6f8fa;
+        --panel-hover: #f3f4f6;
+        --border: #d0d7de;
+        --text: #1f2328;
+        --muted: #656d76;
+        --green: #1a7f37;
+        --red: #cf222e;
+        --blue: #0969da;
+        --diff-bg: #fff;
+        --add-bg: #e6ffec;
+        --add-num-bg: #ccffd8;
+        --del-bg: #ffebe9;
+        --del-num-bg: #ffd7d5;
+        --hunk-bg: #ddf4ff;
+    }
+}
 </style>
 </head>
 <body>
@@ -337,7 +440,7 @@ export function renderOutputDiffReport(args: {
 <input id="search" type="search" placeholder="Filter generated files…" aria-label="Filter generated files">
 <select id="fixture"><option value="">All targets</option>${fixtureOptions}</select>
 <select id="status"><option value="">All statuses</option><option value="modified">Modified</option><option value="added">New</option><option value="deleted">Deleted</option></select>
-<button id="expand" type="button">Expand visible</button>
+<button id="expand" type="button">Expand all</button>
 <button id="collapse" type="button">Collapse all</button>
 </div>
 <div id="files">${fileHTML}</div>
@@ -345,7 +448,7 @@ export function renderOutputDiffReport(args: {
 <footer>Generated by quicktype CI. This report is immutable for the tested PR and head SHAs.</footer>
 </main>
 <script>
-const files=[...document.querySelectorAll('.file')],search=document.querySelector('#search'),fixture=document.querySelector('#fixture'),status=document.querySelector('#status'),empty=document.querySelector('#empty');function filter(){const q=search.value.trim().toLowerCase();let visible=0;for(const file of files){const show=(!q||file.dataset.path.includes(q))&&(!fixture.value||file.dataset.fixture===fixture.value)&&(!status.value||file.dataset.status===status.value);file.hidden=!show;if(show)visible++}empty.style.display=visible?'none':'block'}search.addEventListener('input',filter);fixture.addEventListener('change',filter);status.addEventListener('change',filter);document.querySelector('#expand').addEventListener('click',()=>files.forEach(file=>{if(!file.hidden)file.open=true}));document.querySelector('#collapse').addEventListener('click',()=>files.forEach(file=>file.open=false));
+const files=[...document.querySelectorAll('.file')],search=document.querySelector('#search'),fixture=document.querySelector('#fixture'),status=document.querySelector('#status'),empty=document.querySelector('#empty');function filter(){const q=search.value.trim().toLowerCase();let visible=0;for(const file of files){const show=(!q||file.dataset.path.includes(q))&&(!fixture.value||file.dataset.fixture===fixture.value)&&(!status.value||file.dataset.status===status.value);file.hidden=!show;if(show)visible++}empty.style.display=visible?'none':'block'}search.addEventListener('input',filter);fixture.addEventListener('change',filter);status.addEventListener('change',filter);document.querySelector('#expand').addEventListener('click',()=>files.forEach(file=>file.open=true));document.querySelector('#collapse').addEventListener('click',()=>files.forEach(file=>file.open=false));
 </script>
 </body>
 </html>`;

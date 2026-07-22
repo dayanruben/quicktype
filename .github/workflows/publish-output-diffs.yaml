@@ -141,14 +141,16 @@ jobs:
                   fi
 
             - name: Create or update output-diff comment
-              if: steps.metadata.outputs.has_differences == 'true' && steps.current.outputs.is_current == 'true'
+              if: steps.metadata.outputs.supported == 'true' && steps.current.outputs.is_current == 'true'
               env:
                   GH_TOKEN: ${{ github.token }}
+                  HAS_DIFFERENCES: ${{ steps.metadata.outputs.has_differences }}
                   PR_NUMBER: ${{ steps.metadata.outputs.pr_number }}
                   REPORT_URL: https://hostr.flingit.run/s/quicktype/output-diffs/pr-${{ steps.metadata.outputs.pr_number }}/${{ steps.metadata.outputs.pr_sha }}/${{ steps.metadata.outputs.head_sha }}/index.html
               run: |
                   MARKER='<!-- quicktype-generated-output-diff -->'
-                  BODY=$(cat <<EOF
+                  if [[ "$HAS_DIFFERENCES" == true ]]; then
+                      BODY=$(cat <<EOF
                   $MARKER
                   ### Generated-output differences
 
@@ -157,23 +159,20 @@ jobs:
 
                   [Open the generated-output report →]($REPORT_URL)
                   EOF
-                  )
-                  COMMENT_ID=$(gh api --paginate --slurp "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
-                      --jq 'map(.[]) | map(select(.body | contains("<!-- quicktype-generated-output-diff -->"))) | .[0].id // empty')
+                      )
+                  else
+                      BODY=$(cat <<EOF
+                  $MARKER
+                  ### No generated-output differences
+
+                  ✅ Generated outputs are unchanged between the PR base and head revisions.
+                  EOF
+                      )
+                  fi
+                  COMMENT_ID=$(gh api --paginate "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
+                      --jq '.[] | select(.body | contains("<!-- quicktype-generated-output-diff -->")) | .id' | sed -n '1p')
                   if [[ -n "$COMMENT_ID" ]]; then
                       gh api --method PATCH "repos/${{ github.repository }}/issues/comments/$COMMENT_ID" -f body="$BODY" >/dev/null
                   else
                       gh api --method POST "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" -f body="$BODY" >/dev/null
                   fi
-
-            - name: Remove stale comment for a clean comparison
-              if: steps.metadata.outputs.has_differences != 'true' && steps.metadata.outputs.supported == 'true' && steps.current.outputs.is_current == 'true'
-              env:
-                  GH_TOKEN: ${{ github.token }}
-                  PR_NUMBER: ${{ steps.metadata.outputs.pr_number }}
-              run: |
-                  gh api --paginate "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
-                      --jq '.[] | select(.body | contains("<!-- quicktype-generated-output-diff -->")) | .id' |
-                  while read -r COMMENT_ID; do
-                      [[ -z "$COMMENT_ID" ]] || gh api --method DELETE "repos/${{ github.repository }}/issues/comments/$COMMENT_ID"
-                  done
