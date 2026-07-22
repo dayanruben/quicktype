@@ -1143,6 +1143,7 @@ export const JavaScriptLanguage: Language = {
         { "runtime-typecheck": "false" },
         { "runtime-typecheck-ignore-unknown-properties": "true" },
         { converters: "top-level" },
+        ["nested-objects.json", { converters: "all-objects" }],
     ],
     sourceFiles: ["src/language/JavaScript/index.ts"],
 };
