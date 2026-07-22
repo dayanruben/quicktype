@@ -20,4 +20,4 @@ export const schemaArrayTypeAttributeKind = new SchemaArrayTypeAttributeKind();
 
 // Preserve sample-inference semantics when a top-level array is round-tripped
 // through quicktype's JSON Schema output.
-export const inferredTopLevelSchemaProperty = "qt-inferred-top-level";
+export const inferredTopLevelSchemaComment = "qt-inferred-top-level";

@@ -2,7 +2,7 @@ import { iterableFirst, mapFirst } from "collection-utils";
 
 import { addDescriptionToSchema } from "../../attributes/Description.js";
 import {
-    inferredTopLevelSchemaProperty,
+    inferredTopLevelSchemaComment,
     schemaArrayTypeAttributeKind,
 } from "../../attributes/InferenceFlags.js";
 import { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
@@ -198,7 +198,7 @@ export class JSONSchemaRenderer extends ConvenienceRenderer {
                     topLevel.hasNames &&
                     !topLevel.getNames().areInferred)
             ) {
-                topLevelType[inferredTopLevelSchemaProperty] = true;
+                topLevelType.$comment = inferredTopLevelSchemaComment;
             }
         }
 

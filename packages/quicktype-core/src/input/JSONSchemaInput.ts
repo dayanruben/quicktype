@@ -33,7 +33,7 @@ import { defaultValueAttributeProducer } from "../attributes/DefaultValue.js";
 import { descriptionAttributeProducer } from "../attributes/Description.js";
 import { enumValuesAttributeProducer } from "../attributes/EnumValues.js";
 import {
-    inferredTopLevelSchemaProperty,
+    inferredTopLevelSchemaComment,
     schemaArrayTypeAttributeKind,
 } from "../attributes/InferenceFlags.js";
 import { StringTypes } from "../attributes/StringTypes.js";
@@ -1115,7 +1115,7 @@ async function addTypesInSchema(
             typeBuilder.addAttributes(itemType, singularAttributes);
             const provenanceAttributes =
                 schemaArrayTypeAttributeKind.makeAttributes(
-                    schema[inferredTopLevelSchemaProperty] === true
+                    schema.$comment === inferredTopLevelSchemaComment
                         ? "inferred"
                         : "explicit",
                 );
