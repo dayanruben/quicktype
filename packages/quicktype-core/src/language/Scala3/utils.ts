@@ -12,7 +12,11 @@ import {
     splitIntoWords,
 } from "../../support/Strings.js";
 
-import { invalidSymbols, keywords } from "./constants.js";
+import {
+    forbiddenPropertyNames,
+    invalidSymbols,
+    keywords,
+} from "./constants.js";
 
 /**
  * Check if given parameter name should be wrapped in a backtick
@@ -108,6 +112,17 @@ export function enumCaseNameStyle(original: string): string {
 export const upperNamingFunction = funPrefixNamer("upper", (s) =>
     scalaNameStyle(true, s),
 );
-export const lowerNamingFunction = funPrefixNamer("lower", (s) =>
-    scalaNameStyle(false, s),
-);
+export const lowerNamingFunction = funPrefixNamer("lower", (s) => {
+    const styled = scalaNameStyle(false, s);
+    // uPickle's Scala 3 derivation can generate a synthetic accessor with
+    // the same name as fields that consist only of an underscore and digits.
+    if (styled === "") return "field";
+    if (/^_\d+$/.test(styled)) return `field${styled.slice(1)}`;
+    if (
+        keywords.some((keyword) => keyword === styled) ||
+        forbiddenPropertyNames.some((name) => name === styled)
+    ) {
+        return `${styled}Value`;
+    }
+    return styled;
+});

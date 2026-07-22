@@ -2,7 +2,7 @@ import type { Name } from "../../Naming.js";
 import type { Sourcelike } from "../../Source.js";
 import { removeNullFromUnion } from "../../Type/TypeUtils.js";
 import type { ClassType, EnumType, Type, UnionType } from "../../Type/index.js";
-import { stringEscape } from "../../support/Strings.js";
+import { utf16StringEscape as stringEscape } from "../../support/Strings.js";
 
 import { Scala3Renderer } from "./Scala3Renderer.js";
 import { unionMemberSortOrder, wrapOption } from "./utils.js";
@@ -12,6 +12,10 @@ export class UpickleRenderer extends Scala3Renderer {
 
     protected emitClassDefinitionMethods(): void {
         this.emitLine(") derives OptionPickler.ReadWriter");
+    }
+
+    protected emitPropertyAnnotation(_name: Name, jsonName: string): void {
+        this.emitLine(`@upickle.implicits.key("${stringEscape(jsonName)}")`);
     }
 
     protected anySourceType(optional: boolean): Sourcelike {
@@ -71,7 +75,7 @@ object JsonExt:
     }
 
     def badMerge[T](r1: => OptionPickler.Reader[?], rest: OptionPickler.Reader[?]*): OptionPickler.Reader[T] = valueReader.map { json =>
-        var t: T | Null = null
+        var t: T | scala.Null = null
         val stack       = Vector.newBuilder[Throwable]
         (r1 +: rest).foreach { reader =>
             if t == null then
@@ -80,7 +84,7 @@ object JsonExt:
             catch
                 case exc => stack += exc
         }
-        if t != null then t.nn else throw new Exception(json.toString(), stack.result().headOption.getOrElse(null))
+        if t != null then t.nn else throw new java.lang.Exception(json.toString(), stack.result().headOption.getOrElse(null))
     }
 end JsonExt
 `);
