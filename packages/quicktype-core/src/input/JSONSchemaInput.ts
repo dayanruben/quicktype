@@ -29,6 +29,7 @@ import {
     minMaxLengthAttributeProducer,
     patternAttributeProducer,
 } from "../attributes/Constraints.js";
+import { defaultValueAttributeProducer } from "../attributes/DefaultValue.js";
 import { descriptionAttributeProducer } from "../attributes/Description.js";
 import { enumValuesAttributeProducer } from "../attributes/EnumValues.js";
 import {
@@ -655,7 +656,9 @@ const schemaTypes = Object.getOwnPropertyNames(
 
 export interface JSONSchemaAttributes {
     forArray?: TypeAttributes;
+    forBoolean?: TypeAttributes;
     forCases?: TypeAttributes[];
+    forNull?: TypeAttributes;
     forNumber?: TypeAttributes;
     forObject?: TypeAttributes;
     forString?: TypeAttributes;
@@ -1307,6 +1310,12 @@ async function addTypesInSchema(
             const numberAttributes = combineProducedAttributes(
                 ({ forNumber }) => forNumber,
             );
+            const booleanAttributes = combineProducedAttributes(
+                ({ forBoolean }) => forBoolean,
+            );
+            const nullAttributes = combineProducedAttributes(
+                ({ forNull }) => forNull,
+            );
 
             for (const [name, kind] of [
                 ["null", "null"],
@@ -1318,7 +1327,11 @@ async function addTypesInSchema(
 
                 const attributes = isNumberTypeKind(kind)
                     ? numberAttributes
-                    : undefined;
+                    : kind === "bool"
+                      ? booleanAttributes
+                      : kind === "null"
+                        ? nullAttributes
+                        : undefined;
                 unionTypes.push(typeBuilder.getPrimitiveType(kind, attributes));
             }
 
@@ -1575,6 +1588,7 @@ export class JSONSchemaInput implements Input<JSONSchemaSourceData> {
         this._attributeProducers = [
             descriptionAttributeProducer,
             accessorNamesAttributeProducer,
+            defaultValueAttributeProducer,
             enumValuesAttributeProducer,
             uriSchemaAttributesProducer,
             minMaxAttributeProducer,
