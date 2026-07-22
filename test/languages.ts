@@ -159,10 +159,16 @@ export const CSharpLanguage: Language = {
         { density: "dense" },
         { "number-type": "decimal" },
         { "any-type": "dynamic" },
-        // C# 9+ records; end-to-end round-trip with Newtonsoft.
-        { "use-records": "true" },
     ],
     sourceFiles: ["src/language/CSharp/index.ts"],
+};
+
+export const CSharpLanguageRecords: Language = {
+    ...CSharpLanguage,
+    rendererOptions: {
+        ...CSharpLanguage.rendererOptions,
+        "use-records": "true",
+    },
 };
 
 export const CSharpLanguageSystemTextJson: Language = {

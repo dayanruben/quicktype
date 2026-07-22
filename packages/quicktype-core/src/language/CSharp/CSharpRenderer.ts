@@ -76,6 +76,9 @@ export class CSharpRenderer extends ConvenienceRenderer {
                 "GetType",
                 "MemberwiseClone",
                 "ReferenceEquals",
+                ...(this._csOptions.useRecords
+                    ? ["Clone", "EqualityContract", "PrintMembers"]
+                    : []),
             ],
             includeGlobalForbidden: false,
         };
