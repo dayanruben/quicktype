@@ -1554,6 +1554,10 @@ export const KotlinJacksonLanguage: Language = {
         "top-level-enum.schema",
         "top-level-primitive.schema",
         "recursive-union-flattening.schema",
+        // Jackson cannot deserialize the generated ArrayList subclass because
+        // it has no default constructor.
+        "top-level-array.schema",
+        "top-level-primitive-array.schema",
     ],
     skipMiscJSON: false,
     rendererOptions: { framework: "jackson" },
