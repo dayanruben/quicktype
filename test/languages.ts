@@ -635,7 +635,6 @@ export const CJSONLanguage: Language = {
         /* Union, Map and Arrays with invalid types are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "boolean-subschema.schema",
         "class-with-additional.schema",
-        "top-level-primitive-array.schema",
         ...skipsMapValueValidation,
         "multi-type-enum.schema",
         "nested-intersection-union.schema",
@@ -650,7 +649,6 @@ export const CJSONLanguage: Language = {
         /* Required properties absent are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
         "intersection.schema",
         "required.schema",
-        "top-level-array.schema",
         // The default-value fail sample also relies on required-property
         // enforcement, which cJSON does not do.
         "default-value.schema",
@@ -975,7 +973,6 @@ export const SwiftLanguage: Language = {
         // This works on macOS, but on Linux one of the failure test cases doesn't fail
         ...skipsUntypedUnions,
         "required.schema",
-        "top-level-array.schema",
         // The default-value fail sample also relies on required-property enforcement.
         "default-value.schema",
         "multi-type-enum.schema",
@@ -1913,7 +1910,6 @@ export const HaskellLanguage: Language = {
         "keyword-unions.schema",
         "optional-any.schema",
         "required.schema",
-        "top-level-array.schema",
         // The default-value fail sample also relies on required-property enforcement.
         "default-value.schema",
         "required-non-properties.schema",
@@ -2209,7 +2205,6 @@ export const TypeScriptEffectSchemaLanguage: Language = {
         "keyword-unions.schema",
         "optional-any.schema",
         "required.schema",
-        "top-level-array.schema",
         // The default-value fail sample also relies on required-property enforcement.
         "default-value.schema",
         "required-non-properties.schema",
@@ -2270,9 +2265,11 @@ export const ElixirLanguage: Language = {
         // Struct keys cannot be enforced at runtime in Elixir and their values will just be set to null.
         "strict-optional.schema",
         "required.schema",
-        "top-level-array.schema",
         // The default-value fail sample also relies on required-property enforcement.
         "default-value.schema",
+        // The renderer references a nonexistent TopLevelElement module for
+        // top-level primitive arrays.
+        "top-level-primitive-array.schema",
         "boolean-subschema.schema",
         "intersection.schema",
         "optional-any.schema",
