@@ -154,10 +154,10 @@ jobs:
                       echo "is_current=true" >> "$GITHUB_OUTPUT"
                   else
                       echo "is_current=false" >> "$GITHUB_OUTPUT"
-                      echo "The PR advanced to $CURRENT_HEAD; leaving its current output-diff comment untouched." >> "$GITHUB_STEP_SUMMARY"
+                      echo "The PR advanced to $CURRENT_HEAD; not posting a comment for this stale comparison." >> "$GITHUB_STEP_SUMMARY"
                   fi
 
-            - name: Create or update output-diff comment
+            - name: Create output-diff comment
               if: steps.metadata.outputs.supported == 'true' && steps.current.outputs.is_current == 'true'
               env:
                   GH_TOKEN: ${{ github.token }}
@@ -186,10 +186,4 @@ jobs:
                   EOF
                       )
                   fi
-                  COMMENT_ID=$(gh api --paginate "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
-                      --jq '.[] | select(.body | contains("<!-- quicktype-generated-output-diff -->")) | .id' | sed -n '1p')
-                  if [[ -n "$COMMENT_ID" ]]; then
-                      gh api --method PATCH "repos/${{ github.repository }}/issues/comments/$COMMENT_ID" -f body="$BODY" >/dev/null
-                  else
-                      gh api --method POST "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" -f body="$BODY" >/dev/null
-                  fi
+                  gh api --method POST "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" -f body="$BODY" >/dev/null
