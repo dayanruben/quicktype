@@ -143,10 +143,7 @@ export const lowerNamingFunction = funPrefixNamer("lower", (s) => {
     // the same name as fields that consist only of an underscore and digits.
     if (styled === "") return "field";
     if (/^_\d+$/.test(styled)) return `field${styled.slice(1)}`;
-    if (
-        keywords.some((keyword) => keyword === styled) ||
-        forbiddenPropertyNames.some((name) => name === styled)
-    ) {
+    if (forbiddenPropertyNames.some((name) => name === styled)) {
         return `${styled}Value`;
     }
     return styled;

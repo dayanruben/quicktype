@@ -86,7 +86,7 @@ object JsonExt:
     }
 
     def badMerge[T](r1: => OptionPickler.Reader[?], rest: OptionPickler.Reader[?]*): OptionPickler.Reader[T] = valueReader.map { json =>
-        var t: T | scala.Null = null
+        var t: T | Null = null
         val stack       = Vector.newBuilder[Throwable]
         (r1 +: rest).foreach { reader =>
             if t == null then
@@ -95,7 +95,7 @@ object JsonExt:
             catch
                 case exc => stack += exc
         }
-        if t != null then t.nn else throw new java.lang.Exception(json.toString(), stack.result().headOption.getOrElse(null))
+        if t != null then t.nn else throw new Exception(json.toString(), stack.result().headOption.getOrElse(null))
     }
 end JsonExt
 `);

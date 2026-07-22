@@ -27,7 +27,11 @@ import {
     type UnionType,
 } from "../../Type/index.js";
 
-import { forbiddenPropertyNames, keywords } from "./constants.js";
+import {
+    forbiddenPropertyNames,
+    forbiddenTypeNames,
+    keywords,
+} from "./constants.js";
 import type { scala3Options } from "./language.js";
 import {
     backtickedName,
@@ -49,7 +53,7 @@ export class Scala3Renderer extends ConvenienceRenderer {
     }
 
     protected forbiddenNamesForGlobalNamespace(): readonly string[] {
-        return keywords;
+        return [...keywords, ...forbiddenTypeNames];
     }
 
     protected forbiddenForObjectProperties(
@@ -57,8 +61,8 @@ export class Scala3Renderer extends ConvenienceRenderer {
         _classNamed: Name,
     ): ForbiddenWordsInfo {
         return {
-            names: [...forbiddenPropertyNames],
-            includeGlobalForbidden: true,
+            names: [...keywords, ...forbiddenPropertyNames],
+            includeGlobalForbidden: false,
         };
     }
 
@@ -66,7 +70,7 @@ export class Scala3Renderer extends ConvenienceRenderer {
         _: EnumType,
         _enumName: Name,
     ): ForbiddenWordsInfo {
-        return { names: ["_"], includeGlobalForbidden: true };
+        return { names: ["_", ...keywords], includeGlobalForbidden: false };
     }
 
     protected forbiddenForUnionMembers(

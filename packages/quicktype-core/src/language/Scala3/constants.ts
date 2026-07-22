@@ -98,7 +98,11 @@ export const keywords = [
     "List",
     "Map",
     "Enum",
+] as const;
+
+export const forbiddenTypeNames = [
     "None",
+    "Null",
     "Option",
     "Seq",
     "Json",
@@ -108,4 +112,5 @@ export const keywords = [
     "NullValue",
     "OptionPickler",
     "JsonExt",
+    "Exception",
 ] as const;
