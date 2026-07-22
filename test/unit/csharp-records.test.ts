@@ -7,11 +7,14 @@ import {
     quicktype,
 } from "quicktype-core";
 
-async function renderCSharp(rendererOptions: RendererOptions): Promise<string> {
+async function renderCSharp(
+    rendererOptions: RendererOptions,
+    sample = '{"name":"Alice","age":37}',
+): Promise<string> {
     const jsonInput = jsonInputForTargetLanguage("csharp");
     await jsonInput.addSource({
         name: "Person",
-        samples: ['{"name":"Alice","age":37}'],
+        samples: [sample],
     });
     const inputData = new InputData();
     inputData.addInput(jsonInput);
@@ -43,6 +46,16 @@ describe("C# use-records", () => {
         const output = await renderCSharp({ framework: "SystemTextJson" });
         expect(output).toContain("public partial class Person");
         expect(output).not.toContain("public partial record Person");
+    });
+
+    test("avoids compiler-generated record member names", async () => {
+        const output = await renderCSharp(
+            { "use-records": true },
+            '{"clone":"copy","equalityContract":"contract","printMembers":"members"}',
+        );
+        expect(output).not.toMatch(
+            /public string (Clone|EqualityContract|PrintMembers) \{/,
+        );
     });
 
     test("just-types with use-records still emits records", async () => {

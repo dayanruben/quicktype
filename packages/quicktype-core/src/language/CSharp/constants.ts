@@ -50,7 +50,6 @@ export const keywords = [
     "protected",
     "public",
     "readonly",
-    "record",
     "ref",
     "return",
     "sbyte",
