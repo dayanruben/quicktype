@@ -27,10 +27,9 @@ import {
     type UnionType,
 } from "../../Type/index.js";
 
-import { keywords } from "./constants.js";
+import { forbiddenPropertyNames, keywords } from "./constants.js";
 import type { scala3Options } from "./language.js";
 import {
-    backtickedName,
     enumCaseNameStyle,
     lowerNamingFunction,
     scalaNameStyle,
@@ -55,7 +54,10 @@ export class Scala3Renderer extends ConvenienceRenderer {
         _: ObjectType,
         _classNamed: Name,
     ): ForbiddenWordsInfo {
-        return { names: [], includeGlobalForbidden: true };
+        return {
+            names: [...forbiddenPropertyNames],
+            includeGlobalForbidden: true,
+        };
     }
 
     protected forbiddenForEnumCases(
@@ -219,6 +221,17 @@ export class Scala3Renderer extends ConvenienceRenderer {
         this.emitLine("case class ", className, "()");
     }
 
+    protected emitPropertyAnnotation(_name: Name, _jsonName: string): void {
+        // Overridden by frameworks that support property rename annotations.
+    }
+
+    protected emitClassDefinitionPostamble(
+        _c: ClassType,
+        _className: Name,
+    ): void {
+        // Overridden by frameworks that need to emit custom codecs.
+    }
+
     protected emitClassDefinition(c: ClassType, className: Name): void {
         if (c.getProperties().size === 0) {
             this.emitEmptyClassDefinition(c, className);
@@ -238,7 +251,7 @@ export class Scala3Renderer extends ConvenienceRenderer {
         this.indent(() => {
             let count = c.getProperties().size;
             let first = true;
-            this.forEachClassProperty(c, "none", (_, jsonName, p) => {
+            this.forEachClassProperty(c, "none", (name, jsonName, p) => {
                 const nullable =
                     p.type.kind === "union" &&
                     nullableFromUnion(p.type as UnionType) !== null;
@@ -263,9 +276,10 @@ export class Scala3Renderer extends ConvenienceRenderer {
                     emit();
                 }
 
+                this.emitPropertyAnnotation(name, jsonName);
                 this.emitLine(
                     "val ",
-                    backtickedName(jsonName),
+                    name,
                     " : ",
                     scalaType(p),
                     p.isOptional
@@ -285,6 +299,7 @@ export class Scala3Renderer extends ConvenienceRenderer {
         });
 
         this.emitClassDefinitionMethods();
+        this.emitClassDefinitionPostamble(c, className);
     }
 
     protected emitClassDefinitionMethods(): void {

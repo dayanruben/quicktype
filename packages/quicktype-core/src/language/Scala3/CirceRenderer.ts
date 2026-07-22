@@ -14,7 +14,7 @@ import type {
     UnionType,
 } from "../../Type/index.js";
 
-import { stringEscape } from "../../support/Strings.js";
+import { utf16StringEscape as stringEscape } from "../../support/Strings.js";
 
 import { Scala3Renderer } from "./Scala3Renderer.js";
 import { unionMemberSortOrder, wrapOption } from "./utils.js";
@@ -106,7 +106,49 @@ export class CirceRenderer extends Scala3Renderer {
     }
 
     protected emitClassDefinitionMethods(): void {
-        this.emitLine(") derives Encoder.AsObject, Decoder");
+        this.emitLine(")");
+    }
+
+    protected emitClassDefinitionPostamble(
+        c: ClassType,
+        className: Name,
+    ): void {
+        this.ensureBlankLine();
+        this.emitLine(["object ", className, ":"]);
+        this.indent(() => {
+            this.emitLine("given io.circe.derivation.Configuration =");
+            this.indent(() => {
+                this.emitLine(
+                    "io.circe.derivation.Configuration.default.withTransformMemberNames(",
+                );
+                this.indent(() => {
+                    this.emitLine("io.circe.derivation.renaming.replaceWith(");
+                    this.indent(() => {
+                        let count = c.getProperties().size;
+                        this.forEachClassProperty(
+                            c,
+                            "none",
+                            (name, jsonName) => {
+                                this.emitLine([
+                                    '"',
+                                    name,
+                                    `" -> "${stringEscape(jsonName)}"`,
+                                    --count === 0 ? "" : ",",
+                                ]);
+                            },
+                        );
+                    });
+                    this.emitLine(")");
+                });
+                this.emitLine(")");
+            });
+            this.emitLine([
+                "given io.circe.Codec.AsObject[",
+                className,
+                "] = io.circe.derivation.ConfiguredCodec.derived",
+            ]);
+        });
+        this.ensureBlankLine();
     }
 
     protected emitEnumDefinition(e: EnumType, enumName: Name): void {
