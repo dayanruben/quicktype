@@ -1,4 +1,6 @@
-name: Generated output diff
+# Keep the default-branch publisher from deleting #3074's clean preview
+# comment before its clean-comment fix is merged.
+name: Generated output diff preview
 
 on:
     push:
