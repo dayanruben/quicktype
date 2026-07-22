@@ -95,12 +95,12 @@ The workflow that executes PR code is unprivileged and never receives the hostr 
 A separate `workflow_run` workflow runs from the default branch. It:
 
 1. downloads the completed comparison artifact;
-2. validates the PR number and SHA fields;
+2. validates the PR number and SHA fields against the workflow event (or, for fork events that omit the PR number, a unique open PR with the same head repository and branch);
 3. renders the final HTML using trusted code from the default branch;
 4. publishes the HTML and patch using the `HOSTR_TOKEN` repository secret; and
 5. creates or updates one marker-tagged PR comment with either the summary and immutable link or a clean-comparison confirmation.
 
-Before changing a comment, it verifies that the artifact's head SHA is still the PR's current head. A stale completed run may retain its immutable report, but it cannot replace the current PR comment.
+PRs may target the default branch or another branch, including stacked PRs. Before changing a comment, the publisher verifies that the artifact's head SHA is still the PR's current head. A stale completed run may retain its immutable report, but it cannot replace the current PR comment.
 
 For a current clean run, the publisher updates the marker-tagged comment to confirm that generated outputs are unchanged and publishes no report.
 
