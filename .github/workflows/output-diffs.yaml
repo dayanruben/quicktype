@@ -202,23 +202,17 @@ jobs:
               run: |
                   COMMENT_ID=$(gh api --paginate "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
                       --jq '.[] | select(.body | contains("<!-- quicktype-generated-output-diff -->")) | .id' | sed -n '1p')
-                  if node - <<'NODE' > /tmp/output-diff-comment
+                  node - <<'NODE' > /tmp/output-diff-comment
                   const fs = require("node:fs");
                   const result = JSON.parse(fs.readFileSync(".output-diffs/result/result.json", "utf8"));
-                  const s = result.summary;
-                  if (!result.hasDifferences) process.exit(2);
-                  process.stdout.write(`<!-- quicktype-generated-output-diff -->\n### Generated-output differences\n\n**${s.files} files differ** — ${s.modified} modified, ${s.added} new, ${s.deleted} deleted  \n**${s.changedLines} changed lines** — +${s.insertions} / −${s.deletions}\n\n[Open the generated-output report →](${process.env.REPORT_URL})\n`);
+                  if (result.hasDifferences) {
+                      const s = result.summary;
+                      process.stdout.write(`<!-- quicktype-generated-output-diff -->\n### Generated-output differences\n\n**${s.files} files differ** — ${s.modified} modified, ${s.added} new, ${s.deleted} deleted  \n**${s.changedLines} changed lines** — +${s.insertions} / −${s.deletions}\n\n[Open the generated-output report →](${process.env.REPORT_URL})\n`);
+                  } else {
+                      process.stdout.write("<!-- quicktype-generated-output-diff -->\n### No generated-output differences\n\n✅ Generated outputs are unchanged between the PR base and head revisions.\n");
+                  }
                   NODE
-                  then
-                      STATUS=0
-                  else
-                      STATUS=$?
-                  fi
-                  if [[ "$STATUS" == 2 ]]; then
-                      [[ -z "$COMMENT_ID" ]] || gh api --method DELETE "repos/${{ github.repository }}/issues/comments/$COMMENT_ID"
-                  elif [[ "$STATUS" != 0 ]]; then
-                      exit "$STATUS"
-                  elif [[ -n "$COMMENT_ID" ]]; then
+                  if [[ -n "$COMMENT_ID" ]]; then
                       gh api --method PATCH "repos/${{ github.repository }}/issues/comments/$COMMENT_ID" -F body=@/tmp/output-diff-comment >/dev/null
                   else
                       gh api --method POST "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" -F body=@/tmp/output-diff-comment >/dev/null

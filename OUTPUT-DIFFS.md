@@ -11,7 +11,7 @@ Generated-output differences are informational: they must not fail CI. When diff
 - the total changed lines, with insertion and deletion counts; and
 - a link to the report.
 
-When there are no differences, no report is published and no output-diff comment remains on the PR.
+When there are no differences, no report is published and the output-diff comment confirms that generated outputs are unchanged.
 
 ## Deterministic snapshots
 
@@ -65,7 +65,7 @@ The report is static, self-contained HTML with:
 - a prominent link back to the pull request;
 - filtering by file status and text search;
 - navigation grouped by fixture/target;
-- collapsible, syntax-styled unified diffs; and
+- collapsible, GitHub-style unified diffs with old/new line numbers; and
 - per-file insertion/deletion totals.
 
 Generated source and paths are always HTML-escaped. The page has a restrictive content-security policy and makes no third-party network requests.
@@ -98,11 +98,11 @@ A separate `workflow_run` workflow runs from the default branch. It:
 2. validates the PR number and SHA fields;
 3. renders the final HTML using trusted code from the default branch;
 4. publishes the HTML and patch using the `HOSTR_TOKEN` repository secret; and
-5. creates or updates one marker-tagged PR comment with the summary and immutable link.
+5. creates or updates one marker-tagged PR comment with either the summary and immutable link or a clean-comparison confirmation.
 
 Before changing a comment, it verifies that the artifact's head SHA is still the PR's current head. A stale completed run may retain its immutable report, but it cannot replace the current PR comment.
 
-For a current clean run, the publisher deletes any previous marker-tagged output-diff comment and publishes nothing.
+For a current clean run, the publisher updates the marker-tagged comment to confirm that generated outputs are unchanged and publishes no report.
 
 ## Rollout and verification
 

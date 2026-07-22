@@ -179,5 +179,13 @@ describe("generated-output comparison", () => {
         );
         expect(html).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
         expect(html).not.toContain("<script>alert(1)</script>");
+        expect(html).toContain('class="diff-table"');
+        expect(html).toContain(
+            'class="blob-num old" data-line-number="1">1</td>',
+        );
+        expect(html).toContain(
+            'class="blob-num new" data-line-number="1">1</td>',
+        );
+        expect(html).not.toContain("diff --git");
     });
 });
