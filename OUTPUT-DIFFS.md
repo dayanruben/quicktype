@@ -63,10 +63,10 @@ The report is static, self-contained HTML with:
 
 - summary cards and base/merge/head commit metadata;
 - a prominent link back to the pull request;
-- filtering by file status and text search;
-- navigation grouped by fixture/target;
+- filtering by target, file status, and text search;
+- generated files grouped by input test case, with each target clearly labeled;
 - collapsible, GitHub-style unified diffs with old/new line numbers; and
-- per-file insertion/deletion totals.
+- per-test and per-file insertion/deletion totals.
 
 Generated source and paths are always HTML-escaped. The page has a restrictive content-security policy and makes no third-party network requests.
 
