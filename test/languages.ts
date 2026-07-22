@@ -513,11 +513,15 @@ export const RubyLanguage: Language = {
         "php-mixed-union.json",
         "nbl-stats.json",
         "kitchen-sink.json",
+        // Top-level scalar arrays redefine Array#to_json recursively.
+        "issue2680-scalar-array.json",
     ],
     skipSchema: [
         "integer-before-number.schema", // Python-specific union-order regression.
         // We don't generate a convenience method for top-level enums
         "top-level-enum.schema",
+        // Top-level scalar arrays redefine Array#to_json recursively.
+        "issue2680-top-level-array.schema",
     ],
     skipMiscJSON: false,
     rendererOptions: {},
@@ -632,6 +636,8 @@ export const CJSONLanguage: Language = {
         "combinations2.json",
         /* Array in Array in Union is not supported (for the current implementation, can be added later, need recursivity) */
         "combinations4.json",
+        /* Top-level arrays of scalars store scalar values as pointers incorrectly. */
+        "issue2680-scalar-array.json",
     ],
     skipMiscJSON: false,
     skipSchema: [

@@ -184,9 +184,9 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
     }
 
     protected emitTypes(): void {
-        // Emit top levels that don't get their own named declaration below.
+        // emit primitive top levels
         this.forEachTopLevel("none", (t, name) => {
-            if (this.namedTypeToNameForTopLevel(t) !== undefined) {
+            if (!t.isPrimitive()) {
                 return;
             }
 
