@@ -30,8 +30,10 @@ import {
 import { forbiddenPropertyNames, keywords } from "./constants.js";
 import type { scala3Options } from "./language.js";
 import {
+    backtickedName,
     enumCaseNameStyle,
     lowerNamingFunction,
+    propertyNameNeedsMapping,
     scalaNameStyle,
     upperNamingFunction,
     wrapOption,
@@ -279,7 +281,9 @@ export class Scala3Renderer extends ConvenienceRenderer {
                 this.emitPropertyAnnotation(name, jsonName);
                 this.emitLine(
                     "val ",
-                    name,
+                    propertyNameNeedsMapping(jsonName)
+                        ? name
+                        : backtickedName(jsonName),
                     " : ",
                     scalaType(p),
                     p.isOptional
@@ -298,11 +302,14 @@ export class Scala3Renderer extends ConvenienceRenderer {
             });
         });
 
-        this.emitClassDefinitionMethods();
+        this.emitClassDefinitionMethods(c, className);
         this.emitClassDefinitionPostamble(c, className);
     }
 
-    protected emitClassDefinitionMethods(): void {
+    protected emitClassDefinitionMethods(
+        _c: ClassType,
+        _className: Name,
+    ): void {
         this.emitLine(")");
     }
 

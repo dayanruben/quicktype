@@ -14,10 +14,14 @@ import type {
     UnionType,
 } from "../../Type/index.js";
 
-import { utf16StringEscape as stringEscape } from "../../support/Strings.js";
+import { stringEscape, utf16StringEscape } from "../../support/Strings.js";
 
 import { Scala3Renderer } from "./Scala3Renderer.js";
-import { unionMemberSortOrder, wrapOption } from "./utils.js";
+import {
+    propertyNameNeedsMapping,
+    unionMemberSortOrder,
+    wrapOption,
+} from "./utils.js";
 
 export class CirceRenderer extends Scala3Renderer {
     private readonly seenUnionTypes: string[] = [];
@@ -105,14 +109,31 @@ export class CirceRenderer extends Scala3Renderer {
         return [wrapOption("Json", optional)];
     }
 
-    protected emitClassDefinitionMethods(): void {
-        this.emitLine(")");
+    private renamedProperties(c: ClassType): Array<[Name, string]> {
+        const renamed: Array<[Name, string]> = [];
+        this.forEachClassProperty(c, "none", (name, jsonName) => {
+            if (propertyNameNeedsMapping(jsonName)) {
+                renamed.push([name, jsonName]);
+            }
+        });
+        return renamed;
+    }
+
+    protected emitClassDefinitionMethods(c: ClassType, _className: Name): void {
+        this.emitLine(
+            this.renamedProperties(c).length === 0
+                ? ") derives Encoder.AsObject, Decoder"
+                : ")",
+        );
     }
 
     protected emitClassDefinitionPostamble(
         c: ClassType,
         className: Name,
     ): void {
+        const renamed = this.renamedProperties(c);
+        if (renamed.length === 0) return;
+
         this.ensureBlankLine();
         this.emitLine(["object ", className, ":"]);
         this.indent(() => {
@@ -124,19 +145,14 @@ export class CirceRenderer extends Scala3Renderer {
                 this.indent(() => {
                     this.emitLine("io.circe.derivation.renaming.replaceWith(");
                     this.indent(() => {
-                        let count = c.getProperties().size;
-                        this.forEachClassProperty(
-                            c,
-                            "none",
-                            (name, jsonName) => {
-                                this.emitLine([
-                                    '"',
-                                    name,
-                                    `" -> "${stringEscape(jsonName)}"`,
-                                    --count === 0 ? "" : ",",
-                                ]);
-                            },
-                        );
+                        renamed.forEach(([name, jsonName], index) => {
+                            this.emitLine([
+                                '"',
+                                name,
+                                `" -> "${utf16StringEscape(jsonName)}"`,
+                                index === renamed.length - 1 ? "" : ",",
+                            ]);
+                        });
                     });
                     this.emitLine(")");
                 });

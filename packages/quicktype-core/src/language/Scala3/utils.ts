@@ -40,6 +40,31 @@ export const backtickedName = (name: string): string => {
         : name;
 };
 
+export const propertyNameNeedsMapping = (jsonName: string): boolean => {
+    const isPlainIdentifier = /^[\p{L}_$][\p{L}\p{M}\p{N}_$]*$/u.test(jsonName);
+    const rendered = backtickedName(jsonName);
+    const canBeBackticked =
+        rendered.startsWith("`") &&
+        rendered.endsWith("`") &&
+        !Array.from(jsonName).some((character) => {
+            const codePoint = character.codePointAt(0) ?? 0;
+            return (
+                character === "`" ||
+                character === "\\" ||
+                codePoint <= 0x1f ||
+                (codePoint >= 0x7f && codePoint <= 0x9f) ||
+                codePoint === 0x2028 ||
+                codePoint === 0x2029
+            );
+        });
+
+    return (
+        jsonName === "_" ||
+        (!isPlainIdentifier && !canBeBackticked) ||
+        forbiddenPropertyNames.some((name) => name === jsonName)
+    );
+};
+
 export const wrapOption = (s: string, optional: boolean): string => {
     if (optional) {
         return `Option[${s}]`;
