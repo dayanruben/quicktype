@@ -1888,7 +1888,6 @@ export const HaskellLanguage: Language = {
     skipMiscJSON: false,
     skipSchema: [
         "integer-before-number.schema", // Python-specific union-order regression.
-        "any.schema",
         ...skipsUntypedUnions,
         // The test driver encodes the Maybe result, so a failed decode prints
         // "null" and exits 0 — expected-failure samples cannot be detected.

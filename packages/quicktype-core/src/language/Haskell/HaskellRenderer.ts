@@ -109,7 +109,7 @@ export class HaskellRenderer extends ConvenienceRenderer {
     private haskellType(t: Type, noOptional = false): MultiWord {
         return matchType<MultiWord>(
             t,
-            (_anyType) => multiWord(" ", "Maybe", "Text"),
+            (_anyType) => singleWord("Value"),
             (_nullType) => multiWord(" ", "Maybe", "Text"),
             (_boolType) => singleWord("Bool"),
             (_integerType) => singleWord("Int"),
