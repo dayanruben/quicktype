@@ -1,6 +1,4 @@
-# Keep the default-branch publisher from deleting #3074's clean preview
-# comment before its clean-comment fix is merged.
-name: Generated output diff preview
+name: Generated output diff
 
 on:
     push:
@@ -203,7 +201,7 @@ jobs:
                   REPORT_URL: https://hostr.flingit.run/s/quicktype/output-diffs/pr-${{ github.event.pull_request.number }}/${{ github.sha }}/${{ github.event.pull_request.head.sha }}/index.html
               run: |
                   COMMENT_ID=$(gh api --paginate "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
-                      --jq '.[] | select(.body | contains("<!-- quicktype-generated-output-diff -->")) | .id' | sed -n '1p')
+                      --jq '.[] | select(.body | contains("<!-- quicktype-generated-output-diff -->") or contains("<!-- quicktype-generated-output-diff-preview -->")) | .id' | sed -n '1p')
                   node - <<'NODE' > /tmp/output-diff-comment
                   const fs = require("node:fs");
                   const result = JSON.parse(fs.readFileSync(".output-diffs/result/result.json", "utf8"));
@@ -211,7 +209,10 @@ jobs:
                       const s = result.summary;
                       process.stdout.write(`<!-- quicktype-generated-output-diff -->\n### Generated-output differences\n\n**${s.files} files differ** — ${s.modified} modified, ${s.added} new, ${s.deleted} deleted  \n**${s.changedLines} changed lines** — +${s.insertions} / −${s.deletions}\n\n[Open the generated-output report →](${process.env.REPORT_URL})\n`);
                   } else {
-                      process.stdout.write("<!-- quicktype-generated-output-diff -->\n### No generated-output differences\n\n✅ Generated outputs are unchanged between the PR base and head revisions.\n");
+                      // The preview marker keeps the default-branch version of
+                      // the publisher from deleting this comment before the
+                      // clean-comment behavior in this PR is merged.
+                      process.stdout.write("<!-- quicktype-generated-output-diff-preview -->\n### No generated-output differences\n\n✅ Generated outputs are unchanged between the PR base and head revisions.\n");
                   }
                   NODE
                   if [[ -n "$COMMENT_ID" ]]; then
