@@ -159,6 +159,8 @@ export const CSharpLanguage: Language = {
         { density: "dense" },
         { "number-type": "decimal" },
         { "any-type": "dynamic" },
+        // C# 9+ records; end-to-end round-trip with Newtonsoft.
+        { "use-records": "true" },
     ],
     sourceFiles: ["src/language/CSharp/index.ts"],
 };
@@ -218,6 +220,8 @@ export const CSharpLanguageSystemTextJson: Language = {
         // Suppressing the DateOnly/TimeOnly converters (for pre-.NET 6
         // targets) must still produce compiling, round-tripping code.
         ["unions.json", { "dateonly-timeonly-converters": "false" }],
+        // C# 9+ records; end-to-end round-trip with System.Text.Json.
+        { "use-records": "true" },
     ],
     sourceFiles: ["src/language/CSharp/index.ts"],
 };

@@ -211,6 +211,14 @@ export class CSharpRenderer extends ConvenienceRenderer {
         return undefined;
     }
 
+    /**
+     * Keyword for named object types.  Records need C# 9+; the option is
+     * independent of `--csharp-version`, which only gates older syntax.
+     */
+    protected get objectTypeKind(): string {
+        return this._csOptions.useRecords ? "record" : "class";
+    }
+
     protected emitType(
         description: string[] | undefined,
         accessModifier: AccessModifier,
@@ -296,7 +304,7 @@ export class CSharpRenderer extends ConvenienceRenderer {
         this.emitType(
             this.descriptionForType(c),
             AccessModifier.Public,
-            "partial class",
+            ["partial ", this.objectTypeKind],
             className,
             this.baseclassForType(c),
             () => {
