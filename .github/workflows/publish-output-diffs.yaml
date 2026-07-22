@@ -175,7 +175,7 @@ jobs:
                   $MARKER
                   ### No generated-output differences
 
-                  ✅ Generated outputs are unchanged between the PR base and head revisions.
+                  ✅ This PR does not change generated outputs.
                   EOF
                       )
                   fi
