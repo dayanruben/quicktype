@@ -58,11 +58,10 @@ jobs:
                   path: .output-diffs/base
                   key: ${{ env.OUTPUT_SNAPSHOT_CACHE_PREFIX }}-${{ runner.os }}-${{ github.event.pull_request.base.sha }}
 
-            - name: Check out PR head
+            - name: Check out tested PR merge
               uses: actions/checkout@v4
               with:
-                  repository: ${{ github.event.pull_request.head.repo.full_name }}
-                  ref: ${{ github.event.pull_request.head.sha }}
+                  ref: ${{ github.sha }}
                   path: head-source
 
             - name: Check out base after a cache miss
@@ -115,12 +114,12 @@ jobs:
                   path: .output-diffs/base
                   key: ${{ env.OUTPUT_SNAPSHOT_CACHE_PREFIX }}-${{ runner.os }}-${{ github.event.pull_request.base.sha }}
 
-            - name: Build PR head
+            - name: Build tested PR merge
               if: steps.compatibility.outputs.supported == 'true'
               working-directory: head-source
               run: npm ci && npm run build
 
-            - name: Generate PR head snapshot
+            - name: Generate tested PR merge snapshot
               if: steps.compatibility.outputs.supported == 'true'
               working-directory: head-source
               env:
