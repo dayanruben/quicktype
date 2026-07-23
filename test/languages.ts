@@ -676,6 +676,7 @@ export const CJSONLanguage: Language = {
         "optional-constraints.schema",
         "pattern.schema",
         /* Required properties absent are not checked (for the current implementation, can be added later, should abord parsing and return NULL) */
+        "ie-suffix-singularization.schema",
         "intersection.schema",
         "required.schema",
         // The default-value fail sample also relies on required-property
@@ -1932,6 +1933,7 @@ export const HaskellLanguage: Language = {
         "multi-type-enum.schema",
         "keyword-unions.schema",
         "optional-any.schema",
+        "ie-suffix-singularization.schema",
         "required.schema",
         // The default-value fail sample also relies on required-property enforcement.
         "default-value.schema",
@@ -2294,6 +2296,7 @@ export const ElixirLanguage: Language = {
         "mutually-recursive.schema",
 
         // Struct keys cannot be enforced at runtime in Elixir and their values will just be set to null.
+        "ie-suffix-singularization.schema",
         "strict-optional.schema",
         "required.schema",
         // The default-value fail sample also relies on required-property enforcement.
