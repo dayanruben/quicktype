@@ -1199,7 +1199,11 @@ export const JavaScriptPropTypesLanguage: Language = {
         "spotify-album.json", // renderer does not support recursion
         "76ae1.json", // renderer does not support recursion
     ],
-    skipSchema: ["integer-before-number.schema"], // Python-specific union-order regression.
+    skipSchema: [
+        // The renderer does not support a bare top-level map.
+        "empty-object.schema",
+        "integer-before-number.schema", // Python-specific union-order regression.
+    ],
     skipMiscJSON: false,
     rendererOptions: { "module-system": "es6" },
     quickTestRendererOptions: [{ converters: "top-level" }],
@@ -1372,7 +1376,11 @@ I havea no idea how to encode these tests correctly.
         "php-mixed-union.json",
         "nst-test-suite.json",
     ],
-    skipSchema: ["integer-before-number.schema"], // Python-specific union-order regression.
+    skipSchema: [
+        // The renderer does not support a bare top-level map.
+        "empty-object.schema",
+        "integer-before-number.schema", // Python-specific union-order regression.
+    ],
     skipMiscJSON: false,
     rendererOptions: { "just-types": "true" },
     quickTestRendererOptions: [],
@@ -1917,6 +1925,7 @@ export const HaskellLanguage: Language = {
         "nested-intersection-union.schema",
         "prefix-items.schema",
         "direct-union.schema",
+        "empty-object.schema",
         ...skipsEnumValueValidation,
         ...skipsMapValueValidation,
         "intersection.schema",
@@ -1969,6 +1978,8 @@ export const PHPLanguage: Language = {
     ],
     skipMiscJSON: true,
     skipSchema: [
+        // The renderer does not support a bare top-level map.
+        "empty-object.schema",
         "integer-before-number.schema", // Python-specific union-order regression.
         // PHP class names are case-insensitive, but the namer dedups
         // case-sensitively, so this declares classes that collide (same
@@ -2078,6 +2089,8 @@ export const TypeScriptZodLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        // The renderer does not support a bare top-level map.
+        "empty-object.schema",
         "integer-before-number.schema", // Python-specific union-order regression.
         "any.schema",
         ...skipsUntypedUnions,
@@ -2203,6 +2216,8 @@ export const TypeScriptEffectSchemaLanguage: Language = {
     ],
     skipMiscJSON: false,
     skipSchema: [
+        // The renderer does not support a bare top-level map.
+        "empty-object.schema",
         "integer-before-number.schema", // Python-specific union-order regression.
         "any.schema",
         ...skipsUntypedUnions,
@@ -2294,6 +2309,12 @@ export const ElixirLanguage: Language = {
         // The test incorrectly succeeds due to the emitter being permissive for unions that contain only primitives. A future enhancement
         // for the Elixir emitter could be a user-controlled 'strict' mode that pattern matches even on unions of only primitive types.
         ...skipsMapValueValidation,
+
+        // A bare top-level map is emitted as a Jason.decode!/encode! pass-through
+        // with no shape validation, so the .fail.json case (a non-object) is not
+        // rejected and round-trips instead of exiting nonzero. Same permissiveness
+        // class as go-schema-pattern-properties above.
+        "empty-object.schema",
 
         // The generated top-level type is not emitted as a TopLevel module the fixture can call.
         "recursive-union-flattening.schema",

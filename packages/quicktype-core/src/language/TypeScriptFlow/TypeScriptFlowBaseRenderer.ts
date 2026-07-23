@@ -238,14 +238,14 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
 
     protected emitTypes(): void {
         this.forEachTopLevel("none", (t, name) => {
-            if (!t.isPrimitive() && !(t instanceof ArrayType)) {
+            if (this.namedTypeToNameForTopLevel(t) !== undefined) {
                 return;
             }
 
             this.ensureBlankLine();
             this.emitDescription(this.descriptionForType(t));
             this.emitLine(
-                t instanceof ArrayType ? "export type " : "type ",
+                t.isPrimitive() ? "type " : "export type ",
                 name,
                 " = ",
                 this.sourceFor(t).source,
