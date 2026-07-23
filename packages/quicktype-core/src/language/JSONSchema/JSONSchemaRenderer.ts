@@ -1,10 +1,6 @@
 import { iterableFirst, mapFirst } from "collection-utils";
 
 import { addDescriptionToSchema } from "../../attributes/Description.js";
-import {
-    inferredTopLevelSchemaComment,
-    schemaArrayTypeAttributeKind,
-} from "../../attributes/InferenceFlags.js";
 import { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
 import type { Name, Namer } from "../../Naming.js";
 import { defined, panic } from "../../support/Support.js";
@@ -182,26 +178,10 @@ export class JSONSchemaRenderer extends ConvenienceRenderer {
 
     protected emitSourceStructure(): void {
         // FIXME: Find a good way to do multiple top-levels.  Maybe multiple files?
-        const topLevel =
-            this.topLevels.size === 1
-                ? defined(mapFirst(this.topLevels))
-                : undefined;
         const topLevelType =
-            topLevel === undefined ? {} : this.schemaForType(topLevel);
-        if (topLevel?.kind === "array") {
-            const provenance = schemaArrayTypeAttributeKind.tryGetInAttributes(
-                topLevel.getAttributes(),
-            );
-            if (
-                provenance === "inferred" ||
-                (provenance === undefined &&
-                    topLevel.hasNames &&
-                    !topLevel.getNames().areInferred)
-            ) {
-                topLevelType.$comment = inferredTopLevelSchemaComment;
-            }
-        }
-
+            this.topLevels.size === 1
+                ? this.schemaForType(defined(mapFirst(this.topLevels)))
+                : {};
         const schema: Schema = {
             $schema: "http://json-schema.org/draft-06/schema#",
             ...topLevelType,

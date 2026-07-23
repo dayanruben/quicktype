@@ -1,6 +1,5 @@
 import { arrayIntercalate } from "collection-utils";
 
-import { schemaArrayTypeAttributeKind } from "../../attributes/InferenceFlags.js";
 import { ConvenienceRenderer } from "../../ConvenienceRenderer.js";
 import { type Name, type Namer, funPrefixNamer } from "../../Naming.js";
 import type { RenderContext } from "../../Renderer.js";
@@ -87,15 +86,7 @@ export class JavaScriptRenderer extends ConvenienceRenderer {
     }
 
     protected namedTypeToNameForTopLevel(type: Type): Type | undefined {
-        // JSON sample arrays collapse to their item type, including when
-        // round-tripped through quicktype's schema output.  Only arrays
-        // explicitly declared by an input schema retain their wrapper.
-        if (
-            type.kind === "array" &&
-            schemaArrayTypeAttributeKind.tryGetInAttributes(
-                type.getAttributes(),
-            ) === "explicit"
-        ) {
+        if (type.kind === "array") {
             return undefined;
         }
 

@@ -1,4 +1,3 @@
-import { schemaArrayTypeAttributeKind } from "../../attributes/InferenceFlags.js";
 import { type Name, type Namer, funPrefixNamer } from "../../Naming.js";
 import type { RenderContext } from "../../Renderer.js";
 import type { OptionValues } from "../../RendererOptions/index.js";
@@ -239,19 +238,14 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
 
     protected emitTypes(): void {
         this.forEachTopLevel("none", (t, name) => {
-            const isSchemaArray =
-                t instanceof ArrayType &&
-                schemaArrayTypeAttributeKind.tryGetInAttributes(
-                    t.getAttributes(),
-                ) === "explicit";
-            if (!t.isPrimitive() && !isSchemaArray) {
+            if (!t.isPrimitive() && !(t instanceof ArrayType)) {
                 return;
             }
 
             this.ensureBlankLine();
             this.emitDescription(this.descriptionForType(t));
             this.emitLine(
-                isSchemaArray ? "export type " : "type ",
+                t instanceof ArrayType ? "export type " : "type ",
                 name,
                 " = ",
                 this.sourceFor(t).source,
