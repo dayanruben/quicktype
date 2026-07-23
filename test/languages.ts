@@ -226,8 +226,6 @@ export const CSharpLanguageSystemTextJson: Language = {
         // Suppressing the DateOnly/TimeOnly converters (for pre-.NET 6
         // targets) must still produce compiling, round-tripping code.
         ["unions.json", { "dateonly-timeonly-converters": "false" }],
-        // C# 9+ records; end-to-end round-trip with System.Text.Json.
-        { "use-records": "true" },
     ],
     sourceFiles: ["src/language/CSharp/index.ts"],
 };
@@ -1333,7 +1331,7 @@ export const Smithy4sLanguage: Language = {
         "name-style.json",
 
         /*
-I havea no idea how to encode these tests correctly. 
+I havea no idea how to encode these tests correctly.
 */
         "kitchen-sink.json",
         "26c9c.json",
