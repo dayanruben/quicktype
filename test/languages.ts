@@ -172,6 +172,14 @@ export const CSharpLanguage: Language = {
     sourceFiles: ["src/language/CSharp/index.ts"],
 };
 
+export const CSharpLanguageRecords: Language = {
+    ...CSharpLanguage,
+    rendererOptions: {
+        ...CSharpLanguage.rendererOptions,
+        "use-records": "true",
+    },
+};
+
 export const CSharpLanguageSystemTextJson: Language = {
     name: "csharp",
     base: "test/fixtures/csharp-SystemTextJson",
@@ -1344,7 +1352,7 @@ export const Smithy4sLanguage: Language = {
         "name-style.json",
 
         /*
-I havea no idea how to encode these tests correctly. 
+I havea no idea how to encode these tests correctly.
 */
         "kitchen-sink.json",
         "26c9c.json",
