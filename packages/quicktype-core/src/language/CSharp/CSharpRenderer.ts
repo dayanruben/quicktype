@@ -59,6 +59,9 @@ export class CSharpRenderer extends ConvenienceRenderer {
             "DateTimeOffset",
             "Guid",
             "Uri",
+            ...(this._csOptions.useRecords
+                ? ["Clone", "EqualityContract", "PrintMembers"]
+                : []),
         ];
     }
 
