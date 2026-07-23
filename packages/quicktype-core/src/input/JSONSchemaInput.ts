@@ -32,6 +32,10 @@ import {
 import { defaultValueAttributeProducer } from "../attributes/DefaultValue.js";
 import { descriptionAttributeProducer } from "../attributes/Description.js";
 import { enumValuesAttributeProducer } from "../attributes/EnumValues.js";
+import {
+    inferredTopLevelSchemaComment,
+    schemaArrayTypeAttributeKind,
+} from "../attributes/InferenceFlags.js";
 import { StringTypes } from "../attributes/StringTypes.js";
 import {
     type TypeAttributes,
@@ -1039,7 +1043,9 @@ async function addTypesInSchema(
         async function makeArrayType(
             arrayAttributes: TypeAttributes,
         ): Promise<TypeRef> {
-            const singularAttributes = singularizeTypeNames(typeAttributes);
+            const singularAttributes = makeTypeAttributesInferred(
+                singularizeTypeNames(typeAttributes),
+            );
             const items = schema.items;
             // JSON Schema 2020-12 renamed the array (tuple) form of `items` to
             // `prefixItems`; treat it the same as a draft-07 array-valued
@@ -1107,7 +1113,20 @@ async function addTypesInSchema(
             }
 
             typeBuilder.addAttributes(itemType, singularAttributes);
-            return typeBuilder.getArrayType(arrayAttributes, itemType);
+            const provenanceAttributes =
+                schemaArrayTypeAttributeKind.makeAttributes(
+                    schema.$comment === inferredTopLevelSchemaComment
+                        ? "inferred"
+                        : "explicit",
+                );
+            return typeBuilder.getArrayType(
+                combineTypeAttributes(
+                    "union",
+                    arrayAttributes,
+                    provenanceAttributes,
+                ),
+                itemType,
+            );
         }
 
         async function makeObjectType(): Promise<TypeRef> {

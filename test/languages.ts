@@ -1558,6 +1558,10 @@ export const KotlinJacksonLanguage: Language = {
         "top-level-enum.schema",
         "top-level-primitive.schema",
         "recursive-union-flattening.schema",
+        // Jackson cannot deserialize the generated ArrayList subclass because
+        // it has no default constructor.
+        "top-level-array.schema",
+        "top-level-primitive-array.schema",
         // A top-level array is deserialized into an `ArrayList<Long>` whose
         // element type is erased at runtime, so a mistyped element
         // round-trips instead of failing.
@@ -1706,6 +1710,8 @@ export const KotlinXLanguage: Language = {
         // Top-level array: `typealias TopLevel = JsonArray<T>` doesn't
         // compile (documented TODO in KotlinXRenderer.ts).
         "union.schema",
+        "top-level-array.schema",
+        "top-level-primitive-array.schema",
         "issue2680-top-level-array.schema",
     ],
     skipMiscJSON: false,
@@ -1976,6 +1982,8 @@ export const PHPLanguage: Language = {
         "top-level-enum.schema",
         // The driver does not support top-level arrays.
         "union.schema",
+        "top-level-array.schema",
+        "top-level-primitive-array.schema",
         "issue2680-top-level-array.schema",
     ],
     rendererOptions: {},
@@ -2275,6 +2283,10 @@ export const ElixirLanguage: Language = {
         "required.schema",
         // The default-value fail sample also relies on required-property enforcement.
         "default-value.schema",
+        // The renderer references a nonexistent TopLevelElement module for
+        // top-level arrays.
+        "top-level-array.schema",
+        "top-level-primitive-array.schema",
         "boolean-subschema.schema",
         "intersection.schema",
         "optional-any.schema",
