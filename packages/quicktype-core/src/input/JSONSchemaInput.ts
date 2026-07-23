@@ -1277,6 +1277,7 @@ async function addTypesInSchema(
             typeSet !== undefined ||
             schema.properties !== undefined ||
             schema.additionalProperties !== undefined ||
+            schema.unevaluatedProperties !== undefined ||
             schema.items !== undefined ||
             schema.prefixItems !== undefined ||
             schema.required !== undefined ||
