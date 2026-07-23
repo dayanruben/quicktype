@@ -84,20 +84,20 @@ describe("TypeScript top-level arrays", () => {
         expect(output).toContain("export type SomeInput = string[];");
     });
 
-    test("JSON sample arrays still collapse to the element type", async () => {
+    test("JSON sample arrays emit an alias", async () => {
         const sample = '[{"label":"a","score":1},{"label":"b","score":2}]';
         const output = await typesForJSON("Sample", sample);
 
-        expect(output).toContain("export interface Sample");
-        expect(output).not.toContain("export type Sample =");
+        expect(output).toContain("export type Sample = SampleElement[];");
+        expect(output).toContain("export interface SampleElement");
         expect(await typesForJSONViaSchema("Sample", sample)).toBe(output);
     });
 
-    test("JSON primitive arrays still round-trip without an alias", async () => {
+    test("JSON primitive arrays emit an alias", async () => {
         const sample = '["one","two"]';
         const output = await typesForJSON("Sample", sample);
 
-        expect(output).toBe("");
+        expect(output).toContain("export type Sample = string[];");
         expect(await typesForJSONViaSchema("Sample", sample)).toBe(output);
     });
 });
