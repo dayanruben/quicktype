@@ -20,11 +20,7 @@ import {
     type Type,
     UnionType,
 } from "../../Type/index.js";
-import {
-    directlyReachableSingleNamedType,
-    matchType,
-    nullableFromUnion,
-} from "../../Type/TypeUtils.js";
+import { matchType, nullableFromUnion } from "../../Type/TypeUtils.js";
 import {
     JavaScriptRenderer,
     type JavaScriptTypeAnnotations,
@@ -241,9 +237,8 @@ export abstract class TypeScriptFlowBaseRenderer extends JavaScriptRenderer {
     }
 
     protected emitTypes(): void {
-        // Emit top levels whose name isn't used by forEachNamedType below.
         this.forEachTopLevel("none", (t, name) => {
-            if (directlyReachableSingleNamedType(t) !== undefined) {
+            if (this.namedTypeToNameForTopLevel(t) !== undefined) {
                 return;
             }
 

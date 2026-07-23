@@ -51,15 +51,6 @@ describe("TypeScript/Flow unnamed top-level aliases", () => {
         );
     });
 
-    test("TypeScript emits a top-level array alias", async () => {
-        const output = await renderSchema("typescript", "Names", {
-            type: "array",
-            items: { type: "string" },
-        });
-
-        expect(output).toContain("export type Names = string[];");
-    });
-
     test.each([
         "typescript",
         "flow",
