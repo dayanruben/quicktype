@@ -1228,6 +1228,9 @@ export const Scala3Language: Language = {
     diffViaSchema: true,
     skipDiffViaSchema: [
         "bug427.json",
+        // Property names generated from JSON and JSON Schema can differ when
+        // they collide with differently inferred class names.
+        "blns-object.json",
         // These round-trip fine; the code generated via JSON Schema
         // orders one property differently (a pre-existing
         // alphabetization quirk around renamed keyword properties).
@@ -1241,27 +1244,10 @@ export const Scala3Language: Language = {
     features: ["enum", "union", "no-defaults"],
     output: "TopLevel.scala",
     topLevel: "TopLevel",
-    skipJSON: [
-        // The renderer emits raw JSON property names as (backticked)
-        // Scala identifiers, so empty names, a bare "_", and names
-        // containing backticks or line separators cannot compile, and
-        // properties named "None"/"Option" generate case classes that
-        // shadow the Scala prelude.
-        "blns-object.json",
-        "identifiers.json",
-        "simple-identifiers.json",
-        "keywords.json",
-        "nst-test-suite.json",
-
-        // Scala3 has the same prelude-shadowing bug that this input
-        // guards against in Rust (issue #2521): a field named "options"
-        // generates `case class Option`, which shadows scala.Option.
-        "bug2521.json",
-    ],
+    skipJSON: [],
     skipSchema: [
         "integer-before-number.schema", // Python-specific union-order regression.
-        // Same raw-identifier limitation as in skipJSON: a property
-        // named "_" and classes shadowing None/Option don't compile.
+        // The generated case class exceeds the JVM's 254-parameter limit.
         "keyword-unions.schema",
     ],
     skipMiscJSON: false,
@@ -1279,6 +1265,9 @@ export const Scala3UpickleLanguage: Language = {
     diffViaSchema: true,
     skipDiffViaSchema: [
         "bug427.json",
+        // Property names generated from JSON and JSON Schema can differ when
+        // they collide with differently inferred class names.
+        "blns-object.json",
         // These round-trip fine; the code generated via JSON Schema
         // orders one property differently (a pre-existing
         // alphabetization quirk around renamed keyword properties).
@@ -1292,27 +1281,10 @@ export const Scala3UpickleLanguage: Language = {
     features: ["enum", "union", "no-defaults"],
     output: "TopLevel.scala",
     topLevel: "TopLevel",
-    skipJSON: [
-        // The renderer emits raw JSON property names as (backticked)
-        // Scala identifiers, so empty names, a bare "_", and names
-        // containing backticks or line separators cannot compile, and
-        // properties named "None"/"Option" generate case classes that
-        // shadow the Scala prelude.
-        "blns-object.json",
-        "identifiers.json",
-        "simple-identifiers.json",
-        "keywords.json",
-        "nst-test-suite.json",
-
-        // Scala3 has the same prelude-shadowing bug that this input
-        // guards against in Rust (issue #2521): a field named "options"
-        // generates `case class Option`, which shadows scala.Option.
-        "bug2521.json",
-    ],
+    skipJSON: [],
     skipSchema: [
         "integer-before-number.schema", // Python-specific union-order regression.
-        // Same raw-identifier limitation as in skipJSON: a property
-        // named "_" and classes shadowing None/Option don't compile.
+        // The generated case class exceeds the JVM's 254-parameter limit.
         "keyword-unions.schema",
     ],
     skipMiscJSON: false,
