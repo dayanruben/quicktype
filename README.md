@@ -5,6 +5,13 @@
 
 `quicktype` generates strongly-typed models and serializers from JSON, JSON Schema, TypeScript, and [GraphQL queries](https://blog.quicktype.io/graphql-with-quicktype/), making it a breeze to work with JSON type-safely in many programming languages.
 
+This fork is a compatibility validation target. npm, VS Code Marketplace, and
+hosted output-diff publication run only in `glideapps/quicktype`; build, unit,
+fixture, and generated-output comparison checks remain available in forks.
+Security overrides keep Glob, Minimatch, and Mocha's JavaScript serializer on
+patched versions while their parent packages retain older dependency ranges.
+Run the build, unit and fixture checks after changing these overrides.
+
 -   [Try `quicktype` in your browser](https://app.quicktype.io).
 -   Read ['A first look at quicktype'](http://blog.quicktype.io/first-look/) for more introduction.
 -   If you have any questions, check out the [FAQ](FAQ.md) first.
